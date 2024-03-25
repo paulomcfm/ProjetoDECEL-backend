@@ -9,8 +9,9 @@ export default class AlunoCtrl {
             const rg = dados.rg;
             const observacoes = dados.observacoes;
             const dataNasc = dados.dataNasc;
-            if (nome && rg && observacoes && dataNasc) {
-                const aluno = new Aluno(0, nome, rg, observacoes, dataNasc);
+            const resposavel = dados.responsaveis;
+            const aluno = new Aluno(0, nome, rg, observacoes, dataNasc);
+            if (nome && aluno.validarRG(rg) && aluno.validaDataNascimento(dataNasc)) {
                 aluno.gravar().then(() => {
                     resposta.status(200).json({
                         "status": true,

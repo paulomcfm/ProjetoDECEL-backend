@@ -1,6 +1,7 @@
 import AlunoDAO from "../persistencia/alunoDAO.js";
+import Pessoa from "./ipessoa.js";
 
-export default class Aluno {
+export default class Aluno extends Pessoa {
     #codigo;
     #nome;
     #rg;
@@ -9,6 +10,7 @@ export default class Aluno {
     #responsaveis;
 
     constructor(codigo = 0, nome = '', rg = '', observacoes = '', dataNasc = '') {
+        super();
         this.#codigo = codigo;
         this.#nome = nome;
         this.#rg = rg;
@@ -63,6 +65,23 @@ export default class Aluno {
 
     set responsaveis(novoResponsavel) {
         this.#responsaveis = novoResponsavel;
+    }
+
+    validaDataNascimento(data) {
+        return true;
+    }
+    
+
+    validarRG(rg){
+        if (rg.length !== 9) {
+            return false;
+        }
+        for (let i = 0; i < rg.length; i++) {
+            if (isNaN(parseInt(rg[i]))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     toJSON() {
