@@ -1,40 +1,38 @@
-import Aluno from "../modelo/aluno.js";
+import Parentesco from "../modelo/parentesco.js";
 
-export default class AlunoCtrl {
+export default class ParentescoCtrl {
     gravar(requisicao, resposta) {
         resposta.type('application/json');
         if (requisicao.method === 'POST') {
             const dados = requisicao.body;
-            const nome = dados.nome;
-            const rg = dados.rg;
-            const observacoes = dados.observacoes;
-            const dataNasc = dados.dataNasc;
-            const aluno = new Aluno(0, nome, rg, observacoes, dataNasc);
-            if (nome && aluno.validarRG(rg) && aluno.validaDataNascimento(dataNasc)) {
-                aluno.gravar().then(() => {
+            const codigoAluno = dados.codigoAluno;
+            const codigoResponsavel = dados.codigoResponsavel;
+            const par = dados.parentesco;
+            const parentesco = new Parentesco(codigoAluno, codigoResponsavel, par);
+            if (codigoAluno > 0 && codigoResponsavel > 0 && par) {
+                parentesco.gravar().then(() => {
                     resposta.status(200).json({
                         "status": true,
-                        "codigoGerado": aluno.codigo,
-                        "mensagem": 'Aluno incluida com sucesso!'
+                        "mensagem": 'Parentesco incluido com sucesso!'
                     });
                 }).catch((erro) => {
                     resposta.status(500).json({
                         "status": false,
-                        "mensagem": 'Erro ao registrar o aluno: ' + erro.message
+                        "mensagem": 'Erro ao registrar o parentesco: ' + erro.message
                     });
                 });
             }
             else {
                 resposta.status(400).json({
                     "status": false,
-                    "mensagem": 'Por favor, informe o nome do aluno!'
+                    "mensagem": 'Por favor, informe o parentesco!'
                 });
             }
         }
         else {
             resposta.status(400).json({
                 "status": false,
-                "mensagem": 'Por favor, utilize o método POST para cadastrar um aluno!'
+                "mensagem": 'Por favor, utilize o método POST para cadastrar um parentesco!'
             });
         }
     }
@@ -43,37 +41,35 @@ export default class AlunoCtrl {
         resposta.type('application/json');
         if ((requisicao.method === 'PUT' || requisicao.method === 'PATCH') && requisicao.is('application/json')) {
             const dados = requisicao.body;
-            const codigo = dados.codigo;
-            const nome = dados.nome;
-            const rg = dados.rg;
-            const observacoes = dados.observacoes;
-            const dataNasc = dados.dataNasc;
-            if (codigo>=0 && nome && rg && observacoes && dataNasc) {
-                const aluno = new Aluno(codigo, nome, rg, observacoes, dataNasc);
-                aluno.atualizar().then(() => {
+            const codigoAluno = dados.codigoAluno;
+            const codigoResponsavel = dados.codigoResponsavel;
+            const par = dados.parentesco;
+            const parentesco = new Parentesco(codigoAluno, codigoResponsavel, par);
+            if (codigoAluno > 0 && codigoResponsavel > 0 && par) {
+                const parentesco = new Parentesco();
+                parentesco.atualizar().then(() => {
                     resposta.status(200).json({
                         "status": true,
-                        "codigoGerado": aluno.codigo,
-                        "mensagem": 'Aluno alterado com sucesso!'
+                        "mensagem": 'Parentesco alterado com sucesso!'
                     });
                 }).catch((erro) => {
                     resposta.status(500).json({
                         "status": false,
-                        "mensagem": 'Erro ao alterar o aluno: ' + erro.message
+                        "mensagem": 'Erro ao alterar o parentesco: ' + erro.message
                     });
                 });
             }
             else {
                 resposta.status(400).json({
                     "status": false,
-                    "mensagem": 'Por favor, informe o codigo e o nome do aluno!'
+                    "mensagem": 'Por favor, informe o parentesco!'
                 });
             }
         }
         else {
             resposta.status(400).json({
                 "status": false,
-                "mensagem": 'Por favor, utilize os métodos PUT ou PATCH para atualizar um aluno!'
+                "mensagem": 'Por favor, utilize os métodos PUT ou PATCH para atualizar um parentesco!'
             });
         }
     }
@@ -82,33 +78,33 @@ export default class AlunoCtrl {
         resposta.type('application/json');
         if (requisicao.method === 'DELETE' && requisicao.is('application/json')) {
             const dados = requisicao.body;
-            const codigo = dados.codigo;
-            if (codigo>=0) {
-                const aluno = new Aluno(codigo);
-                aluno.excluir().then(() => {
+            const codigoAluno = dados.codigoAluno;
+            const codigoResponsavel = dados.codigoResponsavel;
+            if (codigoAluno >0 && codigoResponsavel >0) {
+                const parentesco = new Parentesco(codigoAluno, codigoResponsavel, '');
+                parentesco.excluir().then(() => {
                     resposta.status(200).json({
                         "status": true,
-                        "codigoGerado": aluno.codigo,
-                        "mensagem": 'Aluno excluído com sucesso!'
+                        "mensagem": 'Parentesco excluído com sucesso!'
                     });
                 }).catch((erro) => {
                     resposta.status(500).json({
                         "status": false,
-                        "mensagem": 'Erro ao excluir o aluno: ' + erro.message
+                        "mensagem": 'Erro ao excluir o parentesco: ' + erro.message
                     });
                 });
             }
             else {
                 resposta.status(400).json({
                     "status": false,
-                    "mensagem": 'Por favor, informe o codigo do aluno!'
+                    "mensagem": 'Por favor, informe o codigo do parentesco!'
                 });
             }
         }
         else {
             resposta.status(400).json({
                 "status": false,
-                "mensagem": 'Por favor, utilize os métodos DELETE para excluir um aluno!'
+                "mensagem": 'Por favor, utilize os métodos DELETE para excluir um parentesco!'
             });
         }
     }
@@ -120,23 +116,23 @@ export default class AlunoCtrl {
             termo = '';
         }
         if (requisicao.method === 'GET') {
-            const alunos = new Aluno();
-            alunos.consultar(termo).then((listaAlunos) => {
+            const parentescos = new Parentesco();
+            parentescos.consultar(termo).then((listaParentescos) => {
                 resposta.json({
                     "status": true,
-                    "listaAlunos": listaAlunos
+                    "listaParentescos": listaParentescos
                 });
             }).catch((erro) => {
                 resposta.status(500).json({
                     "status": false,
-                    "mensagem": 'Erro ao consultar os alunos: ' + erro.message
+                    "mensagem": 'Erro ao consultar os parentescos: ' + erro.message
                 });
             });
         }
         else {
             resposta.status(400).json({
                 "status": false,
-                "mensagem": 'Por favor, utilize o método GET para consultar os alunos!'
+                "mensagem": 'Por favor, utilize o método GET para consultar os parentescos!'
             });
         }
     }

@@ -22,3 +22,12 @@ CREATE TABLE Alunos (
     alu_observacoes VARCHAR(255),
     alu_datanasc DATE NOT NULL
 );
+
+CREATE TABLE Parentescos(
+    alu_codigo INT NOT NULL,
+    resp_codigo INT NOT NULL,
+    par_parentesco VARCHAR(45) NOT NULL,
+    CONSTRAINT pk_parentesco PRIMARY KEY (alu_codigo, resp_codigo),
+    CONSTRAINT fk_aluparentesco FOREIGN KEY (alu_codigo) REFERENCES Alunos(alu_codigo),
+    CONSTRAINT fk_respparentesco FOREIGN KEY (resp_codigo) REFERENCES Responsaveis(resp_codigo)
+);
