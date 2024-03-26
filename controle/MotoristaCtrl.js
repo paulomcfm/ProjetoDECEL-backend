@@ -1,4 +1,4 @@
-import Motorista from '../Modelo/motorista.js'
+import Motorista from '../modelo/motorista.js'
 
 export default class MotoristaCtrl{
     
