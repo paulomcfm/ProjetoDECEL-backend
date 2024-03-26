@@ -5,7 +5,7 @@ import poolConexao from "./conexao.js";
 export default class AlunoDAO {
     async gravar(aluno) {
         if (aluno instanceof Aluno) {
-            const sql = "INSERT INTO alunos(alu_nome, alu_rg, alu_observacoes, alu_dataNasc) VALUES(?,?,?,?)";
+            const sql = "INSERT INTO alunos(alu_nome, alu_rg, alu_observacoes, alu_dataNasc) VALUES($1,$2,$3,$4)";
             const parametros = [aluno.nome, aluno.rg, aluno.observacoes, aluno.dataNasc];
             
             const retorno = await poolConexao.query(sql, parametros);
@@ -14,7 +14,7 @@ export default class AlunoDAO {
 
     async atualizar(aluno) {
         if (aluno instanceof Aluno) {
-            const sql = "UPDATE alunos SET alu_nome = ?, alu_rg = ?, alu_observacoes = ?, alu_dataNasc = ? WHERE alu_codigo = ?";
+            const sql = "UPDATE alunos SET alu_nome = $1, alu_rg = $2, alu_observacoes = $3, alu_dataNasc = $4 WHERE alu_codigo = $5";
             const parametros = [aluno.nome, aluno.rg, aluno.observacoes, aluno.dataNasc, aluno.codigo];
             
             await poolConexao.query(sql, parametros);
@@ -24,7 +24,7 @@ export default class AlunoDAO {
 
     async excluir(aluno) {
         if (aluno instanceof Aluno) {
-            const sql = "DELETE FROM alunos WHERE alu_codigo = ?";
+            const sql = "DELETE FROM alunos WHERE alu_codigo = $1";
             const parametros = [aluno.codigo];
             
             await poolConexao.query(sql, parametros);
@@ -36,14 +36,14 @@ export default class AlunoDAO {
         let sql = '';
         let parametros = [];
         if (!isNaN(parseInt(parametroConsulta))) {
-            sql = 'SELECT * FROM alunos WHERE alu_codigo = ? order by alu_nome';
+            sql = 'SELECT * FROM alunos WHERE alu_codigo = $1 order by alu_nome';
             parametros = [parametroConsulta];
         }
         else {
             if (!parametroConsulta) {
                 parametroConsulta = '';
             }
-            sql = "SELECT * FROM alunos WHERE alu_nome like ?";
+            sql = "SELECT * FROM alunos WHERE alu_nome like $1";
             parametros = ['%' + parametroConsulta + '%'];
         }
         

@@ -4,7 +4,7 @@ import poolConexao from "./conexao.js";
 export default class ParentescoDAO {
     async gravar(parentesco) {
         if (parentesco instanceof Parentesco) {
-            const sql = "INSERT INTO parentescos(alu_codigo, resp_codigo, par_parentesco) VALUES(?,?,?)";
+            const sql = "INSERT INTO parentescos(alu_codigo, resp_codigo, par_parentesco) VALUES($1,$2,$3)";
             const parametros = [parentesco.codigoAluno, parentesco.codigoResponsavel, parentesco.parentesco];
             
             await poolConexao.query(sql, parametros);
@@ -14,7 +14,7 @@ export default class ParentescoDAO {
 
     async atualizar(parentesco) {
         if (parentesco instanceof Parentesco) {
-            const sql = "UPDATE parentescos SET par_parentesco = ? WHERE alu_codigo = ? AND resp_codigo = ?";
+            const sql = "UPDATE parentescos SET par_parentesco = $1 WHERE alu_codigo = $2 AND resp_codigo = $3";
             const parametros = [parentesco.parentesco, parentesco.codigoAluno, parentesco.codigoResponsavel];
             
             await poolConexao.query(sql, parametros);
@@ -24,7 +24,7 @@ export default class ParentescoDAO {
 
     async excluir(parentesco) {
         if (parentesco instanceof Parentesco) {
-            const sql = "DELETE FROM parentescos WHERE alu_codigo = ? AND resp_codigo = ?";
+            const sql = "DELETE FROM parentescos WHERE alu_codigo = $1 AND resp_codigo = $2";
             const parametros = [parentesco.codigoAluno, parentesco.codigoResponsavel];
             
             await poolConexao.query(sql, parametros);
@@ -36,7 +36,7 @@ export default class ParentescoDAO {
         let sql = '';
         let parametros = [];
         if (!isNaN(parseInt(parametroConsulta[0])) && !isNaN(parseInt(parametroConsulta[1]))) {
-            sql = 'SELECT * FROM parentescos WHERE alu_codigo = ? AND resp_codigo = ?';
+            sql = 'SELECT * FROM parentescos WHERE alu_codigo = $1 AND resp_codigo = $2';
             parametros = [parametroConsulta];
         }
         else {
@@ -57,7 +57,7 @@ export default class ParentescoDAO {
         let sql = '';
         let parametros = [];
         if (!isNaN(parseInt(parametroConsulta))) {
-            sql = 'SELECT * FROM parentescos WHERE alu_codigo = ?';
+            sql = 'SELECT * FROM parentescos WHERE alu_codigo = $1';
             parametros = [parametroConsulta];
         }
         
