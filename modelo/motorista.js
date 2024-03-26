@@ -1,4 +1,4 @@
-import motoristaDAO from "../Persistencia/motoristaDAO.js"
+import motoristaDAO from "../persistencia/motoristaDAO.js"
 export default class Motorista{
     #id;
     #nome;

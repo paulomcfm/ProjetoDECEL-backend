@@ -1,4 +1,3 @@
-import Motorista from "../Modelo/motorista.js";
 import poolConexao from "./conexao.js";
 
 export default class motoristaDAO{
