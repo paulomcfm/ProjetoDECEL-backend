@@ -7,8 +7,8 @@ import cors from 'cors';
 import rotaPontoEmbarque from './rotas/rotaPontoEmbarque.js';
 import rotaMotorista from './rotas/rotaMotorista.js'
 const app = express();
-const porta = 4000;
-const host = '0.0.0.0';
+
+const porta = '8080'
 
 app.use(express.json());
 app.use(cors({origin:"*"}));
@@ -21,6 +21,5 @@ app.use('/responsavel', rotaResponsavel);
 app.use('/pontos-embarque', rotaPontoEmbarque);
 app.use('/motorista',rotaMotorista)
 
-app.listen(porta, host, () => {
-    console.log(`API do sistema em execução: ${host}:${porta}`);
-});
+
+app.listen(porta,()=>{console.log("servidor iniciado "+porta)})
