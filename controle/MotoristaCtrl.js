@@ -2,7 +2,6 @@ import Motorista from '../Modelo/motorista.js'
 
 export default class MotoristaCtrl{
     
-
     
     async gravar(requisicao,resposta){
         const body = requisicao.body;

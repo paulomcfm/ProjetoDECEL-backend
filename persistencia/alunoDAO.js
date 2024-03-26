@@ -1,15 +1,14 @@
 import Aluno from "../modelo/aluno.js";
-import conectar from "./conexao.js";
+import poolConexao from "./conexao.js";
+
 
 export default class AlunoDAO {
     async gravar(aluno) {
         if (aluno instanceof Aluno) {
             const sql = "INSERT INTO alunos(alu_nome, alu_rg, alu_observacoes, alu_dataNasc) VALUES(?,?,?,?)";
             const parametros = [aluno.nome, aluno.rg, aluno.observacoes, aluno.dataNasc];
-            const conexao = await conectar();
-            const retorno = await conexao.query(sql, parametros);
-            aluno.codigo = retorno[0].insertId;
-            global.poolConexoes.releaseConnection(conexao);
+            
+            const retorno = await poolConexao.query(sql, parametros);
         }
     }
 
@@ -17,9 +16,9 @@ export default class AlunoDAO {
         if (aluno instanceof Aluno) {
             const sql = "UPDATE alunos SET alu_nome = ?, alu_rg = ?, alu_observacoes = ?, alu_dataNasc = ? WHERE alu_codigo = ?";
             const parametros = [aluno.nome, aluno.rg, aluno.observacoes, aluno.dataNasc, aluno.codigo];
-            const conexao = await conectar();
-            await conexao.query(sql, parametros);
-            global.poolConexoes.releaseConnection(conexao);
+            
+            await poolConexao.query(sql, parametros);
+            
         }
     }
 
@@ -27,9 +26,9 @@ export default class AlunoDAO {
         if (aluno instanceof Aluno) {
             const sql = "DELETE FROM alunos WHERE alu_codigo = ?";
             const parametros = [aluno.codigo];
-            const conexao = await conectar();
-            await conexao.query(sql, parametros);
-            global.poolConexoes.releaseConnection(conexao);
+            
+            await poolConexao.query(sql, parametros);
+            
         }
     }
 
@@ -47,8 +46,8 @@ export default class AlunoDAO {
             sql = "SELECT * FROM alunos WHERE alu_nome like ?";
             parametros = ['%' + parametroConsulta + '%'];
         }
-        const conexao = await conectar();
-        const { rows: registros, fields: campos } = await client.query(sql, parametros);
+        
+        const { rows: registros, fields: campos } = await poolConexao.query(sql, parametros);
         let listaAlunos = [];
         for (const registro of registros) {
             const aluno = new Aluno(registro.alu_codigo, registro.alu_nome, registro.alu_rg, registro.alu_observacoes, registro.alu_datanasc);
