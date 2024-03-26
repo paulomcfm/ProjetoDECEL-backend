@@ -3,6 +3,7 @@ import rotaEscola from './rotas/rotaEscola.js';
 import rotaResponsavel from './rotas/rotaResponsavel.js';
 import rotaAluno from './rotas/rotaAluno.js';
 import rotaParentesco from './rotas/rotaParentesco.js';
+import rotaMotorista from './rotas/rotaMotorista.js'
 import cors from 'cors';
 
 
@@ -18,6 +19,7 @@ app.use('/parentesco', rotaParentesco);
 app.use('/escola', rotaEscola);
 app.use('/aluno', rotaAluno);
 app.use('/responsavel', rotaResponsavel);
+app.use('/motoristas',rotaMotorista)
 
 app.listen(porta, host, () => {
     console.log(`API do sistema em execução: ${host}:${porta}`);
