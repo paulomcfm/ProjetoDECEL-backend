@@ -1,5 +1,5 @@
 import { Router } from "express";
-import MotoristaCtrl from "./Controle/MotoristaCtrl.js";
+import MotoristaCtrl from '../controle/MotoristaCtrl.js'
 
 const motoristaCtrl = new MotoristaCtrl();
 const rotaMotorista = new Router()

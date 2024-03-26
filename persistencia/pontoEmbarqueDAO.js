@@ -7,7 +7,7 @@ export default class PontoEmbarqueDAO {
             const sql = "INSERT INTO pontos_de_embarque(pde_endereco) VALUES(?)";
             const parametros = [pontoEmbarque.endereco];
             const conexao = await conectar();
-            const retorno = await conexao.execute(sql, parametros);
+            const retorno = await conexao.query(sql, parametros);
             pontoEmbarque.codigo = retorno[0].insertId;
             global.poolConexoes.releaseConnection(conexao);
         }
@@ -18,7 +18,7 @@ export default class PontoEmbarqueDAO {
             const sql = "UPDATE pontos_de_embarque SET pde_endereco = ? WHERE pde_codigo = ?";
             const parametros = [pontoEmbarque.endereco, pontoEmbarque.codigo];
             const conexao = await conectar();
-            await conexao.execute(sql, parametros);
+            await conexao.query(sql, parametros);
             global.poolConexoes.releaseConnection(conexao);
         }
     }
@@ -28,7 +28,7 @@ export default class PontoEmbarqueDAO {
             const sql = "DELETE FROM pontos_de_embarque WHERE pde_codigo = ?";
             const parametros = [pontoEmbarque.codigo];
             const conexao = await conectar();
-            await conexao.execute(sql, parametros);
+            await conexao.query(sql, parametros);
             global.poolConexoes.releaseConnection(conexao);
         }
     }
@@ -48,7 +48,7 @@ export default class PontoEmbarqueDAO {
             parametros = ['%' + parametroConsulta + '%'];
         }
         const conexao = await conectar();
-        const [registros, campos] = await conexao.execute(sql, parametros);
+        const { rows: registros, fields: campos } = await client.query(sql, parametros);
         let listaPontosEmbarque = [];
         for (const registro of registros) {
             const pontoEmbarque = new PontoEmbarque(registro.pde_codigo, registro.pde_endereco);

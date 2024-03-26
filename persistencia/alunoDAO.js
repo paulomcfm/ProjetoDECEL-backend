@@ -7,7 +7,7 @@ export default class AlunoDAO {
             const sql = "INSERT INTO alunos(alu_nome, alu_rg, alu_observacoes, alu_dataNasc) VALUES(?,?,?,?)";
             const parametros = [aluno.nome, aluno.rg, aluno.observacoes, aluno.dataNasc];
             const conexao = await conectar();
-            const retorno = await conexao.execute(sql, parametros);
+            const retorno = await conexao.query(sql, parametros);
             aluno.codigo = retorno[0].insertId;
             global.poolConexoes.releaseConnection(conexao);
         }
@@ -18,7 +18,7 @@ export default class AlunoDAO {
             const sql = "UPDATE alunos SET alu_nome = ?, alu_rg = ?, alu_observacoes = ?, alu_dataNasc = ? WHERE alu_codigo = ?";
             const parametros = [aluno.nome, aluno.rg, aluno.observacoes, aluno.dataNasc, aluno.codigo];
             const conexao = await conectar();
-            await conexao.execute(sql, parametros);
+            await conexao.query(sql, parametros);
             global.poolConexoes.releaseConnection(conexao);
         }
     }
@@ -28,7 +28,7 @@ export default class AlunoDAO {
             const sql = "DELETE FROM alunos WHERE alu_codigo = ?";
             const parametros = [aluno.codigo];
             const conexao = await conectar();
-            await conexao.execute(sql, parametros);
+            await conexao.query(sql, parametros);
             global.poolConexoes.releaseConnection(conexao);
         }
     }
@@ -48,7 +48,7 @@ export default class AlunoDAO {
             parametros = ['%' + parametroConsulta + '%'];
         }
         const conexao = await conectar();
-        const [registros, campos] = await conexao.execute(sql, parametros);
+        const { rows: registros, fields: campos } = await client.query(sql, parametros);
         let listaAlunos = [];
         for (const registro of registros) {
             const aluno = new Aluno(registro.alu_codigo, registro.alu_nome, registro.alu_rg, registro.alu_observacoes, registro.alu_datanasc);

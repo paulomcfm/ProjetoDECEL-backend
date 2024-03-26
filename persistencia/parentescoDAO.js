@@ -7,7 +7,7 @@ export default class ParentescoDAO {
             const sql = "INSERT INTO parentescos(alu_codigo, resp_codigo, par_parentesco) VALUES(?,?,?)";
             const parametros = [parentesco.codigoAluno, parentesco.codigoResponsavel, parentesco.parentesco];
             const conexao = await conectar();
-            await conexao.execute(sql, parametros);
+            await conexao.query(sql, parametros);
             global.poolConexoes.releaseConnection(conexao);
         }
     }
@@ -17,7 +17,7 @@ export default class ParentescoDAO {
             const sql = "UPDATE parentescos SET par_parentesco = ? WHERE alu_codigo = ? AND resp_codigo = ?";
             const parametros = [parentesco.parentesco, parentesco.codigoAluno, parentesco.codigoResponsavel];
             const conexao = await conectar();
-            await conexao.execute(sql, parametros);
+            await conexao.query(sql, parametros);
             global.poolConexoes.releaseConnection(conexao);
         }
     }
@@ -27,7 +27,7 @@ export default class ParentescoDAO {
             const sql = "DELETE FROM parentescos WHERE alu_codigo = ? AND resp_codigo = ?";
             const parametros = [parentesco.codigoAluno, parentesco.codigoResponsavel];
             const conexao = await conectar();
-            await conexao.execute(sql, parametros);
+            await conexao.query(sql, parametros);
             global.poolConexoes.releaseConnection(conexao);
         }
     }
@@ -47,7 +47,7 @@ export default class ParentescoDAO {
             parametros = ['%' + parametroConsulta + '%'];
         }
         const conexao = await conectar();
-        const [registros, campos] = await conexao.execute(sql, parametros);
+        const { rows: registros, fields: campos } = await client.query(sql, parametros);
         let listaParentescos = [];
         for (const registro of registros) {
             const parentesco = new Parentesco(registro.alu_codigo, registro.resp_codigo, registro.par_parentesco);
