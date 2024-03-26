@@ -10,12 +10,12 @@ export default class AlunoCtrl {
             const observacoes = dados.observacoes;
             const dataNasc = dados.dataNasc;
             const aluno = new Aluno(0, nome, rg, observacoes, dataNasc);
-            if (nome && aluno.validarRG(rg) && aluno.validaDataNascimento(dataNasc)) {
+            if (nome && aluno.validarRg(rg) && aluno.validarDataNascimento(dataNasc)) {
                 aluno.gravar().then(() => {
                     resposta.status(200).json({
                         "status": true,
                         "codigoGerado": aluno.codigo,
-                        "mensagem": 'Aluno incluida com sucesso!'
+                        "mensagem": 'Aluno incluido com sucesso!'
                     });
                 }).catch((erro) => {
                     resposta.status(500).json({
@@ -48,8 +48,8 @@ export default class AlunoCtrl {
             const rg = dados.rg;
             const observacoes = dados.observacoes;
             const dataNasc = dados.dataNasc;
-            if (codigo>=0 && nome && rg && observacoes && dataNasc) {
-                const aluno = new Aluno(codigo, nome, rg, observacoes, dataNasc);
+            const aluno = new Aluno(codigo, nome, rg, observacoes, dataNasc);
+            if (codigo>=0 && nome && aluno.validarRg(rg) && aluno.validarDataNascimento(dataNasc)) {
                 aluno.atualizar().then(() => {
                     resposta.status(200).json({
                         "status": true,
@@ -114,7 +114,6 @@ export default class AlunoCtrl {
     }
 
     consultar(requisicao, resposta) {
-        resposta.type('application/json');
         let termo = requisicao.params.termo;
         if (!termo) {
             termo = '';

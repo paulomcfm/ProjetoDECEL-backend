@@ -40,11 +40,25 @@ export default class ParentescoDAO {
             parametros = [parametroConsulta];
         }
         else {
-            if (!parametroConsulta) {
-                parametroConsulta = '';
-            }
-            sql = "SELECT * FROM parentescos WHERE par_parentesco like ?";
-            parametros = ['%' + parametroConsulta + '%'];
+            sql = "SELECT * FROM parentescos";
+            parametros = '';
+        }
+        const conexao = await conectar();
+        const [registros, campos] = await conexao.execute(sql, parametros);
+        let listaParentescos = [];
+        for (const registro of registros) {
+            const parentesco = new Parentesco(registro.alu_codigo, registro.resp_codigo, registro.par_parentesco);
+            listaParentescos.push(parentesco);
+        }
+        return listaParentescos;
+    }
+
+    async consultarAluno(parametroConsulta) {
+        let sql = '';
+        let parametros = [];
+        if (!isNaN(parseInt(parametroConsulta))) {
+            sql = 'SELECT * FROM parentescos WHERE alu_codigo = ?';
+            parametros = [parametroConsulta];
         }
         
         const { rows: registros, fields: campos } = await poolConexao.query(sql, parametros);
