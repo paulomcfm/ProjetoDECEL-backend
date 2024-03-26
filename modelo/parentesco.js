@@ -5,7 +5,7 @@ export default class Parentesco {
     #codigoResponsavel;
     #parentesco;
 
-    constructor(codigoAluno = '', codigoResponsavel= '', parentesco= '') {
+    constructor(codigoAluno = 0, codigoResponsavel= 0, parentesco= '') {
         this.#codigoAluno=codigoAluno;
         this.#codigoResponsavel=codigoResponsavel;
         this.#parentesco=parentesco;
@@ -65,5 +65,10 @@ export default class Parentesco {
     async consultar(parametro) {
         const parDAO = new ParentescoDAO();
         return await parDAO.consultar(parametro);
+    }
+
+    async consultarAluno(parametro) {
+        const parDAO = new ParentescoDAO();
+        return await parDAO.consultarAluno(parametro);
     }
 }

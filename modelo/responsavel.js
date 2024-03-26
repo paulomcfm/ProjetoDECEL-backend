@@ -1,7 +1,6 @@
 import ResponsavelDAO from "../persistencia/responsavelDAO.js";
-import Pessoa from "./ipessoa.js";
 
-export default class Responsavel extends Pessoa{
+export default class Responsavel {
     #codigo;
     #nome;
     #rg;
@@ -12,7 +11,6 @@ export default class Responsavel extends Pessoa{
     #alunos;
 
     constructor(codigo = 0, nome = '', rg = '', cpf = '', email = '', telefone = '', celular = '') {
-        super();
         this.#codigo = codigo;
         this.#nome = nome;
         this.#rg = rg;
