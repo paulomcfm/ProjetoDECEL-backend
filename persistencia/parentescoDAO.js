@@ -69,4 +69,21 @@ export default class ParentescoDAO {
         }
         return listaParentescos;
     }
+
+    async consultarResponsavel(parametroConsulta) {
+        let sql = '';
+        let parametros = [];
+        if (!isNaN(parseInt(parametroConsulta))) {
+            sql = 'SELECT * FROM parentescos WHERE resp_codigo = $1';
+            parametros = [parametroConsulta];
+        }
+        
+        const { rows: registros, fields: campos } = await poolConexao.query(sql, parametros);
+        let listaParentescos = [];
+        for (const registro of registros) {
+            const parentesco = new Parentesco(registro.alu_codigo, registro.resp_codigo, registro.par_parentesco);
+            listaParentescos.push(parentesco);
+        }
+        return listaParentescos;
+    }
 }

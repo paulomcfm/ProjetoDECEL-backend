@@ -162,4 +162,31 @@ export default class ParentescoCtrl {
             });
         }
     }
+    consultarResponsavel(requisicao, resposta) {
+        resposta.type('application/json');
+        let termo = requisicao.params.termo;
+        if (!termo) {
+            termo = '';
+        }
+        if (requisicao.method === 'GET') {
+            const parentescos = new Parentesco();
+            parentescos.consultarResponsavel(termo).then((listaParentescos) => {
+                resposta.json({
+                    "status": true,
+                    "listaParentescos": listaParentescos
+                });
+            }).catch((erro) => {
+                resposta.status(500).json({
+                    "status": false,
+                    "mensagem": 'Erro ao consultar os parentescos: ' + erro.message
+                });
+            });
+        }
+        else {
+            resposta.status(400).json({
+                "status": false,
+                "mensagem": 'Por favor, utilize o método GET para consultar os parentescos!'
+            });
+        }
+    }
 }
