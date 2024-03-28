@@ -1,8 +1,14 @@
 CREATE TABLE Escolas (
     esc_codigo INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     esc_nome VARCHAR(255) NOT NULL,
-    esc_endereco VARCHAR(255) NOT NULL,
-    esc_tipo CHAR NOT NULL
+    esc_tipo CHAR NOT NULL,
+    esc_rua VARCHAR(255) NOT NULL,
+    esc_numero INT NOT NULL,
+    esc_cidade VARCHAR(255) NOT NULL,
+    esc_bairro VARCHAR(255) NOT NULL,
+    esc_cep VARCHAR(35) NOT NULL,
+    esc_email VARCHAR(255) NOT NULL,
+    esc_telefone VARCHAR(20) NOT NULL
 );
 
 CREATE TABLE Responsaveis (
