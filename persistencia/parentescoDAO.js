@@ -44,7 +44,6 @@ export default class ParentescoDAO {
             sql = "SELECT * FROM parentescos";
             parametros = '';
         }
-        const conexao = await conectar();
         const { rows: registros, fields: campos } = await poolConexao.query(sql, parametros);
         let listaParentescos = [];
         for (const registro of registros) {
