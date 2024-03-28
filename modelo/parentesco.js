@@ -71,4 +71,9 @@ export default class Parentesco {
         const parDAO = new ParentescoDAO();
         return await parDAO.consultarAluno(parametro);
     }
+    async consultarResponsavel(parametro) {
+        const parDAO = new ParentescoDAO();
+        return await parDAO.consultarResponsavel(parametro);
+    }
+
 }
