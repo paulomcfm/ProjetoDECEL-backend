@@ -6,10 +6,16 @@ export default class EscolaCtrl {
         if (requisicao.method === 'POST' && requisicao.is('application/json')) {
             const dados = requisicao.body;
             const nome = dados.nome;
-            const endereco = dados.endereco;
             const tipo = dados.tipo;
-            if (nome && endereco && tipo) {
-                const escola = new Escola(0, nome, endereco, tipo);
+            const rua = dados.rua
+            const numero = dados.numero;
+            const cidade = dados.cidade;
+            const bairro = dados.bairro;
+            const cep = dados.cep;
+            const email = dados.email;
+            const telefone = dados.telefone
+            if (nome && tipo && rua && rua && numero>=0 && cidade && bairro && email && telefone && cep) {
+                const escola = new Escola(0, nome, tipo, rua, numero, cidade, bairro, cep, email, telefone);
                 escola.gravar().then(() => {
                     resposta.status(200).json({
                         "status": true,
@@ -44,10 +50,16 @@ export default class EscolaCtrl {
             const dados = requisicao.body;
             const codigo = dados.codigo;
             const nome = dados.nome;
-            const endereco = dados.endereco;
             const tipo = dados.tipo;
-            if (codigo>=0 && nome && endereco && tipo) {
-                const escola = new Escola(codigo, nome, endereco, tipo);
+            const rua = dados.rua
+            const numero = dados.numero;
+            const cidade = dados.cidade;
+            const bairro = dados.bairro;
+            const cep = dados.cep;
+            const email = dados.email;
+            const telefone = dados.telefone
+            if (codigo>=0 && nome && tipo && rua && rua && numero>=0 && cidade && bairro && cep && email && telefone) {
+                const escola = new Escola(codigo, nome, tipo, rua, numero, cidade, bairro, cep, email, telefone);
                 escola.atualizar().then(() => {
                     resposta.status(200).json({
                         "status": true,
