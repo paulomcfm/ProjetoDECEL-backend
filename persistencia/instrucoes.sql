@@ -37,3 +37,11 @@ CREATE TABLE Parentescos (
     CONSTRAINT fk_aluparentesco FOREIGN KEY (alu_codigo) REFERENCES Alunos(alu_codigo) ON DELETE CASCADE,
     CONSTRAINT fk_respparentesco FOREIGN KEY (resp_codigo) REFERENCES Responsaveis(resp_codigo) ON DELETE CASCADE
 );
+
+CREATE TABLE Usuarios (
+    user_codigo INT NOT NULL,
+    user_nome VARCHAR(100) NOT NULL,
+    user_senha VARCHAR(255) NOT NULL,
+    user_categoria VARCHAR(15) NOT NULL,
+    CONSTRAINT pk_usuario PRIMARY KEY (user_codigo)
+)
