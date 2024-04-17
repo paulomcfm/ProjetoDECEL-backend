@@ -9,8 +9,9 @@ export default class AlunoCtrl {
             const rg = dados.rg;
             const observacoes = dados.observacoes;
             const dataNasc = dados.dataNasc;
-            const aluno = new Aluno(0, nome, rg, observacoes, dataNasc);
-            if (nome && aluno.validarRg(rg) && aluno.validarDataNascimento(dataNasc)) {
+            const celular = dados.celular;
+            const aluno = new Aluno(0, nome, rg, observacoes, dataNasc, celular);
+            if (nome && rg && aluno.validarDataNascimento(dataNasc)) {
                 aluno.gravar().then(() => {
                     resposta.status(200).json({
                         "status": true,
@@ -48,8 +49,9 @@ export default class AlunoCtrl {
             const rg = dados.rg;
             const observacoes = dados.observacoes;
             const dataNasc = dados.dataNasc;
-            const aluno = new Aluno(codigo, nome, rg, observacoes, dataNasc);
-            if (codigo>=0 && nome && aluno.validarRg(rg) && aluno.validarDataNascimento(dataNasc)) {
+            const celular = dados.celular;
+            const aluno = new Aluno(codigo, nome, rg, observacoes, dataNasc, celular);
+            if (codigo>=0 && nome && rg && aluno.validarDataNascimento(dataNasc)) {
                 aluno.atualizar().then(() => {
                     resposta.status(200).json({
                         "status": true,

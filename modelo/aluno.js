@@ -6,14 +6,16 @@ export default class Aluno {
     #rg;
     #observacoes;
     #dataNasc;
+    #celular;
     #responsaveis;
 
-    constructor(codigo = 0, nome = '', rg = '', observacoes = '', dataNasc = '') {
+    constructor(codigo = 0, nome = '', rg = '', observacoes = '', dataNasc = '', celular = '') {
         this.#codigo = codigo;
         this.#nome = nome;
         this.#rg = rg;
         this.#observacoes = observacoes;
         this.#dataNasc = dataNasc;
+        this.#celular = celular;
         this.#responsaveis = [];
     }
 
@@ -65,6 +67,13 @@ export default class Aluno {
         this.#responsaveis = novoResponsavel;
     }
 
+    get celular() {
+        return this.#celular;
+    }
+
+    set celular(novoCelular) {
+        this.#celular = novoCelular;
+    }
     validarDataNascimento(data) {
         const targetDate = new Date(data);
         const currentDate = new Date();
@@ -73,10 +82,6 @@ export default class Aluno {
         return targetDate <= currentDate && targetDate >= past100Years;
       }
 
-    validarRg(rg) {
-        return /^\d{2}\.\d{3}\.\d{3}-[\dxX]$/.test(rg);
-    }
-
     toJSON() {
         return {
             codigo: this.#codigo,
@@ -84,6 +89,7 @@ export default class Aluno {
             rg: this.#rg,
             observacoes: this.#observacoes,
             dataNasc: this.#dataNasc,
+            celular: this.#celular,
             responsaveis: this.#responsaveis
         }
     }

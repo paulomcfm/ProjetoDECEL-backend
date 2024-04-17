@@ -3,7 +3,6 @@ import poolConexao from "./conexao.js";
 
 export default class ParentescoDAO {
     async gravar(parentesco) {
-        console.log("entrou");
         if (parentesco instanceof Parentesco) {
             const sql = "INSERT INTO parentescos(alu_codigo, resp_codigo, par_parentesco) VALUES($1,$2,$3)";
             const parametros = [parentesco.codigoAluno, parentesco.codigoResponsavel, parentesco.parentesco];
