@@ -2,11 +2,17 @@ import pontoEmbarqueDAO from "../persistencia/pontoEmbarqueDAO.js";
 
 export default class PontoEmbarque {
     #codigo;
-    #endereco;
+    #rua;
+    #numero;
+    #bairro;
+    #cep;
 
-    constructor(codigo = 0, endereco = '') {
+    constructor(codigo = 0, rua = '', numero = 0, bairro = '', cep = '') {
         this.#codigo = codigo;
-        this.#endereco = endereco;
+        this.#rua = rua;
+        this.#numero = numero;
+        this.#bairro = bairro;
+        this.#cep = cep;
     }
 
     get codigo() {
@@ -17,18 +23,45 @@ export default class PontoEmbarque {
         this.#codigo = novoCodigo;
     }
 
-    get endereco() {
-        return this.#endereco;
+    get rua() {
+        return this.#rua
     }
 
-    set endereco(novoEndereco) {
-        this.#endereco = novoEndereco;
+    set rua(novaRua) {
+        this.#rua = novaRua
+    }
+
+    get numero() {
+        return this.#numero;
+    }
+
+    set numero(novoNumero) {
+        this.#numero = novoNumero;
+    }
+
+    get bairro() {
+        return this.#bairro;
+    }
+
+    set bairro(novoBairro) {
+        this.#bairro = novoBairro;
+    }
+
+    get cep() {
+        return this.#cep;
+    }
+
+    set cep(novoCep) {
+        this.#cep = novoCep;
     }
 
     toJSON() {
         return {
             codigo: this.#codigo,
-            endereco: this.#endereco,
+            rua: this.#rua,
+            numero: this.#numero,
+            bairro: this.#bairro,
+            cep: this.#cep
         }
     }
 

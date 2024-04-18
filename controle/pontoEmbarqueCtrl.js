@@ -5,9 +5,12 @@ export default class PontoEmbarqueCtrl {
         resposta.type('application/json');
         if (requisicao.method === 'POST' && requisicao.is('application/json')) {
             const dados = requisicao.body;
-            const endereco = dados.endereco;
-            if (endereco) {
-                const pontoEmbarque = new PontoEmbarque(0, endereco);
+            const rua = dados.rua;
+            const numero = dados.numero;
+            const bairro = dados.bairro;
+            const cep = dados.cep;
+            if (rua && numero && bairro && cep) {
+                const pontoEmbarque = new PontoEmbarque(0, rua, numero, bairro, cep);
                 pontoEmbarque.gravar().then(() => {
                     resposta.status(200).json({
                         "status": true,
@@ -24,7 +27,7 @@ export default class PontoEmbarqueCtrl {
             else {
                 resposta.status(400).json({
                     "status": false,
-                    "mensagem": 'Por favor, informe o endereço do ponto de embarque!'
+                    "mensagem": 'Por favor, informe todos os dados de ponto de embarque!'
                 });
             }
         }
@@ -41,9 +44,12 @@ export default class PontoEmbarqueCtrl {
         if ((requisicao.method === 'PUT' || requisicao.method === 'PATCH') && requisicao.is('application/json')) {
             const dados = requisicao.body;
             const codigo = dados.codigo;
-            const endereco = dados.endereco;
-            if (codigo>=0 && endereco) {
-                const pontoEmbarque = new PontoEmbarque(codigo, endereco);
+            const rua = dados.rua;
+            const numero = dados.numero;
+            const bairro = dados.bairro;
+            const cep = dados.cep;
+            if (codigo>=0 && rua && numero && bairro && cep) {
+                const pontoEmbarque = new PontoEmbarque(codigo, rua, numero, bairro, cep);
                 pontoEmbarque.atualizar().then(() => {
                     resposta.status(200).json({
                         "status": true,
