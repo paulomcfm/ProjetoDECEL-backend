@@ -40,7 +40,7 @@ CREATE TABLE Parentescos (
 
 CREATE TABLE Usuarios (
     user_codigo INT NOT NULL,
-    user_login VARCHAR(100) NOT NULL,
+    user_nome VARCHAR(100) NOT NULL,
     user_senha VARCHAR(255) NOT NULL,
     user_cpf VARCHAR(14) NOT NULL,
     user_email VARCHAR(255) NOT NULL,
