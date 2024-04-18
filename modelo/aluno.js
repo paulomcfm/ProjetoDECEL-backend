@@ -7,7 +7,6 @@ export default class Aluno {
     #observacoes;
     #dataNasc;
     #celular;
-    #responsaveis;
 
     constructor(codigo = 0, nome = '', rg = '', observacoes = '', dataNasc = '', celular = '') {
         this.#codigo = codigo;
@@ -16,7 +15,6 @@ export default class Aluno {
         this.#observacoes = observacoes;
         this.#dataNasc = dataNasc;
         this.#celular = celular;
-        this.#responsaveis = [];
     }
 
     get codigo() {
@@ -59,14 +57,6 @@ export default class Aluno {
         this.#dataNasc = novaDataNasc;
     }
 
-    get responsaveis() {
-        return this.#responsaveis;
-    }
-
-    set responsaveis(novoResponsavel) {
-        this.#responsaveis = novoResponsavel;
-    }
-
     get celular() {
         return this.#celular;
     }
@@ -89,8 +79,7 @@ export default class Aluno {
             rg: this.#rg,
             observacoes: this.#observacoes,
             dataNasc: this.#dataNasc,
-            celular: this.#celular,
-            responsaveis: this.#responsaveis
+            celular: this.#celular
         }
     }
 
