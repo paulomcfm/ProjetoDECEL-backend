@@ -44,7 +44,7 @@ export default class AlunoDAO {
             if (!parametroConsulta) {
                 parametroConsulta = '';
             }
-            sql = "SELECT * FROM alunos WHERE alu_nome like $1";
+            sql = "SELECT * FROM alunos WHERE alu_nome like $1 order by alu_nome";
             parametros = ['%' + parametroConsulta + '%'];
         }
         
