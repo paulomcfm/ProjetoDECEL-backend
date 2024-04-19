@@ -7,15 +7,11 @@ export default class EscolaCtrl {
             const dados = requisicao.body;
             const nome = dados.nome;
             const tipo = dados.tipo;
-            const rua = dados.rua
-            const numero = dados.numero;
-            const cidade = dados.cidade;
-            const bairro = dados.bairro;
-            const cep = dados.cep;
             const email = dados.email;
-            const telefone = dados.telefone
-            if (nome && tipo && rua && rua && numero>=0 && cidade && bairro && email && telefone && cep) {
-                const escola = new Escola(0, nome, tipo, rua, numero, cidade, bairro, cep, email, telefone);
+            const telefone = dados.telefone;
+            const pontoEmbarque = dados.pontoEmbarque;
+            if (nome && tipo && email && telefone && pontoEmbarque) {
+                const escola = new Escola(0, nome, tipo, email, telefone, pontoEmbarque);
                 escola.gravar().then(() => {
                     resposta.status(200).json({
                         "status": true,
@@ -51,15 +47,11 @@ export default class EscolaCtrl {
             const codigo = dados.codigo;
             const nome = dados.nome;
             const tipo = dados.tipo;
-            const rua = dados.rua
-            const numero = dados.numero;
-            const cidade = dados.cidade;
-            const bairro = dados.bairro;
-            const cep = dados.cep;
             const email = dados.email;
-            const telefone = dados.telefone
-            if (codigo>=0 && nome && tipo && rua && rua && numero>=0 && cidade && bairro && cep && email && telefone) {
-                const escola = new Escola(codigo, nome, tipo, rua, numero, cidade, bairro, cep, email, telefone);
+            const telefone = dados.telefone;
+            const pontoEmbarque = dados.pontoEmbarque;
+            if (codigo>=0 && nome && tipo && email && telefone && pontoEmbarque) {
+                const escola = new Escola(codigo, nome, tipo, email, telefone, pontoEmbarque);
                 escola.atualizar().then(() => {
                     resposta.status(200).json({
                         "status": true,

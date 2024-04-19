@@ -1,14 +1,12 @@
-CREATE TABLE Escolas (
-    esc_codigo INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    esc_nome VARCHAR(255) NOT NULL,
-    esc_tipo CHAR NOT NULL,
-    esc_rua VARCHAR(255) NOT NULL,
-    esc_numero INT NOT NULL,
-    esc_cidade VARCHAR(255) NOT NULL,
-    esc_bairro VARCHAR(255) NOT NULL,
-    esc_cep VARCHAR(35) NOT NULL,
-    esc_email VARCHAR(255) NOT NULL,
-    esc_telefone VARCHAR(20) NOT NULL
+CREATE TABLE escola (
+    esc_codigo INT PRIMARY KEY,
+    esc_nome VARCHAR(100),
+    esc_tipo CHAR(1), 
+    esc_email VARCHAR(100),
+    esc_telefone VARCHAR(15), 
+    esc_ponto_de_embarque_cod INT,
+    FOREIGN KEY (esc_ponto_de_embarque_cod) 
+        REFERENCES pontos_de_embarque(pde_cod)
 );
 
 CREATE TABLE Responsaveis (
