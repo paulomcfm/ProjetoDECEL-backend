@@ -97,6 +97,5 @@ CREATE TABLE Usuarios (
     user_senha VARCHAR(255) NOT NULL,
     user_cpf VARCHAR(14) NOT NULL,
     user_email VARCHAR(255) NOT NULL,
-    user_celular VARCHAR(20) NOT NULL,
-    user_categoria VARCHAR(11) NOT NULL
+    user_celular VARCHAR(20) NOT NULL
 );

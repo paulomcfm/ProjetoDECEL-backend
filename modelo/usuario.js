@@ -7,16 +7,14 @@ export default class Usuario {
     #cpf;
     #email;
     #celular;
-    #categoria;
 
-    constructor(codigo=0, nome='',senha='',cpf='',email='',celular='',categoria=''){
+    constructor(codigo=0, nome='',senha='',cpf='',email='',celular=''){
         this.#codigo = codigo;
         this.#nome = nome;
         this.#senha = senha;
         this.#cpf = cpf;
         this.#email = email;
         this.#celular = celular;
-        this.#categoria = categoria;
     }
 
     get codigo() {
@@ -67,14 +65,6 @@ export default class Usuario {
         this.#celular = novoCelular;
     }
 
-    get categoria() {
-        return this.#categoria;
-    }
-
-    set categoria(novaCategoria) {
-        this.#categoria = novaCategoria;
-    }
-
     toJSON(){
         return {
             codigo: this.#codigo,
@@ -83,7 +73,6 @@ export default class Usuario {
             cpf: this.#cpf,
             email: this.#email,
             celular: this.#celular,
-            categoria: this.#categoria
         }
     }
 

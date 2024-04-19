@@ -10,9 +10,8 @@ export default class UsuarioCtrl {
             const cpf = dados.cpf;
             const email = dados.email;
             const celular = dados.celular;
-            const categoria = dados.categoria;
-            if (nome && senha && cpf && email && celular && categoria) {
-                const usuario = new Usuario(0, nome, senha, cpf, email, celular, categoria);
+            if (nome && senha && cpf && email && celular) {
+                const usuario = new Usuario(0, nome, senha, cpf, email, celular);
                 usuario.gravar().then(() => {
                     resposta.status(200).json({
                         "status": true,
@@ -51,9 +50,8 @@ export default class UsuarioCtrl {
             const cpf = dados.cpf;
             const email = dados.email;
             const celular = dados.celular;
-            const categoria = dados.categoria
-            if (codigo>=0 && nome && senha && cpf && email && celular && categoria) {
-                const usuario = new Usuario(codigo, nome, senha, cpf, email, celular, categoria);
+            if (codigo>=0 && nome && senha && cpf && email && celular) {
+                const usuario = new Usuario(codigo, nome, senha, cpf, email, celular);
                 usuario.atualizar().then(() => {
                     resposta.status(200).json({
                         "status": true,
