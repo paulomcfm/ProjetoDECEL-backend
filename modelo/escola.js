@@ -4,25 +4,17 @@ export default class Escola {
     #codigo;
     #nome;
     #tipo;
-    #rua;
-    #numero;
-    #cidade;
-    #bairro;
-    #cep;
     #email;
     #telefone;
+    #pontoEmbarque;    
 
-    constructor(codigo = 0, nome = '', tipo = '', rua = '', numero = 0, cidade = '', bairro = '', cep = '', email = '', telefone = '') {
+    constructor(codigo = 0, nome = '', tipo = '', email = '', telefone = '', pontoEmbarque = []) {
         this.#codigo = codigo;
         this.#nome = nome;
         this.#tipo = tipo;
-        this.#rua = rua;
-        this.#numero = numero;
-        this.#cidade = cidade;
-        this.#bairro = bairro;
-        this.#cep = cep;
         this.#email = email;
         this.#telefone = telefone;
+        this.#pontoEmbarque = pontoEmbarque;
     }
 
     get codigo() {
@@ -48,46 +40,6 @@ export default class Escola {
     set tipo(novoTipo) {
         this.#tipo = novoTipo;
     }  
-    
-    get rua() {
-        return this.#rua;
-    }
-
-    set rua(novaRua) {
-        this.#rua = novaRua;
-    } 
-
-    get numero() {
-        return this.#numero;
-    }
-
-    set numero(novoNumero) {
-        this.#numero = novoNumero;
-    } 
-
-    get cidade() {
-        return this.#cidade;
-    }
-
-    set cidade(novaCidade) {
-        this.#cidade = novaCidade;
-    } 
-
-    get bairro() {
-        return this.#bairro;
-    }
-
-    set bairro(novoBairro) {
-        this.#bairro = novoBairro;
-    } 
-
-    get cep() {
-        return this.#cep;
-    }
-
-    set cep(novoCep) {
-        this.#cep = novoCep;
-    } 
 
     get email() {
         return this.#email;
@@ -105,18 +57,22 @@ export default class Escola {
         this.#telefone = novoTelefone;
     } 
 
+    get pontoEmbarque() {
+        return this.#pontoEmbarque;
+    }
+
+    set pontoEmbarque(novoPontoEmbarque) {
+        this.#pontoEmbarque = novoPontoEmbarque;
+    }
+
     toJSON() {
         return {
             codigo: this.#codigo,
             nome: this.#nome,
             tipo: this.#tipo,
-            rua: this.#rua,
-            numero: this.#numero,
-            cidade: this.#cidade,
-            bairro: this.#bairro,
-            cep: this.#cep,
             email: this.#email,
-            telefone: this.#telefone
+            telefone: this.#telefone,
+            pontoEmbarque: this.#pontoEmbarque
         }
     }
 
