@@ -1,34 +1,34 @@
-import Aluno from "../modelo/aluno.js";
+import Veiculo from "../modelo/veiculo.js";
 import poolConexao from "../persistencia/conexao.js";
 
-export default class AlunoCtrl {
+export default class VeiculoCtrl {
     static _instance = null;
 
     constructor() {
-        if (AlunoCtrl._instance) {
-            return AlunoCtrl._instance
+        if (VeiculoCtrl._instance) {
+            return VeiculoCtrl._instance
         }
-        AlunoCtrl._instance = this;
+        VeiculoCtrl._instance = this;
     }
     static async gravar(requisicao, resposta) {
         resposta.type('application/json');
         if (requisicao.method === 'POST') {
             const dados = requisicao.body;
-            const nome = dados.nome;
-            const rg = dados.rg;
-            const observacoes = dados.observacoes;
-            const dataNasc = dados.dataNasc;
-            const celular = dados.celular;
-            const aluno = new Aluno(0, nome, rg, observacoes, dataNasc, celular);
-            if (nome && rg && aluno.validarDataNascimento(dataNasc)) {
+            const renavam = dados.renavam;
+            const placa = dados.placa;
+            const modelo = dados.modelo;
+            const capacidade = dados.capacidade;
+            const tipo = dados.tipo;
+            const veiculo = new Veiculo(0, renavam, placa, modelo, capacidade, tipo);
+            if (renavam && placa && modelo && capacidade && tipo) {
                 const client = await poolConexao.connect();
                 try {
                     await client.query('BEGIN');
-                    aluno.gravar(client).then(() => {
+                    veiculo.gravar(client).then(() => {
                         resposta.status(200).json({
                             "status": true,
-                            "codigoGerado": aluno.codigo,
-                            "mensagem": 'Aluno incluido com sucesso!'
+                            "codigoGerado": veiculo.codigo,
+                            "mensagem": 'Veiculo incluido com sucesso!'
                         });
                         client.query('COMMIT');
                     }).catch(async (erro) => {
@@ -36,12 +36,12 @@ export default class AlunoCtrl {
                         if (erro.code === '23505') {
                             resposta.status(400).json({
                                 "status": false,
-                                "mensagem": 'CPF já cadastrado.'
+                                "mensagem": 'Renavam já cadastrado.'
                             });
                         } else {
                             resposta.status(500).json({
                                 "status": false,
-                                "mensagem": 'Erro ao registrar o aluno: ' + erro.message
+                                "mensagem": 'Erro ao registrar o veiculo: ' + erro.message
                             });
                         }
                     });
@@ -51,22 +51,17 @@ export default class AlunoCtrl {
                 } finally {
                     client.release();
                 }
-            } else if (!aluno.validarDataNascimento(dataNasc)) {
-                resposta.status(400).json({
-                    "status": false,
-                    "mensagem": 'Data de nascimento inválida.'
-                });
             } else {
                 resposta.status(400).json({
                     "status": false,
-                    "mensagem": 'Por favor, informe o nome do aluno!'
+                    "mensagem": 'Por favor, informe o renavam do veiculo!'
                 });
             }
         }
         else {
             resposta.status(400).json({
                 "status": false,
-                "mensagem": 'Por favor, utilize o método POST para cadastrar um aluno!'
+                "mensagem": 'Por favor, utilize o método POST para cadastrar um veiculo!'
             });
         }
     }
@@ -81,16 +76,16 @@ export default class AlunoCtrl {
             const observacoes = dados.observacoes;
             const dataNasc = dados.dataNasc;
             const celular = dados.celular;
-            const aluno = new Aluno(codigo, nome, rg, observacoes, dataNasc, celular);
-            if (codigo >= 0 && nome && rg && aluno.validarDataNascimento(dataNasc)) {
+            const veiculo = new Veiculo(codigo, nome, rg, observacoes, dataNasc, celular);
+            if (codigo >= 0 && nome && rg && veiculo.validarDataNascimento(dataNasc)) {
                 const client = await poolConexao.connect();
                 try {
                     await client.query('BEGIN');
-                    aluno.atualizar(client).then(() => {
+                    veiculo.atualizar(client).then(() => {
                         resposta.status(200).json({
                             "status": true,
-                            "codigoGerado": aluno.codigo,
-                            "mensagem": 'Aluno alterado com sucesso!'
+                            "codigoGerado": veiculo.codigo,
+                            "mensagem": 'Veiculo alterado com sucesso!'
                         });
                         client.query('COMMIT');
                     }).catch(async (erro) => {
@@ -103,7 +98,7 @@ export default class AlunoCtrl {
                         } else {
                             resposta.status(500).json({
                                 "status": false,
-                                "mensagem": 'Erro ao alterar o aluno: ' + erro.message
+                                "mensagem": 'Erro ao alterar o veiculo: ' + erro.message
                             });
                         }
                     });
@@ -114,7 +109,7 @@ export default class AlunoCtrl {
                     client.release();
                 }
             }
-            else if (!aluno.validarDataNascimento(dataNasc)) {
+            else if (!veiculo.validarDataNascimento(dataNasc)) {
                 resposta.status(400).json({
                     "status": false,
                     "mensagem": 'Data de nascimento inválida.'
@@ -122,14 +117,14 @@ export default class AlunoCtrl {
             } else {
                 resposta.status(400).json({
                     "status": false,
-                    "mensagem": 'Por favor, informe o código e o nome do aluno!'
+                    "mensagem": 'Por favor, informe o código e o nome do veiculo!'
                 });
             }
         }
         else {
             resposta.status(400).json({
                 "status": false,
-                "mensagem": 'Por favor, utilize os métodos PUT ou PATCH para atualizar um aluno!'
+                "mensagem": 'Por favor, utilize os métodos PUT ou PATCH para atualizar um veiculo!'
             });
         }
     }
@@ -143,19 +138,19 @@ export default class AlunoCtrl {
                 const client = await poolConexao.connect();
                 try {
                     await client.query('BEGIN');
-                    const aluno = new Aluno(codigo);
-                    aluno.excluir(client).then(() => {
+                    const veiculo = new Veiculo(codigo);
+                    veiculo.excluir(client).then(() => {
                         resposta.status(200).json({
                             "status": true,
-                            "codigoGerado": aluno.codigo,
-                            "mensagem": 'Aluno excluído com sucesso!'
+                            "codigoGerado": veiculo.codigo,
+                            "mensagem": 'Veiculo excluído com sucesso!'
                         });
                         client.query('COMMIT');
                     }).catch(async (erro) => {
                         await client.query('ROLLBACK');
                         resposta.status(500).json({
                             "status": false,
-                            "mensagem": 'Erro ao excluir o aluno: ' + erro.message
+                            "mensagem": 'Erro ao excluir o veiculo: ' + erro.message
                         });
                     });
                 } catch (e) {
@@ -168,14 +163,14 @@ export default class AlunoCtrl {
             else {
                 resposta.status(400).json({
                     "status": false,
-                    "mensagem": 'Por favor, informe o codigo do aluno!'
+                    "mensagem": 'Por favor, informe o codigo do veiculo!'
                 });
             }
         }
         else {
             resposta.status(400).json({
                 "status": false,
-                "mensagem": 'Por favor, utilize os métodos DELETE para excluir um aluno!'
+                "mensagem": 'Por favor, utilize os métodos DELETE para excluir um veiculo!'
             });
         }
     }
@@ -187,16 +182,18 @@ export default class AlunoCtrl {
         }
         if (requisicao.method === 'GET') {
             const client = await poolConexao.connect();
-            const alunos = new Aluno();
-            alunos.consultar(termo, client).then((listaAlunos) => {
+            const veiculos = new Veiculo();
+            veiculos.consultar(termo, client).then((listaVeiculos) => {
                 resposta.json({
                     "status": true,
-                    "listaAlunos": listaAlunos
+                    "listaVeiculos": listaVeiculos
                 });
+                client.query('COMMIT');
             }).catch(async (erro) => {
+                await client.query('ROLLBACK');
                 resposta.status(500).json({
                     "status": false,
-                    "mensagem": 'Erro ao consultar os alunos: ' + erro.message
+                    "mensagem": 'Erro ao consultar os veiculos: ' + erro.message
                 });
             });
             client.release();
@@ -204,7 +201,7 @@ export default class AlunoCtrl {
         else {
             resposta.status(400).json({
                 "status": false,
-                "mensagem": 'Por favor, utilize o método GET para consultar os alunos!'
+                "mensagem": 'Por favor, utilize o método GET para consultar os veiculos!'
             });
         }
     }
