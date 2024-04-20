@@ -83,23 +83,23 @@ export default class Aluno {
         }
     }
 
-    async gravar() {
+    async gravar(client) {
         const aluDAO = new AlunoDAO();
-        await aluDAO.gravar(this);
+        await aluDAO.gravar(this, client);
     }
 
-    async excluir() {
+    async excluir(client) {
         const aluDAO = new AlunoDAO();
-        await aluDAO.excluir(this);
+        await aluDAO.excluir(this, client);
     }
 
-    async atualizar() {
+    async atualizar(client) {
         const aluDAO = new AlunoDAO();
-        await aluDAO.atualizar(this);
+        await aluDAO.atualizar(this, client);
     }
 
-    async consultar(parametro) {
+    async consultar(parametro, client) {
         const aluDAO = new AlunoDAO();
-        return await aluDAO.consultar(parametro);
+        return await aluDAO.consultar(parametro, client);
     }
 }
