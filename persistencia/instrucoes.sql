@@ -43,7 +43,7 @@ CREATE TABLE Parentescos (
     CONSTRAINT fk_respparentesco FOREIGN KEY (resp_codigo) REFERENCES Responsaveis(resp_codigo) ON DELETE CASCADE
 );
 
-CREATE TABLE PontosdeEmbarque (
+CREATE TABLE pontos_de_embarque (
   pde_codigo SERIAL PRIMARY KEY,
   pde_rua VARCHAR(45) NOT NULL,
   pde_bairro VARCHAR(45) NOT NULL,
@@ -57,15 +57,15 @@ CREATE TABLE Escolas (
   esc_tipo CHAR NOT NULL,
   esc_email VARCHAR(45) NOT NULL,
   esc_telefone VARCHAR(45) NOT NULL,
-  pde_codigo INT NOT NULL,
-  CONSTRAINT fk_escolas_pontosdeembarque FOREIGN KEY (pde_codigo) REFERENCES PontosdeEmbarque(pde_codigo)
+  esc_pde_codigo INT NOT NULL,
+  CONSTRAINT fk_escolas_pontosdeembarque FOREIGN KEY (esc_pde_codigo) REFERENCES pontos_de_embarque(pde_codigo)
 );
 
 CREATE TABLE Motoristas (
-  mot_codigo SERIAL PRIMARY KEY,
-  mot_cnh VARCHAR(45) NOT NULL UNIQUE,
-  mot_celular VARCHAR(16) NOT NULL,
-  mot_nome VARCHAR(45) NOT NULL
+  moto_id SERIAL PRIMARY KEY,
+  moto_cnh VARCHAR(45) NOT NULL UNIQUE,
+  moto_celular VARCHAR(16) NOT NULL,
+  moto_nome VARCHAR(45) NOT NULL
 );
 
 CREATE TABLE Monitores (
@@ -96,10 +96,6 @@ CREATE TABLE Inscricoes (
   insc_etapa CHAR NOT NULL,
   insc_periodo CHAR NOT NULL,
   insc_dataAlocacao DATE,
-  insc_rua VARCHAR(45) NOT NULL,
-  insc_cep VARCHAR(45) NOT NULL,
-  insc_numero VARCHAR(45) NOT NULL,
-  insc_bairro VARCHAR(45) NOT NULL,
   alu_codigo INT NOT NULL,
   esc_codigo INT NOT NULL,
   pde_codigo INT NOT NULL,
@@ -107,7 +103,7 @@ CREATE TABLE Inscricoes (
   PRIMARY KEY (insc_codigo, alu_codigo),
   CONSTRAINT fk_inscricoes_alunos FOREIGN KEY (alu_codigo) REFERENCES Alunos(alu_codigo),
   CONSTRAINT fk_inscricoes_escolas FOREIGN KEY (esc_codigo) REFERENCES Escolas(esc_codigo),
-  CONSTRAINT fk_inscricoes_pontosdeembarque FOREIGN KEY (pde_codigo) REFERENCES PontosdeEmbarque(pde_codigo),
+  CONSTRAINT fk_inscricoes_pontosdeembarque FOREIGN KEY (pde_codigo) REFERENCES pontos_de_embarque(pde_codigo),
   CONSTRAINT fk_inscricoes_rotas FOREIGN KEY (rot_codigo) REFERENCES Rotas(rot_codigo)
 );
 
@@ -124,13 +120,97 @@ CREATE TABLE Rotas_tem_PontosdeEmbarque (
   pde_codigo INT NOT NULL,
   PRIMARY KEY (rot_codigo, pde_codigo),
   CONSTRAINT fk_rotas_tem_pontosdeembarque_rotas FOREIGN KEY (rot_codigo) REFERENCES Rotas(rot_codigo),
-  CONSTRAINT fk_rotas_tem_pontosdeembarque_pontosdeembarque FOREIGN KEY (pde_codigo) REFERENCES PontosdeEmbarque(pde_codigo)
+  CONSTRAINT fk_rotas_tem_pontosdeembarque_pontosdeembarque FOREIGN KEY (pde_codigo) REFERENCES pontos_de_embarque(pde_codigo)
 );
 
 CREATE TABLE Rotas_tem_Motoristas (
-  mot_codigo INT NOT NULL,
+  moto_id INT NOT NULL,
   rot_codigo INT NOT NULL,
-  PRIMARY KEY (mot_codigo, rot_codigo),
+  PRIMARY KEY (moto_id, rot_codigo),
   CONSTRAINT fk_rotas_tem_motoristas_rotas FOREIGN KEY (rot_codigo) REFERENCES Rotas(rot_codigo),
-  CONSTRAINT fk_rotas_tem_motoristas_motoristas FOREIGN KEY (mot_codigo) REFERENCES Motoristas(mot_codigo)
+  CONSTRAINT fk_rotas_tem_motoristas_motoristas FOREIGN KEY (moto_id) REFERENCES Motoristas(moto_id)
 );
+
+-- Inserts para a tabela Usuarios
+INSERT INTO Usuarios (user_nome, user_senha, user_cpf, user_email, user_celular)
+VALUES ('usuario1', 'senha123', '123.456.789-00', 'usuario1@email.com', '(123) 456-7890'),
+       ('usuario2', 'senha456', '987.654.321-00', 'usuario2@email.com', '(987) 654-3210'),
+       ('usuario3', 'senha789', '111.222.333-44', 'usuario3@email.com', '(111) 222-3333');
+
+-- Inserts para a tabela Veiculos
+INSERT INTO Veiculos (vei_renavam, vei_placa, vei_modelo, vei_capacidade, vei_tipo)
+VALUES ('12345678901', 'ABC1234', 'Modelo 1', 5, 'C'),
+       ('98765432109', 'DEF5678', 'Modelo 2', 7, 'V'),
+       ('11122233344', 'GHI9012', 'Modelo 3', 9, 'C');
+
+-- Inserts para a tabela Responsaveis
+INSERT INTO Responsaveis (resp_nome, resp_rg, resp_cpf, resp_email, resp_telefone, resp_celular)
+VALUES ('Responsavel 1', '1234567-8', '123.456.789-00', 'responsavel1@email.com', '(123) 456-7890', '(123) 456-7890'),
+       ('Responsavel 2', '9876543-2', '987.654.321-00', 'responsavel2@email.com', '(987) 654-3210', '(987) 654-3210'),
+       ('Responsavel 3', '1112223-4', '111.222.333-44', 'responsavel3@email.com', '(111) 222-3333', '(111) 222-3333');
+
+-- Inserts para a tabela Alunos
+INSERT INTO Alunos (alu_nome, alu_rg, alu_observacoes, alu_datanasc, alu_celular)
+VALUES ('Aluno 1', '1234567-8', 'Observacoes sobre Aluno 1', '2005-01-01', '(123) 456-7890'),
+       ('Aluno 2', '9876543-2', 'Observacoes sobre Aluno 2', '2006-02-02', '(987) 654-3210'),
+       ('Aluno 3', '1112223-4', 'Observacoes sobre Aluno 3', '2007-03-03', '(111) 222-3333');
+
+-- Inserts para a tabela Parentescos
+INSERT INTO Parentescos (alu_codigo, resp_codigo, par_parentesco)
+VALUES (1, 1, 'Pai'),
+       (2, 2, 'Mãe'),
+       (3, 3, 'Tio');
+
+-- Inserts para a tabela PontosdeEmbarque
+INSERT INTO pontos_de_embarque (pde_rua, pde_bairro, pde_numero, pde_cep)
+VALUES ('Rua 1', 'Bairro 1', '123', '12345-678'),
+       ('Rua 2', 'Bairro 2', '456', '98765-432'),
+       ('Rua 3', 'Bairro 3', '789', '54321-876');
+
+-- Inserts para a tabela Escolas
+INSERT INTO Escolas (esc_nome, esc_tipo, esc_email, esc_telefone, esc_pde_codigo)
+VALUES ('Escola 1', 'P', 'escola1@email.com', '(123) 456-7890', 1),
+       ('Escola 2', 'E', 'escola2@email.com', '(987) 654-3210', 2),
+       ('Escola 3', 'P', 'escola3@email.com', '(111) 222-3333', 3);
+
+-- Inserts para a tabela Motoristas
+INSERT INTO Motoristas (moto_cnh, moto_celular, moto_nome)
+VALUES ('12345678901', '(123) 456-7890', 'Motorista 1'),
+       ('98765432109', '(987) 654-3210', 'Motorista 2'),
+       ('11122233344', '(111) 222-3333', 'Motorista 3');
+
+-- Inserts para a tabela Monitores
+INSERT INTO Monitores (mon_nome, mon_cpf, mon_celular)
+VALUES ('Monitor 1', '123.456.789-00', '(123) 456-7890'),
+       ('Monitor 2', '987.654.321-00', '(987) 654-3210'),
+       ('Monitor 3', '111.222.333-44', '(111) 222-3333');
+
+-- Inserts para a tabela Rotas
+INSERT INTO Rotas (rot_nome, rot_km, rot_periodo, rot_tempoInicio, rot_tempoFinal, vei_codigo, mon_codigo)
+VALUES ('Rota 1', 10, 'M', '08:00', '10:00', 1, 1),
+       ('Rota 2', 15, 'T', '13:00', '15:00', 2, 2),
+       ('Rota 3', 20, 'N', '18:00', '20:00', 3, 3);
+
+-- Inserts para a tabela Inscricoes
+INSERT INTO Inscricoes (insc_ano, insc_anoLetivo, insc_turma, insc_etapa, insc_periodo, insc_dataAlocacao, alu_codigo, esc_codigo, pde_codigo, rot_codigo)
+VALUES (2024, '24', 'A', 'F', 'M', '2024-04-22', 1, 1, 1, 1),
+       (2024, '24', 'B', 'I', 'T', '2024-04-22', 2, 2, 2, 2),
+       (2024, '24', 'C', 'F', 'N', '2024-04-22', 3, 3, 3, 3);
+
+-- Inserts para a tabela Manutencoes
+INSERT INTO Manutencoes (manu_tipo, manu_data, vei_codigo)
+VALUES ('P', '2024-04-22', 1),
+       ('C', '2024-04-22', 2),
+       ('P', '2024-04-22', 3);
+
+-- Inserts para a tabela Rotas_tem_PontosdeEmbarque
+INSERT INTO Rotas_tem_PontosdeEmbarque (rot_codigo, pde_codigo)
+VALUES (1, 1),
+       (2, 2),
+       (3, 3);
+
+-- Inserts para a tabela Rotas_tem_Motoristas
+INSERT INTO Rotas_tem_Motoristas (moto_id, rot_codigo)
+VALUES (1, 1),
+       (2, 2),
+       (3, 3);

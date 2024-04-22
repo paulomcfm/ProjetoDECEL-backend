@@ -1,5 +1,6 @@
 import Aluno from "../modelo/aluno.js";
 import poolConexao from "./conexao.js";
+import Responsavel from "../modelo/responsavel.js";
 
 
 export default class AlunoDAO {
@@ -37,23 +38,59 @@ export default class AlunoDAO {
         let sql = '';
         let parametros = [];
         if (!isNaN(parseInt(parametroConsulta))) {
-            sql = 'SELECT * FROM alunos WHERE alu_codigo = $1 order by alu_nome';
+            sql = `SELECT alunos.*, responsaveis.*
+                FROM alunos
+                INNER JOIN parentescos ON alunos.alu_codigo = parentescos.alu_codigo
+                INNER JOIN responsaveis ON parentescos.resp_codigo = responsaveis.resp_codigo
+                WHERE alunos.alu_codigo = $1
+                ORDER BY alunos.alu_nome, responsaveis.resp_nome;`;
             parametros = [parametroConsulta];
-        }
-        else {
+        } else {
             if (!parametroConsulta) {
                 parametroConsulta = '';
             }
-            sql = "SELECT * FROM alunos WHERE alu_nome like $1 order by alu_nome";
+            sql = `SELECT alunos.*, responsaveis.*
+                FROM alunos
+                INNER JOIN parentescos ON alunos.alu_codigo = parentescos.alu_codigo
+                INNER JOIN responsaveis ON parentescos.resp_codigo = responsaveis.resp_codigo
+                WHERE alunos.alu_nome ILIKE  $1
+                ORDER BY alunos.alu_nome, responsaveis.resp_nome;`;
             parametros = ['%' + parametroConsulta + '%'];
         }
-        
+    
         const { rows: registros, fields: campos } = await client.query(sql, parametros);
         let listaAlunos = [];
+        let alunoAtual = null;
         for (const registro of registros) {
-            const aluno = new Aluno(registro.alu_codigo, registro.alu_nome, registro.alu_rg, registro.alu_observacoes, registro.alu_datanasc, registro.alu_celular);
-            listaAlunos.push(aluno);
+            if (!alunoAtual || alunoAtual.codigo !== registro.alu_codigo) {
+                if (alunoAtual) {
+                    listaAlunos.push(alunoAtual);
+                }
+                alunoAtual = {
+                    codigo: registro.alu_codigo,
+                    nome: registro.alu_nome,
+                    rg: registro.alu_rg,
+                    observacoes: registro.alu_observacoes,
+                    dataNasc: registro.alu_datanasc,
+                    celular: registro.alu_celular,
+                    responsaveis: []
+                };
+            }
+            const responsavel = {
+                codigo: registro.resp_codigo,
+                nome: registro.resp_nome,
+                rg: registro.resp_rg,
+                cpf: registro.resp_cpf,
+                email: registro.resp_email,
+                telefone: registro.resp_telefone,
+                celular: registro.resp_celular
+            };
+            alunoAtual.responsaveis.push(responsavel);
+        }
+        if (alunoAtual) {
+            listaAlunos.push(alunoAtual);
         }
         return listaAlunos;
     }
+    
 }

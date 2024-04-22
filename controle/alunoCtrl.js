@@ -1,5 +1,7 @@
 import Aluno from "../modelo/aluno.js";
+import Parentesco from "../modelo/parentesco.js";
 import poolConexao from "../persistencia/conexao.js";
+import ParentescoCtrl from "./parentescoCtrl.js";
 
 export default class AlunoCtrl {
     static _instance = null;
@@ -30,6 +32,7 @@ export default class AlunoCtrl {
                             "codigoGerado": aluno.codigo,
                             "mensagem": 'Aluno incluido com sucesso!'
                         });
+                        ParentescoCtrl.gravar(requisicao, resposta);
                         client.query('COMMIT');
                     }).catch(async (erro) => {
                         await client.query('ROLLBACK');
@@ -82,6 +85,9 @@ export default class AlunoCtrl {
             const dataNasc = dados.dataNasc;
             const celular = dados.celular;
             const aluno = new Aluno(codigo, nome, rg, observacoes, dataNasc, celular);
+            // const parentescosAtuais = dados.responsaveis.map(responsavel => {
+            //     return new Parentesco(codigo, responsavel.codigoResponsavel, responsavel.parentesco);
+            // });
             if (codigo >= 0 && nome && rg && aluno.validarDataNascimento(dataNasc)) {
                 const client = await poolConexao.connect();
                 try {
@@ -92,6 +98,7 @@ export default class AlunoCtrl {
                             "codigoGerado": aluno.codigo,
                             "mensagem": 'Aluno alterado com sucesso!'
                         });
+                        // const parentescosAntes = ParentescoCtrl.consultarAluno(codigo);
                         client.query('COMMIT');
                     }).catch(async (erro) => {
                         await client.query('ROLLBACK');
