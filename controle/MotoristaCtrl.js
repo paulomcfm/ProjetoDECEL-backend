@@ -5,7 +5,8 @@ export default class MotoristaCtrl{
     
     async gravar(requisicao,resposta){
         const body = requisicao.body;
-        const motorista = new Motorista(0,body.nome,body.cnh,body.telefone)
+        console.log(body.celular)
+        const motorista = new Motorista(0,body.nome,body.cnh,body.celular)
         await motorista.gravar().then(()=>{
                 resposta.status(200).json({
                     'status':true,
@@ -37,7 +38,7 @@ export default class MotoristaCtrl{
 
     async atualizar(requisicao,resposta){
          const body = requisicao.body
-         const motorista = new Motorista(0,body.nome,body.cnh,body.telefone)
+         const motorista = new Motorista(0,body.nome,body.cnh,body.celular)
          motorista.atualizar().then(()=>{
             resposta.status(200).json({
                 'status':true,
