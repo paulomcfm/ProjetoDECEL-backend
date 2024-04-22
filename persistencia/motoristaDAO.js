@@ -9,8 +9,8 @@ export default class motoristaDAO{
     }
 
     async gravar(motorista){
-        const sql = 'insert into motoristas(moto_nome,moto_cnh,moto_telefone) values ($1,$2,$3)'
-        const values = [motorista.nome,motorista.cnh,motorista.telefone]
+        const sql = 'insert into motoristas(moto_nome,moto_cnh,moto_celular) values ($1,$2,$3)'
+        const values = [motorista.nome,motorista.cnh,motorista.celular]
         await this.#conexao.query(sql,values)
     }
 
@@ -40,7 +40,7 @@ export default class motoristaDAO{
                 'id':linhas[i].moto_id,
                 'nome':linhas[i].moto_nome,
                 'cnh':linhas[i].moto_cnh,
-                'telefone':linhas[i].moto_telefone
+                'celular':linhas[i].moto_celular
             }
             lista.push(motorista)
         }
@@ -48,8 +48,8 @@ export default class motoristaDAO{
     }
 
     async atualizar(motorista){
-        const sql = 'update motoristas set moto_nome=$1,moto_telefone=$2 where moto_cnh = $3'
-        const values = [motorista.nome,motorista.telefone,motorista.cnh]
+        const sql = 'update motoristas set moto_nome=$1,moto_celular=$2 where moto_cnh = $3'
+        const values = [motorista.nome,motorista.celular,motorista.cnh]
         await this.#conexao.query(sql,values)
     }
 
