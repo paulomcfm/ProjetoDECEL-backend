@@ -1,16 +1,11 @@
-//MySQL
 CREATE TABLE Usuarios (
-    user_codigo INT NOT NULL,
-    user_nome VARCHAR(100) NOT NULL,
+    user_nome VARCHAR(100) NOT NULL PRIMARY KEY,
     user_senha VARCHAR(255) NOT NULL,
-    user_cpf VARCHAR(14) NOT NULL,
+    user_cpf VARCHAR(14) NOT NULL UNIQUE,
     user_email VARCHAR(255) NOT NULL,
-    user_celular VARCHAR(20) NOT NULL,
-    user_categoria VARCHAR(11) NOT NULL,
-    CONSTRAINT pk_usuario PRIMARY KEY (user_codigo)
-)
+    user_celular VARCHAR(20) NOT NULL
+);
 
-//PostgreSQL
 CREATE TABLE Veiculos (
   vei_codigo SERIAL PRIMARY KEY,
   vei_renavam VARCHAR(11) NOT NULL UNIQUE,
@@ -46,16 +41,6 @@ CREATE TABLE Parentescos (
     CONSTRAINT pk_parentesco PRIMARY KEY (alu_codigo, resp_codigo),
     CONSTRAINT fk_aluparentesco FOREIGN KEY (alu_codigo) REFERENCES Alunos(alu_codigo) ON DELETE CASCADE,
     CONSTRAINT fk_respparentesco FOREIGN KEY (resp_codigo) REFERENCES Responsaveis(resp_codigo) ON DELETE CASCADE
-);
-
-CREATE TABLE Usuarios (
-    user_codigo SERIAL PRIMARY KEY,
-    user_login VARCHAR(100) NOT NULL,
-    user_senha VARCHAR(255) NOT NULL,
-    user_cpf VARCHAR(14) NOT NULL,
-    user_email VARCHAR(255) NOT NULL,
-    user_celular VARCHAR(20) NOT NULL,
-    user_categoria VARCHAR(11) NOT NULL
 );
 
 CREATE TABLE PontosdeEmbarque (
@@ -97,10 +82,8 @@ CREATE TABLE Rotas (
   rot_periodo CHAR NOT NULL,
   rot_tempoInicio VARCHAR(45) NOT NULL,
   rot_tempoFinal VARCHAR(45) NOT NULL,
-  mot_codigo INT NOT NULL,
   vei_codigo INT NOT NULL,
   mon_codigo INT NOT NULL,
-  CONSTRAINT fk_rotas_motoristas FOREIGN KEY (mot_codigo) REFERENCES Motoristas(mot_codigo),
   CONSTRAINT fk_rotas_veiculos FOREIGN KEY (vei_codigo) REFERENCES Veiculos(vei_codigo),
   CONSTRAINT fk_rotas_monitores FOREIGN KEY (mon_codigo) REFERENCES Monitores(mon_codigo)
 );
@@ -142,4 +125,12 @@ CREATE TABLE Rotas_tem_PontosdeEmbarque (
   PRIMARY KEY (rot_codigo, pde_codigo),
   CONSTRAINT fk_rotas_tem_pontosdeembarque_rotas FOREIGN KEY (rot_codigo) REFERENCES Rotas(rot_codigo),
   CONSTRAINT fk_rotas_tem_pontosdeembarque_pontosdeembarque FOREIGN KEY (pde_codigo) REFERENCES PontosdeEmbarque(pde_codigo)
+);
+
+CREATE TABLE Rotas_tem_Motoristas (
+  mot_codigo INT NOT NULL,
+  rot_codigo INT NOT NULL,
+  PRIMARY KEY (mot_codigo, rot_codigo),
+  CONSTRAINT fk_rotas_tem_motoristas_rotas FOREIGN KEY (rot_codigo) REFERENCES Rotas(rot_codigo),
+  CONSTRAINT fk_rotas_tem_motoristas_motoristas FOREIGN KEY (mot_codigo) REFERENCES Motoristas(mot_codigo)
 );
