@@ -7,6 +7,7 @@ import rotaParentesco from './rotas/rotaParentesco.js';
 import rotaPontoEmbarque from './rotas/rotaPontoEmbarque.js';
 import rotaMotorista from './rotas/rotaMotorista.js'
 import rotaVeiculo from './rotas/rotaVeiculo.js'
+import rotaDefRota from './rotas/rotaDefRota.js';
 
 const app = express();
 const porta = '8080'
@@ -20,5 +21,6 @@ app.use('/responsavel', rotaResponsavel);
 app.use('/pontos-embarque', rotaPontoEmbarque);
 app.use('/motorista', rotaMotorista);
 app.use('/veiculo', rotaVeiculo);
+app.use('/definir-rota',rotaDefRota)
 
 app.listen(porta, () => { console.log("servidor iniciado " + porta) })
