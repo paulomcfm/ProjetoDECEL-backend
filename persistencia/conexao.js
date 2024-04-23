@@ -13,9 +13,9 @@ const postgresUrl = process.env.DATABASE_URL;
 // Criar uma pool de clientes PostgreSQL
 const poolConexao = new Pool({
   connectionString: postgresUrl,
-   ssl: {
-     rejectUnauthorized: false, // Dependendo da sua configuração de SSL, você pode precisar ajustar isso
-   }
+  //  ssl: {
+  //    rejectUnauthorized: false, // Dependendo da sua configuração de SSL, você pode precisar ajustar isso
+  //  }
 });
 
 export default poolConexao;
