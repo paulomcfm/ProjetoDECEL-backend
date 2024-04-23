@@ -4,7 +4,7 @@ import poolConexao from "./conexao.js";
 export default class PontoEmbarqueDAO {
     async gravar(pontoEmbarque) {
         if (pontoEmbarque instanceof PontoEmbarque) {
-            const sql = "INSERT INTO pontos_de_embarque(pde_rua, pde_numero, pde_bairro, pde_cep) VALUES($1, $2, $3, $4)";
+            const sql = "INSERT INTO pontosdeembarque(pde_rua, pde_numero, pde_bairro, pde_cep) VALUES($1, $2, $3, $4)";
             const parametros = [pontoEmbarque.rua, pontoEmbarque.numero, pontoEmbarque.bairro, pontoEmbarque.cep];
             await poolConexao.query(sql, parametros);
             
@@ -13,7 +13,7 @@ export default class PontoEmbarqueDAO {
 
     async atualizar(pontoEmbarque) {
         if (pontoEmbarque instanceof PontoEmbarque) {
-            const sql = "UPDATE pontos_de_embarque SET pde_rua = $1, pde_numero = $2, pde_bairro = $3, pde_cep = $4 WHERE pde_codigo = $5";
+            const sql = "UPDATE pontosdeembarque SET pde_rua = $1, pde_numero = $2, pde_bairro = $3, pde_cep = $4 WHERE pde_codigo = $5";
             const parametros = [pontoEmbarque.rua, pontoEmbarque.numero, pontoEmbarque.bairro, pontoEmbarque.cep, pontoEmbarque.codigo];
             
             await poolConexao.query(sql, parametros);
@@ -23,7 +23,7 @@ export default class PontoEmbarqueDAO {
 
     async excluir(pontoEmbarque) {
         if (pontoEmbarque instanceof PontoEmbarque) {
-            const sql = "DELETE FROM pontos_de_embarque WHERE pde_codigo = $1";
+            const sql = "DELETE FROM pontosdeembarque WHERE pde_codigo = $1";
             const parametros = [pontoEmbarque.codigo];
             
             await poolConexao.query(sql, parametros);
@@ -35,14 +35,14 @@ export default class PontoEmbarqueDAO {
         let sql = '';
         let parametros = [];
         if (!isNaN(parseInt(parametroConsulta))) {
-            sql = 'SELECT * FROM pontos_de_embarque WHERE pde_codigo = $1 order by pde_rua';
+            sql = 'SELECT * FROM pontosdeembarque WHERE pde_codigo = $1 order by pde_rua';
             parametros = [parametroConsulta];
         }
         else {
             if (!parametroConsulta) {
                 parametroConsulta = '';
             }
-            sql = "SELECT * FROM pontos_de_embarque WHERE pde_rua like $1 order by pde_rua";
+            sql = "SELECT * FROM pontosdeembarque WHERE pde_rua like $1 order by pde_rua";
             parametros = ['%' + parametroConsulta + '%'];
         }
         
