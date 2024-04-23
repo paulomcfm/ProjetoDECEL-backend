@@ -1,4 +1,5 @@
 import Parentesco from "../modelo/parentesco.js";
+import poolConexao from "../persistencia/conexao.js";
 
 export default class ParentescoCtrl {
     static _instance = null;
@@ -150,8 +151,9 @@ export default class ParentescoCtrl {
             termo = '';
         }
         if (requisicao.method === 'GET') {
+            const client = await poolConexao.connect();
             const parentescos = new Parentesco();
-            parentescos.consultarAluno(termo).then((listaParentescos) => {
+            parentescos.consultarAluno(termo, client).then((listaParentescos) => {
                 resposta.json({
                     "status": true,
                     "listaParentescos": listaParentescos
@@ -162,6 +164,7 @@ export default class ParentescoCtrl {
                     "mensagem": 'Erro ao consultar os parentescos: ' + erro.message
                 });
             });
+            client.release();
         }
         else {
             resposta.status(400).json({
