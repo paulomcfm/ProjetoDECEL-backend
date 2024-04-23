@@ -5,10 +5,18 @@ export default class defRotaDAO{
 
     async gravar(client,rotaModelo){
         console.log(JSON.stringify(rotaModelo)) 
-        console.log((rotaModelo.mon_codigo))
         const sql = 'INSERT INTO Rotas (rot_nome, rot_km, rot_periodo, rot_tempoInicio, rot_tempoFinal, vei_codigo, mon_codigo) values ($1,$2,$3,$4,$5,$6,$7) RETURNING rot_codigo'
-        const values = [rotaModelo.rot_nome,rotaModelo.rot_km,rotaModelo.rot_periodo,rotaModelo.rot_tempoInicio,rotaModelo.rot_tempoFinal,rotaModelo.vei_codigo,rotaModelo.mon_codigo]
+        const values = [rotaModelo.nome,rotaModelo.km,rotaModelo.periodo,rotaModelo.ida,rotaModelo.volta,rotaModelo.veiculo,rotaModelo.monitor]
         const retorno = await client.query(sql,values)
-        rotaModelo.rot_codigo = retorno.rows[0].rot_codigo
+        rotaModelo.codigo = retorno.rows[0].rot_codigo
+        console.log(rotaModelo.codigo)
+    }
+
+    async gravarPontos(client,rotaModelo){
+        for(const ponto of rotaModelo.pontos){
+            const sql = 'INSERT INTO rotas_tem_pontosdeembarque(rot_codigo,pde_codigo) values ($1,$2)'
+            const values = [rotaModelo.codigo,ponto]
+            await client.query(sql,values)
+        }
     }
 }
