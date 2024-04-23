@@ -1,7 +1,4 @@
 import Aluno from "../modelo/aluno.js";
-import poolConexao from "./conexao.js";
-import Responsavel from "../modelo/responsavel.js";
-
 
 export default class AlunoDAO {
     async gravar(aluno, client) {
@@ -40,8 +37,8 @@ export default class AlunoDAO {
         if (!isNaN(parseInt(parametroConsulta))) {
             sql = `SELECT alunos.*, responsaveis.*
                 FROM alunos
-                INNER JOIN parentescos ON alunos.alu_codigo = parentescos.alu_codigo
-                INNER JOIN responsaveis ON parentescos.resp_codigo = responsaveis.resp_codigo
+                LEFT JOIN parentescos ON alunos.alu_codigo = parentescos.alu_codigo
+                LEFT JOIN responsaveis ON parentescos.resp_codigo = responsaveis.resp_codigo
                 WHERE alunos.alu_codigo = $1
                 ORDER BY alunos.alu_nome, responsaveis.resp_nome;`;
             parametros = [parametroConsulta];
@@ -51,8 +48,8 @@ export default class AlunoDAO {
             }
             sql = `SELECT alunos.*, responsaveis.*
                 FROM alunos
-                INNER JOIN parentescos ON alunos.alu_codigo = parentescos.alu_codigo
-                INNER JOIN responsaveis ON parentescos.resp_codigo = responsaveis.resp_codigo
+                LEFT JOIN parentescos ON alunos.alu_codigo = parentescos.alu_codigo
+                LEFT JOIN responsaveis ON parentescos.resp_codigo = responsaveis.resp_codigo
                 WHERE alunos.alu_nome ILIKE  $1
                 ORDER BY alunos.alu_nome, responsaveis.resp_nome;`;
             parametros = ['%' + parametroConsulta + '%'];
