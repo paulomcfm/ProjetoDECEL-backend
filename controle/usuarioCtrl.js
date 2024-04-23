@@ -11,11 +11,11 @@ export default class UsuarioCtrl {
             const email = dados.email;
             const celular = dados.celular;
             if (nome && senha && cpf && email && celular) {
-                const usuario = new Usuario(0, nome, senha, cpf, email, celular);
+                const usuario = new Usuario(nome, senha, cpf, email, celular);
                 usuario.gravar().then(() => {
                     resposta.status(200).json({
                         "status": true,
-                        "codigoGerado": usuario.codigo,
+                        "nomeUsuario": usuario.nome,
                         "mensagem": 'usuario incluida com sucesso!'
                     });
                 }).catch((erro) => {
@@ -44,14 +44,13 @@ export default class UsuarioCtrl {
         resposta.type('application/json');
         if ((requisicao.method === 'PUT' || requisicao.method === 'PATCH') && requisicao.is('application/json')) {
             const dados = requisicao.body;
-            const codigo = dados.codigo;
             const nome = dados.nome;
             const senha = dados.senha;
             const cpf = dados.cpf;
             const email = dados.email;
             const celular = dados.celular;
-            if (codigo>=0 && nome && senha && cpf && email && celular) {
-                const usuario = new Usuario(codigo, nome, senha, cpf, email, celular);
+            if (nome && senha && cpf && email && celular) {
+                const usuario = new Usuario(nome, senha, cpf, email, celular);
                 usuario.atualizar().then(() => {
                     resposta.status(200).json({
                         "status": true,
@@ -68,7 +67,7 @@ export default class UsuarioCtrl {
             else {
                 resposta.status(400).json({
                     "status": false,
-                    "mensagem": 'Por favor, informe o codigo e o nome da usuario!'
+                    "mensagem": 'Por favor, informe o nome e o cpf do usuario!'
                 });
             }
         }
@@ -84,13 +83,13 @@ export default class UsuarioCtrl {
         resposta.type('application/json');
         if (requisicao.method === 'DELETE' && requisicao.is('application/json')) {
             const dados = requisicao.body;
-            const codigo = dados.codigo;
-            if (codigo>=0) {
-                const usuario = new Usuario(codigo);
+            const nome = dados.nome;
+            if (nome) {
+                const usuario = new Usuario(nome);
                 usuario.excluir().then(() => {
                     resposta.status(200).json({
                         "status": true,
-                        "codigoGerado": usuario.codigo,
+                        "nomeGerado": usuario.nome,
                         "mensagem": 'usuario excluída com sucesso!'
                     });
                 }).catch((erro) => {
@@ -103,14 +102,14 @@ export default class UsuarioCtrl {
             else {
                 resposta.status(400).json({
                     "status": false,
-                    "mensagem": 'Por favor, informe o codigo da usuario!'
+                    "mensagem": 'Por favor, informe o nome da usuario!'
                 });
             }
         }
         else {
             resposta.status(400).json({
                 "status": false,
-                "mensagem": 'Por favor, utilize os métodos DELETE para excluir uma usuario!'
+                "mensagem": 'Por favor, utilize os métodos DELETE para excluir um usuario!'
             });
         }
     }

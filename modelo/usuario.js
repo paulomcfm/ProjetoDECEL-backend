@@ -1,28 +1,18 @@
 import UsuarioDAO from "../persistencia/usuarioDAO";
 
 export default class Usuario {
-    #codigo;
     #nome;
     #senha;
     #cpf;
     #email;
     #celular;
 
-    constructor(codigo=0, nome='',senha='',cpf='',email='',celular=''){
-        this.#codigo = codigo;
+    constructor(nome='',senha='',cpf='',email='',celular=''){
         this.#nome = nome;
         this.#senha = senha;
         this.#cpf = cpf;
         this.#email = email;
         this.#celular = celular;
-    }
-
-    get codigo() {
-        return this.#codigo;
-    }
-
-    set codigo(novoCodigo) {
-        this.#codigo = novoCodigo;
     }
 
     get nome() {
@@ -67,12 +57,11 @@ export default class Usuario {
 
     toJSON(){
         return {
-            codigo: this.#codigo,
             nome: this.#nome,
             senha: this.#senha,
             cpf: this.#cpf,
             email: this.#email,
-            celular: this.#celular,
+            celular: this.#celular
         }
     }
 
