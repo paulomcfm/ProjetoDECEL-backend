@@ -1,7 +1,15 @@
 import Parentesco from "../modelo/parentesco.js";
 
 export default class ParentescoCtrl {
-    gravar(requisicao, resposta) {
+    static _instance = null;
+
+    constructor() {
+        if (ParentescoCtrl._instance) {
+            return ParentescoCtrl._instance
+        }
+        ParentescoCtrl._instance = this;
+    }
+    static async  gravar(requisicao, resposta) {
         resposta.type('application/json');
         if (requisicao.method === 'POST') {
             const dados = requisicao.body;
@@ -37,7 +45,7 @@ export default class ParentescoCtrl {
         }
     }
 
-    atualizar(requisicao, resposta) {
+    static async  atualizar(requisicao, resposta) {
         resposta.type('application/json');
         const codigoAluno = requisicao.body.codigoAluno;
         const codigoResponsavel = requisicao.body.codigoResponsavel;
@@ -72,7 +80,7 @@ export default class ParentescoCtrl {
         }
     }
 
-    excluir(requisicao, resposta) {
+    static async  excluir(requisicao, resposta) {
         resposta.type('application/json');
         if (requisicao.method === 'DELETE' && requisicao.is('application/json')) {
             const dados = requisicao.body;
@@ -107,7 +115,7 @@ export default class ParentescoCtrl {
         }
     }
 
-    consultar(requisicao, resposta) {
+    static async  consultar(requisicao, resposta) {
         resposta.type('application/json');
         let termo = requisicao.params.termo;
         if (!termo) {
@@ -135,7 +143,7 @@ export default class ParentescoCtrl {
         }
     }
 
-    consultarAluno(requisicao, resposta) {
+    static async  consultarAluno(requisicao, resposta) {
         resposta.type('application/json');
         let termo = requisicao.params.termo;
         if (!termo) {
@@ -162,7 +170,7 @@ export default class ParentescoCtrl {
             });
         }
     }
-    consultarResponsavel(requisicao, resposta) {
+    static async consultarResponsavel(requisicao, resposta) {
         resposta.type('application/json');
         let termo = requisicao.params.termo;
         if (!termo) {

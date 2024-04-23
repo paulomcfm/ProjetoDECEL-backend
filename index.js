@@ -7,6 +7,7 @@ import rotaParentesco from './rotas/rotaParentesco.js';
 import rotaPontoEmbarque from './rotas/rotaPontoEmbarque.js';
 import rotaMotorista from './rotas/rotaMotorista.js'
 import rotaInscricaoAluno from './rotas/rotaInscricaoAluno.js';
+import rotaVeiculo from './rotas/rotaVeiculo.js'
 
 const app = express();
 const porta = '8080'
@@ -20,5 +21,8 @@ app.use('/responsavel', rotaResponsavel);
 app.use('/pontos-embarque', rotaPontoEmbarque);
 app.use('/motorista', rotaMotorista)
 app.use('/inscricao-aluno', rotaInscricaoAluno)
+app.use('/motorista', rotaMotorista);
+app.use('/veiculo', rotaVeiculo);
+
 
 app.listen(porta, () => { console.log("servidor iniciado " + porta) })
