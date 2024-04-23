@@ -1,20 +1,8 @@
 CREATE TABLE Usuarios (
     user_nome VARCHAR(100) NOT NULL PRIMARY KEY,
-    user_nome VARCHAR(100) NOT NULL PRIMARY KEY,
     user_senha VARCHAR(255) NOT NULL,
     user_cpf VARCHAR(14) NOT NULL UNIQUE,
-    user_cpf VARCHAR(14) NOT NULL UNIQUE,
     user_email VARCHAR(255) NOT NULL,
-    user_celular VARCHAR(20) NOT NULL
-);
-
-CREATE TABLE Veiculos (
-  vei_codigo SERIAL PRIMARY KEY,
-  vei_renavam VARCHAR(11) NOT NULL UNIQUE,
-  vei_placa VARCHAR(7) NOT NULL,
-  vei_modelo VARCHAR(45) NOT NULL,
-  vei_capacidade INT NOT NULL,
-  vei_tipo CHAR NOT NULL
     user_celular VARCHAR(20) NOT NULL
 );
 
@@ -55,7 +43,7 @@ CREATE TABLE Parentescos (
     CONSTRAINT fk_respparentesco FOREIGN KEY (resp_codigo) REFERENCES Responsaveis(resp_codigo) ON DELETE CASCADE
 );
 
-CREATE TABLE pontos_de_embarque (
+CREATE TABLE pontosdeembarque (
   pde_codigo SERIAL PRIMARY KEY,
   pde_rua VARCHAR(45) NOT NULL,
   pde_bairro VARCHAR(45) NOT NULL,
@@ -69,8 +57,8 @@ CREATE TABLE Escolas (
   esc_tipo CHAR NOT NULL,
   esc_email VARCHAR(45) NOT NULL,
   esc_telefone VARCHAR(45) NOT NULL,
-  esc_pde_codigo INT NOT NULL,
-  CONSTRAINT fk_escolas_pontosdeembarque FOREIGN KEY (esc_pde_codigo) REFERENCES pontos_de_embarque(pde_codigo)
+  pde_codigo INT NOT NULL,
+  CONSTRAINT fk_escolas_pontosdeembarque FOREIGN KEY (pde_codigo) REFERENCES pontosdeembarque(pde_codigo)
 );
 
 CREATE TABLE Motoristas (
@@ -108,6 +96,10 @@ CREATE TABLE Inscricoes (
   insc_etapa CHAR NOT NULL,
   insc_periodo CHAR NOT NULL,
   insc_dataAlocacao DATE,
+  insc_rua varchar(45),
+  insc_cep varchar(45),
+  insc_numero varchar(45),
+  insc_bairro varchar(45),
   alu_codigo INT NOT NULL,
   esc_codigo INT NOT NULL,
   pde_codigo INT NOT NULL,
@@ -115,7 +107,7 @@ CREATE TABLE Inscricoes (
   PRIMARY KEY (insc_codigo, alu_codigo),
   CONSTRAINT fk_inscricoes_alunos FOREIGN KEY (alu_codigo) REFERENCES Alunos(alu_codigo),
   CONSTRAINT fk_inscricoes_escolas FOREIGN KEY (esc_codigo) REFERENCES Escolas(esc_codigo),
-  CONSTRAINT fk_inscricoes_pontosdeembarque FOREIGN KEY (pde_codigo) REFERENCES pontos_de_embarque(pde_codigo),
+  CONSTRAINT fk_inscricoes_pontosdeembarque FOREIGN KEY (pde_codigo) REFERENCES pontosdeembarque(pde_codigo),
   CONSTRAINT fk_inscricoes_rotas FOREIGN KEY (rot_codigo) REFERENCES Rotas(rot_codigo)
 );
 
@@ -132,7 +124,7 @@ CREATE TABLE Rotas_tem_PontosdeEmbarque (
   pde_codigo INT NOT NULL,
   PRIMARY KEY (rot_codigo, pde_codigo),
   CONSTRAINT fk_rotas_tem_pontosdeembarque_rotas FOREIGN KEY (rot_codigo) REFERENCES Rotas(rot_codigo),
-  CONSTRAINT fk_rotas_tem_pontosdeembarque_pontosdeembarque FOREIGN KEY (pde_codigo) REFERENCES pontos_de_embarque(pde_codigo)
+  CONSTRAINT fk_rotas_tem_pontosdeembarque_pontosdeembarque FOREIGN KEY (pde_codigo) REFERENCES PontosdeEmbarque(pde_codigo)
 );
 
 CREATE TABLE Rotas_tem_Motoristas (
@@ -174,13 +166,13 @@ VALUES (1, 1, 'Pai'),
        (3, 3, 'Tio');
 
 -- Inserts para a tabela PontosdeEmbarque
-INSERT INTO pontos_de_embarque (pde_rua, pde_bairro, pde_numero, pde_cep)
+INSERT INTO PontosdeEmbarque (pde_rua, pde_bairro, pde_numero, pde_cep)
 VALUES ('Rua 1', 'Bairro 1', '123', '12345-678'),
        ('Rua 2', 'Bairro 2', '456', '98765-432'),
        ('Rua 3', 'Bairro 3', '789', '54321-876');
 
 -- Inserts para a tabela Escolas
-INSERT INTO Escolas (esc_nome, esc_tipo, esc_email, esc_telefone, esc_pde_codigo)
+INSERT INTO Escolas (esc_nome, esc_tipo, esc_email, esc_telefone, pde_codigo)
 VALUES ('Escola 1', 'P', 'escola1@email.com', '(123) 456-7890', 1),
        ('Escola 2', 'E', 'escola2@email.com', '(987) 654-3210', 2),
        ('Escola 3', 'P', 'escola3@email.com', '(111) 222-3333', 3);
@@ -204,10 +196,11 @@ VALUES ('Rota 1', 10, 'M', '08:00', '10:00', 1, 1),
        ('Rota 3', 20, 'N', '18:00', '20:00', 3, 3);
 
 -- Inserts para a tabela Inscricoes
-INSERT INTO Inscricoes (insc_ano, insc_anoLetivo, insc_turma, insc_etapa, insc_periodo, insc_dataAlocacao, alu_codigo, esc_codigo, pde_codigo, rot_codigo)
-VALUES (2024, '24', 'A', 'F', 'M', '2024-04-22', 1, 1, 1, 1),
-       (2024, '24', 'B', 'I', 'T', '2024-04-22', 2, 2, 2, 2),
-       (2024, '24', 'C', 'F', 'N', '2024-04-22', 3, 3, 3, 3);
+INSERT INTO Inscricoes (insc_ano, insc_anoLetivo, insc_turma, insc_etapa, insc_periodo, insc_dataAlocacao, insc_rua, insc_cep, insc_numero, insc_bairro, alu_codigo, esc_codigo, pde_codigo, rot_codigo)
+VALUES
+  (2024, '24', 'A', '1', '1', '2024-04-23', 'Rua A', '12345-678', '123', 'Bairro A', 1, 1, 1, 1),
+  (2024, '24', 'B', '2', '1', '2024-04-23', 'Rua B', '23456-789', '234', 'Bairro B', 2, 2, 2, 2),
+  (2024, '24', 'C', '3', '1', '2024-04-23', 'Rua C', '34567-890', '345', 'Bairro C', 3, 3, 3, 3);
 
 -- Inserts para a tabela Manutencoes
 INSERT INTO Manutencoes (manu_tipo, manu_data, vei_codigo)
