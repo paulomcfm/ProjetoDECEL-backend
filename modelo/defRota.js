@@ -1,101 +1,123 @@
 import defRotaDAO from "../persistencia/defRotaDAO.js"
 
 export default class defRota{
-    #rot_codigo 
-    #rot_nome 
-    #rot_km 
-    #rot_periodo 
-    #rot_tempoInicio 
-    #rot_tempoFinal 
-    #vei_codigo 
-    #mon_codigo 
+    #codigo 
+    #nome 
+    #km 
+    #periodo 
+    #ida
+    #volta 
+    #veiculo 
+    #monitor
+    #pontos
+    #motoristas 
 
 
-    constructor(codigo, nome, km, periodo, tempoInicio, tempoFinal, veiculoCodigo, monitorCodigo) {
-        this.#rot_codigo = codigo;
-        this.#rot_nome = nome;
-        this.#rot_km = km;
-        this.#rot_periodo = periodo;
-        this.#rot_tempoInicio = tempoInicio;
-        this.#rot_tempoFinal = tempoFinal;
-        this.#vei_codigo = veiculoCodigo;
-        this.#mon_codigo = monitorCodigo;
+    constructor(codigo, nome, km, periodo, tempoInicio, volta, veiculoCodigo, monitorCodigo,pontos,motoristas) {
+        this.#codigo = codigo;
+        this.#nome = nome;
+        this.#km = km;
+        this.#periodo = periodo;
+        this.#ida= tempoInicio;
+        this.#volta = volta;
+        this.#veiculo = veiculoCodigo;
+        this.#monitor = monitorCodigo;
+        this.#pontos = pontos
+        this.#motoristas = motoristas
     }
 
-    get rot_codigo() {
-        return this.#rot_codigo;
+    get codigo() {
+        return this.#codigo;
     }
 
-    set rot_codigo(codigo) {
-        this.#rot_codigo = codigo;
+    set codigo(codigo) {
+        this.#codigo = codigo;
     }
 
-    get rot_nome() {
-        return this.#rot_nome;
+    get nome() {
+        return this.#nome;
     }
 
-    set rot_nome(nome) {
-        this.#rot_nome = nome;
+    set nome(nome) {
+        this.#nome = nome;
     }
 
-    get rot_km() {
-        return this.#rot_km;
+    get km() {
+        return this.#km;
     }
 
-    set rot_km(km) {
-        this.#rot_km = km;
+    set km(km) {
+        this.#km = km;
     }
 
-    get rot_periodo() {
-        return this.#rot_periodo;
+    get periodo() {
+        return this.#periodo;
     }
 
-    set rot_periodo(periodo) {
-        this.#rot_periodo = periodo;
+    set periodo(periodo) {
+        this.#periodo = periodo;
     }
 
-    get rot_tempoInicio() {
-        return this.#rot_tempoInicio;
+    get ida() {
+        return this.#ida;
     }
 
-    set rot_tempoInicio(tempoInicio) {
-        this.#rot_tempoInicio = tempoInicio;
+    set ida(tempoInicio) {
+        this.#ida= tempoInicio;
     }
 
-    get rot_tempoFinal() {
-        return this.#rot_tempoFinal;
+    get volta() {
+        return this.#volta;
     }
 
-    set rot_tempoFinal(tempoFinal) {
-        this.#rot_tempoFinal = tempoFinal;
+    set volta(volta) {
+        this.#volta = volta;
     }
 
-    get vei_codigo() {
-        return this.#vei_codigo;
+    get veiculo() {
+        return this.#veiculo;
     }
 
-    set vei_codigo(veiculoCodigo) {
-        this.#vei_codigo = veiculoCodigo;
+    set veiculo(veiculoCodigo) {
+        this.#veiculo = veiculoCodigo;
     }
 
-    get mon_codigo() {
-        return this.#mon_codigo;
+    get monitor() {
+        return this.#monitor;
     }
 
-    set mon_codigo(monitorCodigo) {
-        this.#mon_codigo = monitorCodigo;
+    set monitor(monitorCodigo) {
+        this.#monitor = monitorCodigo;
+    }
+
+    get motoristas() {
+        return this.#motoristas;
+    }
+
+    set motoristas(motoristasCodigo) {
+        this.#motoristas = motoristasCodigo;
+    }
+    
+    get pontos() {
+        return this.#pontos;
+    }
+
+    set pontos(pontosCodigo) {
+        this.#pontos = pontosCodigo;
     }
 
     toJSON() {
         return {
-            rot_codigo: this.#rot_codigo,
-            rot_nome: this.#rot_nome,
-            rot_km: this.#rot_km,
-            rot_periodo: this.#rot_periodo,
-            rot_tempoInicio: this.#rot_tempoInicio,
-            rot_tempoFinal: this.#rot_tempoFinal,
-            vei_codigo: this.#vei_codigo,
-            mon_codigo: this.#mon_codigo
+            codigo: this.#codigo,
+            nome: this.#nome,
+            km: this.#km,
+            periodo: this.#periodo,
+            tempoInicio: this.#ida,
+            volta: this.#volta,
+            veiculo: this.#veiculo,
+            monitor: this.#monitor,
+            motoristas:this.#motoristas,
+            pontos:this.#pontos
         };
     }
     
@@ -116,6 +138,11 @@ export default class defRota{
 
     async consultar(){
         
+    }
+
+    async gravarPontos(client){
+        const dao = new defRotaDAO()
+        await dao.gravarPontos(client,this)
     }
 
 
