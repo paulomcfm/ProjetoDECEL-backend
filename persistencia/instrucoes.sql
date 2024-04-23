@@ -1,8 +1,20 @@
 CREATE TABLE Usuarios (
     user_nome VARCHAR(100) NOT NULL PRIMARY KEY,
+    user_nome VARCHAR(100) NOT NULL PRIMARY KEY,
     user_senha VARCHAR(255) NOT NULL,
     user_cpf VARCHAR(14) NOT NULL UNIQUE,
+    user_cpf VARCHAR(14) NOT NULL UNIQUE,
     user_email VARCHAR(255) NOT NULL,
+    user_celular VARCHAR(20) NOT NULL
+);
+
+CREATE TABLE Veiculos (
+  vei_codigo SERIAL PRIMARY KEY,
+  vei_renavam VARCHAR(11) NOT NULL UNIQUE,
+  vei_placa VARCHAR(7) NOT NULL,
+  vei_modelo VARCHAR(45) NOT NULL,
+  vei_capacidade INT NOT NULL,
+  vei_tipo CHAR NOT NULL
     user_celular VARCHAR(20) NOT NULL
 );
 
