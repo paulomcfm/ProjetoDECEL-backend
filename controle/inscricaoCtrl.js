@@ -92,6 +92,70 @@ export default class InscricaoCtrl {
         }
     }
 
+    atualizarInscricoes(requisicao, resposta) {
+        resposta.type('application/json');
+        if ((requisicao.method === 'PUT' || requisicao.method === 'PATCH') && requisicao.is('application/json')) {
+            const dados = requisicao.body;
+            if (dados.length > 0) {
+                const inscricao = new Inscricao();
+                inscricao.consultarPorRota(dados[0].rota).then((inscricoes) => {
+                    for (const inscricaoEncontrada of inscricoes) {
+                        const encontradaEmDados = dados.find(d => d.aluno.codigo === inscricaoEncontrada.aluno.codigo);
+                        if (!encontradaEmDados) {
+                            inscricaoEncontrada.rota = null;
+                            inscricaoEncontrada.dataAlocacao = null;
+                            inscricaoEncontrada.novaAtualizar();
+                        }
+                    }
+                    for (const inscricao of dados) {
+                        const naoEncontradaNaConsulta = inscricoes.every(i => i.aluno.codigo !== inscricao.aluno.codigo);
+                        if (naoEncontradaNaConsulta) {
+                            const novaInscricao = new Inscricao(
+                                inscricao.codigo,
+                                inscricao.aluno,
+                                inscricao.pontoEmbarque,
+                                inscricao.escola,
+                                inscricao.rota,
+                                inscricao.ano,
+                                inscricao.cep,
+                                inscricao.rua,
+                                inscricao.numero,
+                                inscricao.bairro,
+                                inscricao.periodo,
+                                inscricao.etapa,
+                                inscricao.anoLetivo,
+                                inscricao.turma,
+                                inscricao.dataAlocacao
+                            );
+                            novaInscricao.novaAtualizar();
+                        }
+                    }
+                    resposta.status(200).json({
+                        "status": true,
+                        "mensagem": 'Inscrições alteradas com sucesso!'
+                    });
+                }).catch((erro) => {
+                    resposta.status(500).json({
+                        "status": false,
+                        "mensagem": 'Erro ao alterar as inscrições: ' + erro.message
+                    });
+                });
+            }
+            else {
+                resposta.status(400).json({
+                    "status": false,
+                    "mensagem": 'Por favor, informe inscrições!'
+                });
+            }
+        }
+        else {
+            resposta.status(400).json({
+                "status": false,
+                "mensagem": 'Por favor, utilize os métodos PUT ou PATCH para atualizar uma inscrição!'
+            });
+        }
+    }
+
     excluir(requisicao, resposta) {
         resposta.type('application/json');
         if (requisicao.method === 'DELETE' && requisicao.is('application/json')) {

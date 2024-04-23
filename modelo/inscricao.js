@@ -8,16 +8,16 @@ export default class Inscricao {
     #rota
     #ano
     #cep;
-    #rua;   
+    #rua;
     #numero;
     #bairro;
     #periodo;
     #etapa;
     #anoLetivo;
-    #turma; 
+    #turma;
     #dataAlocacao;
 
-    constructor(codigo = 0, aluno = [], pontoEmbarque = [], escola = [], rota = [], ano='', cep = '', rua = '', numero = 0, bairro = '', periodo = '', etapa = '', anoLetivo = '', turma = '', dataAlocacao = '') {
+    constructor(codigo = 0, aluno = [], pontoEmbarque = [], escola = [], rota = [], ano = '', cep = '', rua = '', numero = 0, bairro = '', periodo = '', etapa = '', anoLetivo = '', turma = '', dataAlocacao = '') {
         this.#codigo = codigo;
         this.#aluno = aluno;
         this.#pontoEmbarque = pontoEmbarque;
@@ -193,5 +193,15 @@ export default class Inscricao {
     async consultar(parametro) {
         const inscDAO = new InscricaoDAO();
         return await inscDAO.consultar(parametro);
+    }
+
+    async novaAtualizar() {
+        const inscDAO = new InscricaoDAO();
+        await inscDAO.novaAtualizar(this);
+    }
+
+    async consultarPorRota(parametro) {
+        const inscDAO = new InscricaoDAO();
+        return await inscDAO.consultarPorRota(parametro);
     }
 }

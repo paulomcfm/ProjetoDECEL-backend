@@ -9,6 +9,6 @@ rotaInscricaoAluno.get('/', inscCtrl.consultar)
     .post('/', inscCtrl.gravar)
     .patch('/', inscCtrl.atualizar)
     .put('/', inscCtrl.atualizar)
-    .delete('/', inscCtrl.excluir);
-
+    .delete('/', inscCtrl.excluir)
+    .put('/atualizar-inscricoes', inscCtrl.atualizarInscricoes);
 export default rotaInscricaoAluno;
