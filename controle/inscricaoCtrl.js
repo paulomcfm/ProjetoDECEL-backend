@@ -4,6 +4,7 @@ export default class InscricaoCtrl {
     gravar(requisicao, resposta) {
         resposta.type('application/json');
         if (requisicao.method === 'POST' && requisicao.is('application/json')) {
+            const dados = requisicao.body;  
             const data = new Date();
             const ano = data.getFullYear();
             const aluno = dados.aluno;

@@ -7,7 +7,7 @@ import poolConexao from "./conexao.js";
 export default class InscricaoDAO {
     async gravar(inscricao) {
         if (inscricao instanceof Inscricao) {
-            const sql = "INSERT INTO inscricoes(insc_ano, insc_anoLetivo, insc_etapa, insc_turma, insc_periodo, insc_rua, insc_numero, insc_bairro, insc_cep, pde_codigo, esc_codigo, alu_codigo) VALUES(DATE_PART($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);";
+            const sql = "INSERT INTO inscricoes(insc_ano, insc_anoLetivo, insc_etapa, insc_turma, insc_periodo, insc_rua, insc_numero, insc_bairro, insc_cep, pde_codigo, esc_codigo, alu_codigo) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)";
             const parametros = [inscricao.ano, inscricao.anoLetivo, inscricao.etapa, inscricao.turma, inscricao.periodo, inscricao.rua, inscricao.numero, inscricao.bairro, inscricao.cep, inscricao.pontoEmbarque.codigo, inscricao.escola.codigo, inscricao.aluno.codigo];
             const retorno = await poolConexao.query(sql, parametros);
         }
