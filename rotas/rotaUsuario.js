@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import UsuarioCtrl from '../controle/usuarioCtrl';
+import UsuarioCtrl from '../controle/usuarioCtrl.js';
 
 const userCtrl = new UsuarioCtrl();
 const rotaUsuario = new Router();

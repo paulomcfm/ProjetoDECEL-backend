@@ -1,4 +1,4 @@
-import Usuario from "../modelo/usuario";
+import Usuario from "../modelo/usuario.js";
 
 export default class UsuarioCtrl {
     gravar(requisicao, resposta) {
@@ -36,6 +36,46 @@ export default class UsuarioCtrl {
             resposta.status(400).json({
                 "status": false,
                 "mensagem": 'Por favor, utilize o método POST para cadastrar uma usuario!'
+            });
+        }
+    }
+
+    autenticarUsuario(requisicao, resposta) {
+        resposta.type('application/json');
+        if (requisicao.method === 'POST' && requisicao.is('application/json')) {
+            const dados = requisicao.body;
+            const nome = dados.nome;
+            const cpf = dados.cpf;
+            if (nome && cpf) {
+                const usuario = new Usuario(nome); // Supondo que o nome seja único na sua base de dados
+                usuario.consultarPorNome().then((usuarioConsultado) => {
+                    if (usuarioConsultado && usuarioConsultado.cpf === cpf) {
+                        resposta.status(200).json({
+                            "status": true,
+                            "mensagem": 'Usuário autenticado com sucesso!'
+                        });
+                    } else {
+                        resposta.status(401).json({
+                            "status": false,
+                            "mensagem": 'Nome de usuário ou CPF inválido!'
+                        });
+                    }
+                }).catch((erro) => {
+                    resposta.status(500).json({
+                        "status": false,
+                        "mensagem": 'Erro ao autenticar o usuário: ' + erro.message
+                    });
+                });
+            } else {
+                resposta.status(400).json({
+                    "status": false,
+                    "mensagem": 'Por favor, informe o nome de usuário e o CPF!'
+                });
+            }
+        } else {
+            resposta.status(400).json({
+                "status": false,
+                "mensagem": 'Por favor, utilize o método POST e envie os dados no formato JSON para autenticar o usuário!'
             });
         }
     }
