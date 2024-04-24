@@ -47,7 +47,7 @@ export default class UsuarioCtrl {
             const nome = dados.nome;
             const cpf = dados.cpf;
             if (nome && cpf) {
-                const usuario = new Usuario(nome); // Supondo que o nome seja único na sua base de dados
+                const usuario = new Usuario(nome);
                 usuario.consultarPorNome().then((usuarioConsultado) => {
                     if (usuarioConsultado && usuarioConsultado.cpf === cpf) {
                         resposta.status(200).json({
