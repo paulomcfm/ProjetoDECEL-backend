@@ -13,7 +13,6 @@ export default class AlunoCtrl {
     }
     static async gravar(requisicao, resposta) {
         var ok = true;
-        var erroV;
         resposta.type('application/json');
         if (requisicao.method === 'POST') {
             const dados = requisicao.body;
@@ -33,7 +32,10 @@ export default class AlunoCtrl {
                             const parentesco = new Parentesco(aluno.codigo, responsavel.codigo, responsavel.parentesco);
                             parentesco.gravar(client).catch((err) => {
                                 ok = false;
-                                erroV = err;
+                                resposta.status(500).json({
+                                    "status": false,
+                                    "mensagem": 'Erro ao registrar o aluno: ' + err.message
+                                });
                             })
                         }
                         if (ok) {
@@ -47,7 +49,7 @@ export default class AlunoCtrl {
                         else {
                             resposta.status(500).json({
                                 "status": false,
-                                "mensagem": 'Erro ao registrar o aluno: ' + erroV.message
+                                "mensagem": 'Erro ao registrar o aluno.'
                             });
                             client.query('ROLLBACK');
                         }
@@ -93,7 +95,6 @@ export default class AlunoCtrl {
 
     static async atualizar(requisicao, resposta) {
         var ok = true;
-        var erroV;
         resposta.type('application/json');
         if ((requisicao.method === 'PUT' || requisicao.method === 'PATCH') && requisicao.is('application/json')) {
             const dados = requisicao.body;
@@ -122,8 +123,11 @@ export default class AlunoCtrl {
                         try {
                             await par.excluir(client);
                         } catch (err) {
-                            erroV = err;
                             ok = false;
+                            resposta.status(500).json({
+                                "status": false,
+                                "mensagem": 'Erro ao registrar o aluno: ' + err.message
+                            });
                         }
                     }
 
@@ -136,8 +140,11 @@ export default class AlunoCtrl {
                         try {
                             await par.gravar(client);
                         } catch (err) {
-                            erroV = err;
                             ok = false;
+                            resposta.status(500).json({
+                                "status": false,
+                                "mensagem": 'Erro ao registrar o aluno: ' + err.message
+                            });
                         }
                     }
 
@@ -152,8 +159,11 @@ export default class AlunoCtrl {
                             try {
                                 await par.atualizar(client);
                             } catch (err) {
-                                erroV = err;
                                 ok = false;
+                                resposta.status(500).json({
+                                    "status": false,
+                                    "mensagem": 'Erro ao registrar o aluno: ' + err.message
+                                });
                             }
                         }
                     }
