@@ -4,7 +4,8 @@ export default class InscricaoCtrl {
     gravar(requisicao, resposta) {
         resposta.type('application/json');
         if (requisicao.method === 'POST' && requisicao.is('application/json')) {
-            const dados = requisicao.body;
+            const data = new Date();
+            const ano = data.getFullYear();
             const aluno = dados.aluno;
             const pontoEmbarque = dados.pontoEmbarque;
             const escola = dados.escola;
@@ -16,12 +17,11 @@ export default class InscricaoCtrl {
             const etapa = dados.etapa;
             const anoLetivo = dados.anoLetivo;
             const turma = dados.turma;
-            if (aluno && pontoEmbarque && escola && cep && rua && numero && bairro && periodo && etapa && anoLetivo && turma) {
-                const inscricao = new Inscricao(0, aluno, pontoEmbarque, escola, null, '', cep, rua, numero, bairro, periodo, etapa, anoLetivo, turma, '');
+            if (ano >= 0 && aluno && pontoEmbarque && escola && cep && rua && numero && bairro && periodo && etapa && anoLetivo && turma) {
+                const inscricao = new Inscricao(ano, aluno, pontoEmbarque, escola, null, cep, rua, numero, bairro, periodo, etapa, anoLetivo, turma, '');
                 inscricao.gravar().then(() => {
                     resposta.status(200).json({
                         "status": true,
-                        "codigoGerado": inscricao.codigo,
                         "mensagem": 'Inscrição incluida com sucesso!'
                     });
                 }).catch((erro) => {
@@ -50,7 +50,7 @@ export default class InscricaoCtrl {
         resposta.type('application/json');
         if ((requisicao.method === 'PUT' || requisicao.method === 'PATCH') && requisicao.is('application/json')) {
             const dados = requisicao.body;
-            const codigo = dados.codigo;
+            const ano = dados.ano;
             const aluno = dados.aluno;
             const pontoEmbarque = dados.pontoEmbarque;
             const escola = dados.escola;
@@ -62,12 +62,11 @@ export default class InscricaoCtrl {
             const etapa = dados.etapa;
             const anoLetivo = dados.anoLetivo;
             const turma = dados.turma;
-            if (codigo >= 0 && aluno && pontoEmbarque && escola && cep && rua && numero && bairro && periodo && etapa && anoLetivo && turma) {
-                const inscricao = new Inscricao(codigo, aluno, pontoEmbarque, escola, null, '', cep, rua, numero, bairro, periodo, etapa, anoLetivo, turma, '');
+            if (ano >= 0 && aluno && pontoEmbarque && escola && cep && rua && numero && bairro && periodo && etapa && anoLetivo && turma) {
+                const inscricao = new Inscricao(ano, aluno, pontoEmbarque, escola, null, cep, rua, numero, bairro, periodo, etapa, anoLetivo, turma, '');
                 inscricao.atualizar().then(() => {
                     resposta.status(200).json({
                         "status": true,
-                        "codigoGerado": inscricao.codigo,
                         "mensagem": 'Inscrição alterada com sucesso!'
                     });
                 }).catch((erro) => {
@@ -104,19 +103,18 @@ export default class InscricaoCtrl {
                         if (!encontradaEmDados) {
                             inscricaoEncontrada.rota = null;
                             inscricaoEncontrada.dataAlocacao = null;
-                            inscricaoEncontrada.novaAtualizar();
+                            inscricaoEncontrada.atualizarRota();
                         }
                     }
                     for (const inscricao of dados) {
                         const naoEncontradaNaConsulta = inscricoes.every(i => i.aluno.codigo !== inscricao.aluno.codigo);
                         if (naoEncontradaNaConsulta) {
                             const novaInscricao = new Inscricao(
-                                inscricao.codigo,
+                                inscricao.ano,
                                 inscricao.aluno,
                                 inscricao.pontoEmbarque,
                                 inscricao.escola,
                                 inscricao.rota,
-                                inscricao.ano,
                                 inscricao.cep,
                                 inscricao.rua,
                                 inscricao.numero,
@@ -127,7 +125,7 @@ export default class InscricaoCtrl {
                                 inscricao.turma,
                                 inscricao.dataAlocacao
                             );
-                            novaInscricao.novaAtualizar();
+                            novaInscricao.atualizarRota();
                         }
                     }
                     resposta.status(200).json({
@@ -160,9 +158,10 @@ export default class InscricaoCtrl {
         resposta.type('application/json');
         if (requisicao.method === 'DELETE' && requisicao.is('application/json')) {
             const dados = requisicao.body;
-            const codigo = dados.codigo;
-            if (codigo >= 0) {
-                const inscricao = new Inscricao(codigo);
+            const ano = dados.ano;
+            const aluno = dados.aluno;
+            if (aluno.codigo >= 0 && ano >= 0) {
+                const inscricao = new Inscricao(ano, aluno);
                 inscricao.excluir().then(() => {
                     resposta.status(200).json({
                         "status": true,
