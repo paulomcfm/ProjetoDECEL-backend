@@ -11,9 +11,10 @@ export default class defRota{
     #monitor
     #pontos
     #motoristas 
+    #inscricoes
 
 
-    constructor(codigo, nome, km, periodo, tempoInicio, volta, veiculoCodigo, monitorCodigo,pontos,motoristas) {
+    constructor(codigo, nome, km, periodo, tempoInicio, volta, veiculoCodigo, monitorCodigo,pontos,motoristas,inscricoes) {
         this.#codigo = codigo;
         this.#nome = nome;
         this.#km = km;
@@ -24,6 +25,7 @@ export default class defRota{
         this.#monitor = monitorCodigo;
         this.#pontos = pontos
         this.#motoristas = motoristas
+        this.#inscricoes = inscricoes
     }
 
     get codigo() {
@@ -105,6 +107,14 @@ export default class defRota{
     set pontos(pontosCodigo) {
         this.#pontos = pontosCodigo;
     }
+    
+    get inscricoes() {
+        return this.#inscricoes;
+    }
+
+    set inscricoes(inscricoesCodigo) {
+        this.#inscricoes = inscricoesCodigo;
+    }
 
     toJSON() {
         return {
@@ -117,7 +127,8 @@ export default class defRota{
             veiculo: this.#veiculo,
             monitor: this.#monitor,
             motoristas:this.#motoristas,
-            pontos:this.#pontos
+            pontos:this.#pontos,
+            inscricoes:this.#inscricoes
         };
     }
     
@@ -159,6 +170,11 @@ export default class defRota{
     async consultarMotoristas(client){
         const dao = new defRotaDAO()
         await dao.consultarMotoristas(client,this)
+    }
+
+    async consultarInscricoes(client){
+        const dao = new defRotaDAO()
+        await dao.consultarInscricoes(client,this)
     }
 
 

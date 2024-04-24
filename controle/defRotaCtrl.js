@@ -91,19 +91,29 @@ export default class defRotaCtrl{
             const client = await poolConexao.connect()
             rota.consultar(client,termo).then((listaRotas)=>{
                 let flag = true
+                let num = 0
                 for(let i=0;i<listaRotas.length && flag;i++){
                     const registro = listaRotas[i]
                     registro.consultarPontos(client).then(()=>{
                         registro.consultarMotoristas(client).then(()=>{
-                            listaRotas[i] = registro
-                            if(i+1>=listaRotas.length){
-                                // resposta final com sucesso caso todos os registro foram consultados corretamente
-                                resposta.status(200).json({
-                                    status:true,
-                                    mensagem:"Rota consultada com sucesso",
-                                    listaRotas:listaRotas
+                            registro.consultarInscricoes(client).then(()=>{
+                                num++;
+                                if(num>=listaRotas.length){
+                                    // resposta final com sucesso caso todos os registro foram consultados corretamente
+                                    resposta.status(200).json({
+                                        status:true,
+                                        mensagem:"Rota consultada com sucesso",
+                                        listaRotas:listaRotas
+                                    })
+                                }
+                            }).catch((erro)=>{
+                                flag = false
+                                resposta.status(500).json({
+                                    status:false,
+                                    mensagem:'Não foi possivel consultar as rotas na base de dados: '+erro,
+                                    listaRotas:[]
                                 })
-                            }
+                            })
                         }).catch((erro)=>{
                             flag = false
                             resposta.status(500).json({
