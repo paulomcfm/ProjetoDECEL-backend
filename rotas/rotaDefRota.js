@@ -3,6 +3,6 @@ import defRotaCtrl from '../controle/defRotaCtrl.js';
 
 const rotaDefRota = new Router();
 
-rotaDefRota.post('/', defRotaCtrl.gravar)
+rotaDefRota.get('/',defRotaCtrl.consultar).get('/:termo',defRotaCtrl.consultar).post('/', defRotaCtrl.gravar)
 
 export default rotaDefRota;
