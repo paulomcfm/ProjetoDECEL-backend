@@ -217,13 +217,13 @@ export default class AlunoCtrl {
                 try {
                     await client.query('BEGIN');
                     const aluno = new Aluno(codigo);
-                    aluno.excluir(client).then(() => {
+                    aluno.excluir(client).then(async () => {
                         resposta.status(200).json({
                             "status": true,
                             "codigoGerado": aluno.codigo,
                             "mensagem": 'Aluno excluído com sucesso!'
                         });
-                        client.query('COMMIT');
+                        await client.query('COMMIT');
                     }).catch(async (erro) => {
                         if (erro.code === '23503') {
                             resposta.status(400).json({
@@ -274,7 +274,7 @@ export default class AlunoCtrl {
                     "status": true,
                     "listaAlunos": listaAlunos
                 });
-            }).catch(async (erro) => {
+            }).catch((erro) => {
                 resposta.status(500).json({
                     "status": false,
                     "mensagem": 'Erro ao consultar os alunos: ' + erro.message
