@@ -2,42 +2,41 @@ import Inscricao from "../modelo/inscricao.js";
 import PontoEmbarque from "../modelo/pontoEmbarque.js";
 import Escola from "../modelo/escola.js";
 import Aluno from "../modelo/aluno.js";
-import poolConexao from "./conexao.js";
 
 export default class InscricaoDAO {
-    async gravar(inscricao) {
+    async gravar(client, inscricao) {
         if (inscricao instanceof Inscricao) {
             const sql = "INSERT INTO inscricoes(insc_ano, insc_anoLetivo, insc_etapa, insc_turma, insc_periodo, insc_rua, insc_numero, insc_bairro, insc_cep, pde_codigo, esc_codigo, alu_codigo) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)";
             const parametros = [inscricao.ano, inscricao.anoLetivo, inscricao.etapa, inscricao.turma, inscricao.periodo, inscricao.rua, inscricao.numero, inscricao.bairro, inscricao.cep, inscricao.pontoEmbarque.codigo, inscricao.escola.codigo, inscricao.aluno.codigo];
-            const retorno = await poolConexao.query(sql, parametros);
+            const retorno = await client.query(sql, parametros);
         }
     }
 
-    async atualizar(inscricao) {
+    async atualizar(client, inscricao) {
         if (inscricao instanceof Inscricao) {
             const sql = "UPDATE inscricoes SET insc_anoLetivo = $1, insc_etapa = $2, insc_turma = $3, insc_periodo = $4, insc_rua = $5, insc_numero = $6, insc_bairro = $7, insc_cep = $8, pde_codigo = $9, esc_codigo = $10 WHERE alu_codigo = $11 AND insc_ano = $12";
             const parametros = [inscricao.anoLetivo, inscricao.etapa, inscricao.turma, inscricao.periodo, inscricao.rua, inscricao.numero, inscricao.bairro, inscricao.cep, inscricao.pontoEmbarque.codigo, inscricao.escola.codigo, inscricao.aluno.codigo, inscricao.ano];
-            const retorno = await poolConexao.query(sql, parametros);
+            const retorno = await client.query(sql, parametros);
         }
     }
 
-    async atualizarRota(inscricao) {
+    async atualizarRota(client, inscricao) {
         if (inscricao instanceof Inscricao) {
             const sql = "UPDATE inscricoes SET insc_anoLetivo = $1, insc_etapa = $2, insc_turma = $3, insc_periodo = $4, insc_rua = $5, insc_numero = $6, insc_bairro = $7, insc_cep = $8, pde_codigo = $9, esc_codigo = $10, insc_dataAlocacao = $11,  rot_codigo = $12 WHERE alu_codigo = $13 AND insc_ano = $14";
             const parametros = [inscricao.anoLetivo, inscricao.etapa, inscricao.turma, inscricao.periodo, inscricao.rua, inscricao.numero, inscricao.bairro, inscricao.cep, inscricao.pontoEmbarque.codigo, inscricao.escola.codigo, inscricao.dataAlocacao, inscricao.rota, inscricao.aluno.codigo, inscricao.ano];
-            const retorno = await poolConexao.query(sql, parametros);
+            const retorno = await client.query(sql, parametros);
         }
     }
 
-    async excluir(inscricao) {
+    async excluir(client, inscricao) {
         if (inscricao instanceof Inscricao) {
             const sql = "DELETE FROM inscricoes WHERE insc_ano = $1 AND alu_codigo = $2";
             const parametros = [inscricao.ano, inscricao.aluno.codigo];
-            const retorno = await poolConexao.query(sql, parametros);
+            const retorno = await client.query(sql, parametros);
         }
     }
 
-    async consultar(parametroConsulta) {
+    async consultar(client, parametroConsulta) {
         let sql = '';
         let parametros = [];
         const listaInscricoes = [];
@@ -60,7 +59,7 @@ export default class InscricaoDAO {
             ORDER BY i.insc_ano DESC, a.alu_nome;;             
             `;
             parametros = ['%' + parametroConsulta + '%'];
-            const { rows: registros, fields: campos } = await poolConexao.query(sql, parametros);
+            const { rows: registros, fields: campos } = await client.query(sql, parametros);
             for (const registro of registros) {
                 const escola = new Escola(registro.esc_codigo, registro.esc_nome, registro.esc_tipo, registro.esc_email, registro.esc_telefone);
                 const aluno = new Aluno(registro.alu_codigo, registro.alu_nome, registro.alu_rg, registro.alu_observacoes, registro.alu_datanasc, registro.alu_celular);
@@ -83,7 +82,7 @@ export default class InscricaoDAO {
             INNER JOIN  alunos a ON i.alu_codigo = a.alu_codigo
             ORDER BY i.insc_ano DESC, a.alu_nome;
             `;
-            const { rows: registros, fields: campos } = await poolConexao.query(sql);
+            const { rows: registros, fields: campos } = await client.query(sql);
             for (const registro of registros) {
                 const escola = new Escola(registro.esc_codigo, registro.esc_nome, registro.esc_tipo, registro.esc_email, registro.esc_telefone);
                 const aluno = new Aluno(registro.alu_codigo, registro.alu_nome, registro.alu_rg, registro.alu_observacoes, registro.alu_datanasc, registro.alu_celular);
@@ -95,7 +94,7 @@ export default class InscricaoDAO {
         return listaInscricoes;
     }
 
-    async consultarPorRota(parametroConsulta) {
+    async consultarPorRota(client, parametroConsulta) {
         let sql = '';
         let parametros = [];
         const listaInscricoes = [];
@@ -114,7 +113,7 @@ export default class InscricaoDAO {
             ORDER BY a.alu_nome;`;
 
         parametros = [parametroConsulta];
-        const { rows: registros, fields: campos } = await poolConexao.query(sql, parametros);
+        const { rows: registros, fields: campos } = await client.query(sql, parametros);
         for (const registro of registros) {
             const escola = new Escola(registro.esc_codigo, registro.esc_nome, registro.esc_tipo, registro.esc_email, registro.esc_telefone);
             const aluno = new Aluno(registro.alu_codigo, registro.alu_nome, registro.alu_rg, registro.alu_observacoes, registro.alu_dataNasc, registro.alu_celular);

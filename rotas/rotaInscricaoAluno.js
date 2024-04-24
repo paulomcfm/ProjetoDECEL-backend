@@ -1,14 +1,14 @@
 import { Router } from 'express';
 import InscricaoCtrl from '../controle/inscricaoCtrl.js';
 
-const inscCtrl = new InscricaoCtrl();
+// const inscCtrl = new InscricaoCtrl();
 const rotaInscricaoAluno = new Router();
 
-rotaInscricaoAluno.get('/', inscCtrl.consultar)
-    .get('/:termo', inscCtrl.consultar)
-    .post('/', inscCtrl.gravar)
-    .patch('/', inscCtrl.atualizar)
-    .put('/', inscCtrl.atualizar)
-    .delete('/', inscCtrl.excluir)
-    .put('/atualizar-inscricoes', inscCtrl.atualizarInscricoes);
+rotaInscricaoAluno.get('/', InscricaoCtrl.consultar)
+    .get('/:termo', InscricaoCtrl.consultar)
+    .post('/', InscricaoCtrl.gravar)
+    .patch('/', InscricaoCtrl.atualizar)
+    .put('/', InscricaoCtrl.atualizar)
+    .delete('/', InscricaoCtrl.excluir)
+    .put('/atualizar-inscricoes', InscricaoCtrl.atualizarInscricoes);
 export default rotaInscricaoAluno;

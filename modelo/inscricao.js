@@ -164,33 +164,33 @@ export default class Inscricao {
         }
     }
 
-    async gravar() {
+    async gravar(client) {
         const inscDAO = new InscricaoDAO();
-        await inscDAO.gravar(this);
+        await inscDAO.gravar(client, this);
     }
 
-    async excluir() {
+    async excluir(client) {
         const inscDAO = new InscricaoDAO();
-        await inscDAO.excluir(this);
+        await inscDAO.excluir(client, this);
     }
 
-    async atualizar() {
+    async atualizar(client) {
         const inscDAO = new InscricaoDAO();
-        await inscDAO.atualizar(this);
+        await inscDAO.atualizar(client, this);
     }
 
-    async consultar(parametro) {
+    async consultar(client, parametro) {
         const inscDAO = new InscricaoDAO();
-        return await inscDAO.consultar(parametro);
+        return await inscDAO.consultar(client, parametro);
     }
 
-    async atualizarRota() {
+    async atualizarRota(client) {
         const inscDAO = new InscricaoDAO();
-        await inscDAO.atualizarRota(this);
+        await inscDAO.atualizarRota(client, this);
     }
 
-    async consultarPorRota(parametro) {
+    async consultarPorRota(client, parametro) {
         const inscDAO = new InscricaoDAO();
-        return await inscDAO.consultarPorRota(parametro);
+        return await inscDAO.consultarPorRota(client, parametro);
     }
 }
