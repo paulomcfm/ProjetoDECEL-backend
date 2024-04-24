@@ -12,35 +12,35 @@ export default class Motorista{
         this.#telefone = telefone;
     }
 
-    getId(){
+    get Id(){
         return this.#id;
     }
 
-    setId(novoId){
+    set Id(novoId){
         this.#id = novoId;
     }
 
-    getNome(){
+    get Nome(){
         return this.#nome;
     }
 
-    setNome(novoNome){
+    set Nome(novoNome){
         this.#nome = novoNome;
     }
 
-    getCnh(){
+    get Cnh(){
         return this.#cnh;
     }
 
-    setCnh(novoCnh){
+    set Cnh(novoCnh){
         this.#cnh = novoCnh;
     }
 
-    getTelefone(){
+    get Telefone(){
         return this.#telefone;
     }
 
-    setTelefone(novoTelefone){
+    set Telefone(novoTelefone){
         this.#telefone = novoTelefone;
     }
     

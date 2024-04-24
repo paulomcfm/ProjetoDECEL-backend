@@ -47,33 +47,33 @@ export default class Parentesco {
         }
     }
 
-    async gravar() {
+    async gravar(client) {
         const parDAO = new ParentescoDAO();
-        await parDAO.gravar(this);
+        await parDAO.gravar(this, client);
     }
 
-    async excluir() {
+    async excluir(client) {
         const parDAO = new ParentescoDAO();
-        await parDAO.excluir(this);
+        await parDAO.excluir(this, client);
     }
 
-    async atualizar() {
+    async atualizar(client) {
         const parDAO = new ParentescoDAO();
-        await parDAO.atualizar(this);
+        await parDAO.atualizar(this, client);
     }
 
-    async consultar(parametro) {
+    async consultar(parametro, client) {
         const parDAO = new ParentescoDAO();
-        return await parDAO.consultar(parametro);
+        return await parDAO.consultar(parametro, client);
     }
 
-    async consultarAluno(parametro) {
+    async consultarAluno(parametro, client) {
         const parDAO = new ParentescoDAO();
-        return await parDAO.consultarAluno(parametro);
+        return await parDAO.consultarAluno(parametro, client);
     }
-    async consultarResponsavel(parametro) {
+    async consultarResponsavel(parametro, client) {
         const parDAO = new ParentescoDAO();
-        return await parDAO.consultarResponsavel(parametro);
+        return await parDAO.consultarResponsavel(parametro, client);
     }
 
 }

@@ -1,38 +1,37 @@
 import Parentesco from "../modelo/parentesco.js";
-import poolConexao from "./conexao.js";
 
 export default class ParentescoDAO {
-    async gravar(parentesco) {
+    async gravar(parentesco, client) {
         if (parentesco instanceof Parentesco) {
             const sql = "INSERT INTO parentescos(alu_codigo, resp_codigo, par_parentesco) VALUES($1,$2,$3)";
             const parametros = [parentesco.codigoAluno, parentesco.codigoResponsavel, parentesco.parentesco];
             
-            await poolConexao.query(sql, parametros);
+            await client.query(sql, parametros);
             
         }
     }
 
-    async atualizar(parentesco) {
+    async atualizar(parentesco, client) {
         if (parentesco instanceof Parentesco) {
             const sql = "UPDATE parentescos SET par_parentesco = $1 WHERE alu_codigo = $2 AND resp_codigo = $3";
             const parametros = [parentesco.parentesco, parentesco.codigoAluno, parentesco.codigoResponsavel];
             
-            await poolConexao.query(sql, parametros);
+            await client.query(sql, parametros);
             
         }
     }
 
-    async excluir(parentesco) {
+    async excluir(parentesco, client) {
         if (parentesco instanceof Parentesco) {
             const sql = "DELETE FROM parentescos WHERE alu_codigo = $1 AND resp_codigo = $2";
             const parametros = [parentesco.codigoAluno, parentesco.codigoResponsavel];
             
-            await poolConexao.query(sql, parametros);
+            await client.query(sql, parametros);
             
         }
     }
 
-    async consultar(parametroConsulta) {
+    async consultar(parametroConsulta, client) {
         let sql = '';
         let parametros = [];
         if (!isNaN(parseInt(parametroConsulta[0])) && !isNaN(parseInt(parametroConsulta[1]))) {
@@ -43,7 +42,7 @@ export default class ParentescoDAO {
             sql = "SELECT * FROM parentescos";
             parametros = '';
         }
-        const { rows: registros, fields: campos } = await poolConexao.query(sql, parametros);
+        const { rows: registros, fields: campos } = await client.query(sql, parametros);
         let listaParentescos = [];
         for (const registro of registros) {
             const parentesco = new Parentesco(registro.alu_codigo, registro.resp_codigo, registro.par_parentesco);
@@ -52,7 +51,7 @@ export default class ParentescoDAO {
         return listaParentescos;
     }
 
-    async consultarAluno(parametroConsulta) {
+    async consultarAluno(parametroConsulta, client) {
         let sql = '';
         let parametros = [];
         if (!isNaN(parseInt(parametroConsulta))) {
@@ -60,7 +59,7 @@ export default class ParentescoDAO {
             parametros = [parametroConsulta];
         }
         
-        const { rows: registros, fields: campos } = await poolConexao.query(sql, parametros);
+        const { rows: registros, fields: campos } = await client.query(sql, parametros);
         let listaParentescos = [];
         for (const registro of registros) {
             const parentesco = new Parentesco(registro.alu_codigo, registro.resp_codigo, registro.par_parentesco);
@@ -69,7 +68,7 @@ export default class ParentescoDAO {
         return listaParentescos;
     }
 
-    async consultarResponsavel(parametroConsulta) {
+    async consultarResponsavel(parametroConsulta, client) {
         let sql = '';
         let parametros = [];
         if (!isNaN(parseInt(parametroConsulta))) {
@@ -77,7 +76,7 @@ export default class ParentescoDAO {
             parametros = [parametroConsulta];
         }
         
-        const { rows: registros, fields: campos } = await poolConexao.query(sql, parametros);
+        const { rows: registros, fields: campos } = await client.query(sql, parametros);
         let listaParentescos = [];
         for (const registro of registros) {
             const parentesco = new Parentesco(registro.alu_codigo, registro.resp_codigo, registro.par_parentesco);

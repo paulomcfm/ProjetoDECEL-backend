@@ -89,7 +89,6 @@ CREATE TABLE Rotas (
 );
 
 CREATE TABLE Inscricoes (
-  insc_codigo SERIAL,
   insc_ano INT NOT NULL,
   insc_anoLetivo VARCHAR(2) NOT NULL,
   insc_turma CHAR NOT NULL,
@@ -104,7 +103,7 @@ CREATE TABLE Inscricoes (
   esc_codigo INT NOT NULL,
   pde_codigo INT NOT NULL,
   rot_codigo INT,
-  PRIMARY KEY (insc_codigo, alu_codigo),
+  PRIMARY KEY (insc_ano, alu_codigo),
   CONSTRAINT fk_inscricoes_alunos FOREIGN KEY (alu_codigo) REFERENCES Alunos(alu_codigo),
   CONSTRAINT fk_inscricoes_escolas FOREIGN KEY (esc_codigo) REFERENCES Escolas(esc_codigo),
   CONSTRAINT fk_inscricoes_pontosdeembarque FOREIGN KEY (pde_codigo) REFERENCES pontosdeembarque(pde_codigo),
