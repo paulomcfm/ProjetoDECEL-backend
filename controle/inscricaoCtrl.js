@@ -30,8 +30,9 @@ export default class InscricaoCtrl {
             const anoLetivo = dados.anoLetivo;
             const turma = dados.turma;
             if (ano >= 0 && aluno && pontoEmbarque && escola && cep && rua && numero && bairro && periodo && etapa && anoLetivo && turma) {
+                const client = await poolConexao.connect();
                 const inscricao = new Inscricao(ano, aluno, pontoEmbarque, escola, null, cep, rua, numero, bairro, periodo, etapa, anoLetivo, turma, '');
-                inscricao.gravar().then(() => {
+                inscricao.gravar(client).then(() => {
                     resposta.status(200).json({
                         "status": true,
                         "mensagem": 'Inscrição incluida com sucesso!'
@@ -58,7 +59,7 @@ export default class InscricaoCtrl {
         }
     }
 
-    atualizar(requisicao, resposta) {
+    static async atualizar(requisicao, resposta) {
         resposta.type('application/json');
         if ((requisicao.method === 'PUT' || requisicao.method === 'PATCH') && requisicao.is('application/json')) {
             const dados = requisicao.body;
@@ -75,8 +76,9 @@ export default class InscricaoCtrl {
             const anoLetivo = dados.anoLetivo;
             const turma = dados.turma;
             if (ano >= 0 && aluno && pontoEmbarque && escola && cep && rua && numero && bairro && periodo && etapa && anoLetivo && turma) {
+                const client = await poolConexao.connect();
                 const inscricao = new Inscricao(ano, aluno, pontoEmbarque, escola, null, cep, rua, numero, bairro, periodo, etapa, anoLetivo, turma, '');
-                inscricao.atualizar().then(() => {
+                inscricao.atualizar(client).then(() => {
                     resposta.status(200).json({
                         "status": true,
                         "mensagem": 'Inscrição alterada com sucesso!'
@@ -199,15 +201,16 @@ export default class InscricaoCtrl {
         }
     }
 
-    excluir(requisicao, resposta) {
+    static async excluir(requisicao, resposta) {
         resposta.type('application/json');
         if (requisicao.method === 'DELETE' && requisicao.is('application/json')) {
             const dados = requisicao.body;
             const ano = dados.ano;
             const aluno = dados.aluno;
             if (aluno.codigo >= 0 && ano >= 0) {
+                const client = await poolConexao.connect();
                 const inscricao = new Inscricao(ano, aluno);
-                inscricao.excluir().then(() => {
+                inscricao.excluir(client).then(() => {
                     resposta.status(200).json({
                         "status": true,
                         "codigoGerado": inscricao.codigo,
@@ -235,15 +238,16 @@ export default class InscricaoCtrl {
         }
     }
 
-    consultar(requisicao, resposta) {
+    static async consultar(requisicao, resposta) {
         resposta.type('application/json');
         let termo = requisicao.params.termo;
         if (!termo) {
             termo = '';
         }
         if (requisicao.method === 'GET') {
+            const client = await poolConexao.connect();
             const inscricoes = new Inscricao();
-            inscricoes.consultar(termo).then((listaInscricoes) => {
+            inscricoes.consultar(client, termo).then((listaInscricoes) => {
                 resposta.json({
                     "status": true,
                     "listaInscricoes": listaInscricoes
