@@ -6,18 +6,28 @@ export default class defRotaDAO{
     constructor(){}
 
     async gravar(client,rotaModelo){
-        console.log(JSON.stringify(rotaModelo)) 
         const sql = 'INSERT INTO Rotas (rot_nome, rot_km, rot_periodo, rot_tempoInicio, rot_tempoFinal, vei_codigo, mon_codigo) values ($1,$2,$3,$4,$5,$6,$7) RETURNING rot_codigo'
         const values = [rotaModelo.nome,rotaModelo.km,rotaModelo.periodo,rotaModelo.ida,rotaModelo.volta,rotaModelo.veiculo,rotaModelo.monitor]
         const retorno = await client.query(sql,values)
         rotaModelo.codigo = retorno.rows[0].rot_codigo
-        console.log(rotaModelo.codigo)
     }
 
     async gravarPontos(client,rotaModelo){
+        let sql = ''
+        let values = []
         for(const ponto of rotaModelo.pontos){
-            const sql = 'INSERT INTO rotas_tem_pontosdeembarque(rot_codigo,pde_codigo) values ($1,$2)'
-            const values = [rotaModelo.codigo,ponto]
+            sql = 'INSERT INTO rotas_tem_pontosdeembarque(rot_codigo,pde_codigo) values ($1,$2)'
+            values = [rotaModelo.codigo,ponto]
+            await client.query(sql,values)
+        }
+    }
+
+    async gravarMotoristas(client,rotaModelo){
+        let sql = ''
+        let values = []
+        for(const motorista of rotaModelo.motoristas){
+            sql = 'INSERT INTO rotas_tem_motoristas(rot_codigo,moto_id) values ($1,$2)'
+            values = [rotaModelo.codigo,motorista]
             await client.query(sql,values)
         }
     }
@@ -37,7 +47,13 @@ export default class defRotaDAO{
         const { rows: registros, fields: campos } = await client.query(sql,values)
 
         for(const registro of registros){
-            const rota = new defRota(registro.rot_codigo,registro.rot_nome,registro.rot_km,registro.rot_periodo,registro.rot_tempoinicio,registro.rot_tempofinal,registro.vei_codigo,registro.mon_codigo,[],[])
+            sql = 'SELECT * FROM veiculos WHERE vei_codigo = $1'
+            values = [registro.vei_codigo]
+            const { rows: veiculo, fields: camposV } = await client.query(sql,values)
+            sql = 'SELECT * FROM monitores WHERE mon_codigo = $1'
+            values = [registro.mon_codigo]
+            const { rows: monitor, fields: camposM } = await client.query(sql,values)
+            const rota = new defRota(registro.rot_codigo,registro.rot_nome,registro.rot_km,registro.rot_periodo,registro.rot_tempoinicio,registro.rot_tempofinal,veiculo,monitor,[],[])
             lista.push(rota)
         }
         return lista

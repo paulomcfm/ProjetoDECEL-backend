@@ -146,6 +146,11 @@ export default class defRota{
         await dao.gravarPontos(client,this)
     }
 
+    async gravarMotoristas(client){
+        const dao = new defRotaDAO()
+        await dao.gravarMotoristas(client,this)
+    }
+
     async consultarPontos(client){
         const dao = new defRotaDAO()
         await dao.consultarPontos(client,this)

@@ -23,10 +23,11 @@ export default class defRotaCtrl{
             const ida = dados.ida
             const volta = dados.volta
             const veiculo = dados.veiculo
+            console.log("veiculo: "+veiculo)
             const monitor = dados.monitor
             const motoristas = JSON.parse(dados.motoristas)
             const pontos = JSON.parse(dados.pontos)
-            const rota = new defRota(0,nome,km,periodo,ida,volta,veiculo,monitor,pontos,monitor)
+            const rota = new defRota(0,nome,km,periodo,ida,volta,veiculo,monitor,pontos,motoristas)
             const client = await poolConexao.connect();            
 
             // se continua ou da rollback
@@ -34,25 +35,34 @@ export default class defRotaCtrl{
             try{
                 await client.query('BEGIN');
                 rota.gravar(client).then(()=>{
-                    resposta.status(200).json({
-                        status:true,
-                        mensagem:"Rota cadastrada com sucesso !!!"
-                    })
-                    console.log("codigo retornado: "+rota.codigo)
+                
                     /// grava os pontos da rota
                     rota.gravarPontos(client).then(()=>{
-
-                        // TERMINAR//
-                        // fazer gravacao dos motoristas
-                        client.query('COMMIT')
+                        // grava os motoristas
+                        rota.gravarMotoristas(client).then(()=>{
+                            // todos os dados foram gravados com sucesso
+                            client.query('COMMIT')
+                            resposta.status(200).json({
+                                status:true,
+                                mensagem:"Rota cadastrada com sucesso !!!"
+                            })
+                        }).catch(async (error)=>{
+                            resposta.status(500).json({
+                                status:false,
+                                mensagem:"Erro ao cadastrar rota: "+error
+                            })
+                            await client.query('ROLLBACK');
+                        })
                         
-
                         // se ocorrer erro no meio da transacao ocorre rollback
                     }).catch(async (error)=>{
+                        resposta.status(500).json({
+                            status:false,
+                            mensagem:"Erro ao cadastrar rota: "+error
+                        })
                         await client.query('ROLLBACK');
                     })
                 }).catch((error)=>{
-                    console.log(error)
                     resposta.status(500).json({
                         status:false,
                         mensagem:"Erro ao cadastrar rota: "+error
