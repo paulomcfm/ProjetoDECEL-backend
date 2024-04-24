@@ -136,13 +136,24 @@ export default class defRota{
 
     }
 
-    async consultar(){
-        
+    async consultar(client,termo){
+        const dao = new defRotaDAO()
+        return await dao.consultar(client,termo)
     }
 
     async gravarPontos(client){
         const dao = new defRotaDAO()
         await dao.gravarPontos(client,this)
+    }
+
+    async consultarPontos(client){
+        const dao = new defRotaDAO()
+        await dao.consultarPontos(client,this)
+    }
+
+    async consultarMotoristas(client){
+        const dao = new defRotaDAO()
+        await dao.consultarMotoristas(client,this)
     }
 
 

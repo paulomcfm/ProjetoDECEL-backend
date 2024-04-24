@@ -58,9 +58,11 @@ export default class defRotaCtrl{
                         mensagem:"Erro ao cadastrar rota: "+error
                     })
                 })
-            }catch(e){
-                
-            }         
+            }catch (e) {
+                await client.query('ROLLBACK');
+            } finally {
+                client.release();
+            }        
         }
         else {
             resposta.status(400).json({
@@ -69,4 +71,72 @@ export default class defRotaCtrl{
             });
         }
     }
+
+    static async consultar(requisicao,resposta){
+        if(requisicao.method === 'GET'){
+            let termo = requisicao.params.termo
+            if(termo === undefined)
+                termo = ""
+            const rota = new defRota()
+            const client = await poolConexao.connect()
+            rota.consultar(client,termo).then((listaRotas)=>{
+                let flag = true
+                for(let i=0;i<listaRotas.length && flag;i++){
+                    const registro = listaRotas[i]
+                    registro.consultarPontos(client).then(()=>{
+                        registro.consultarMotoristas(client).then(()=>{
+                            listaRotas[i] = registro
+                            if(i+1>=listaRotas.length){
+                                // resposta final com sucesso caso todos os registro foram consultados corretamente
+                                resposta.status(200).json({
+                                    status:true,
+                                    mensagem:"Rota consultada com sucesso",
+                                    listaRotas:listaRotas
+                                })
+                            }
+                        }).catch((erro)=>{
+                            flag = false
+                            resposta.status(500).json({
+                                status:false,
+                                mensagem:'Não foi possivel consultar as rotas na base de dados: '+erro,
+                                listaRotas:[]
+                            })
+                        })
+                    }).catch((erro)=>{
+                        flag = false
+                        resposta.status(500).json({
+                            status:false,
+                            mensagem:'Não foi possivel consultar as rotas na base de dados: '+erro,
+                            listaRotas:[]
+                        })
+                    })
+
+                    
+                }
+                if(!flag){
+                    resposta.status(500).json({
+                        status:false,
+                        mensagem:'Erro ao consultar os pontos e motoristas da rota: ',
+                        listaRotas:[]
+                    })
+                }
+
+                // console.log(JSON.stringify(listaRotas))
+            }).catch((erro)=>{
+                resposta.status(500).json({
+                    status:false,
+                    mensagem:'Não foi possivel consultar as rotas na base de dados: '+erro,
+                    listaRotas:[]
+                })
+            })
+            client.release()
+        }
+        else{
+            resposta.status(500).json({
+                status:false,
+                mensagem:'Utilize o método o GET para consultar os dados das rotas',
+                listaRotas:[]
+            })
+        }
+    } 
 }

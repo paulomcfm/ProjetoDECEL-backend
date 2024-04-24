@@ -1,4 +1,6 @@
-import defRotas from "../modelo/defRota.js";
+import defRota from "../modelo/defRota.js";
+import pontoEmbarque from '../modelo/pontoEmbarque.js'
+import motorista from '../modelo/motorista.js'
 export default class defRotaDAO{
 
     constructor(){}
@@ -18,5 +20,50 @@ export default class defRotaDAO{
             const values = [rotaModelo.codigo,ponto]
             await client.query(sql,values)
         }
+    }
+
+    async consultar(client,termo){
+        let linhas = []
+        let lista = []
+        let sql;
+        let values
+        if(termo === ''){
+             sql = 'SELECT * FROM rotas'
+        }else{
+            sql = 'SELECT * FROM rotas WHERE rot_nome ilike $1'
+            values = ['%'+termo+'%']
+        }
+
+        const { rows: registros, fields: campos } = await client.query(sql,values)
+
+        for(const registro of registros){
+            const rota = new defRota(registro.rot_codigo,registro.rot_nome,registro.rot_km,registro.rot_periodo,registro.rot_tempoinicio,registro.rot_tempofinal,registro.vei_codigo,registro.mon_codigo,[],[])
+            lista.push(rota)
+        }
+        return lista
+    }
+
+    async consultarPontos(client,rotaModelo){
+        let lista = []
+        let sql = "SELECT * FROM rotas_tem_pontosdeembarque INNER JOIN pontosdeembarque ON pontosdeembarque.pde_codigo = rotas_tem_pontosdeembarque.pde_codigo where rot_codigo = $1 "
+        let values = [rotaModelo.codigo]
+        const { rows: registros, fields: campos } = await client.query(sql,values)
+        for(const registro of registros){
+            const ponto = new pontoEmbarque(registro.pde_codigo,registro.pde_rua,registro.pde_numero,registro.pde_bairro,registro.pde_cep)
+            lista.push(ponto)
+        }
+        rotaModelo.pontos = lista
+    }
+
+    async consultarMotoristas(client,rotaModelo){
+        let lista = []
+        let sql = "SELECT * FROM ((SELECT * FROM rotas_tem_motoristas WHERE rot_codigo = $1) as rota INNER JOIN motoristas on motoristas.moto_id = rota.moto_id)"
+        let values = [rotaModelo.codigo]
+        const { rows: registros, fields: campos } = await client.query(sql,values)
+        for(const registro of registros){
+            const moto = new motorista(registro.moto_id,registro.moto_nome,registro.moto_cnh,registro.moto_celular)
+            lista.push(moto.toJson())
+        }
+        rotaModelo.motoristas = lista
     }
 }
