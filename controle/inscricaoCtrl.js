@@ -13,6 +13,7 @@ export default class InscricaoCtrl {
     }
 
     static async gravar(requisicao, resposta) {
+        var ok = true;
         resposta.type('application/json');
         if (requisicao.method === 'POST' && requisicao.is('application/json')) {
             const dados = requisicao.body;
@@ -31,18 +32,28 @@ export default class InscricaoCtrl {
             const turma = dados.turma;
             if (ano >= 0 && aluno && pontoEmbarque && escola && cep && rua && numero && bairro && periodo && etapa && anoLetivo && turma) {
                 const client = await poolConexao.connect();
-                const inscricao = new Inscricao(ano, aluno, pontoEmbarque, escola, null, cep, rua, numero, bairro, periodo, etapa, anoLetivo, turma, '');
-                inscricao.gravar(client).then(() => {
-                    resposta.status(200).json({
-                        "status": true,
-                        "mensagem": 'Inscrição incluida com sucesso!'
+                try {
+                    await client.query('BEGIN');
+                    const inscricao = new Inscricao(ano, aluno, pontoEmbarque, escola, null, cep, rua, numero, bairro, periodo, etapa, anoLetivo, turma, '');
+                    inscricao.gravar(client).then(async () => {
+                        resposta.status(200).json({
+                            "status": true,
+                            "mensagem": 'Inscrição incluida com sucesso!'
+                        });
+                        await client.query('COMMIT');
+                    }).catch(async (erro) => {
+                        await client.query('ROLLBACK');
+                        resposta.status(500).json({
+                            "status": false,
+                            "mensagem": 'Erro ao registrar a inscrição: ' + erro.message
+                        });
                     });
-                }).catch((erro) => {
-                    resposta.status(500).json({
-                        "status": false,
-                        "mensagem": 'Erro ao registrar a inscrição: ' + erro.message
-                    });
-                });
+                } catch (e) {
+                    await client.query('ROLLBACK');
+                    throw e;
+                } finally {
+                    client.release();
+                }
             }
             else {
                 resposta.status(400).json({
@@ -60,6 +71,7 @@ export default class InscricaoCtrl {
     }
 
     static async atualizar(requisicao, resposta) {
+        var ok = true;
         resposta.type('application/json');
         if ((requisicao.method === 'PUT' || requisicao.method === 'PATCH') && requisicao.is('application/json')) {
             const dados = requisicao.body;
@@ -77,18 +89,28 @@ export default class InscricaoCtrl {
             const turma = dados.turma;
             if (ano >= 0 && aluno && pontoEmbarque && escola && cep && rua && numero && bairro && periodo && etapa && anoLetivo && turma) {
                 const client = await poolConexao.connect();
-                const inscricao = new Inscricao(ano, aluno, pontoEmbarque, escola, null, cep, rua, numero, bairro, periodo, etapa, anoLetivo, turma, '');
-                inscricao.atualizar(client).then(() => {
-                    resposta.status(200).json({
-                        "status": true,
-                        "mensagem": 'Inscrição alterada com sucesso!'
+                try {
+                    await client.query('BEGIN');
+                    const inscricao = new Inscricao(ano, aluno, pontoEmbarque, escola, null, cep, rua, numero, bairro, periodo, etapa, anoLetivo, turma, '');
+                    inscricao.atualizar(client).then(async () => {
+                        resposta.status(200).json({
+                            "status": true,
+                            "mensagem": 'Inscrição alterada com sucesso!'
+                        });
+                        await client.query('COMMIT');
+                    }).catch(async (erro) => {
+                        resposta.status(500).json({
+                            "status": false,
+                            "mensagem": 'Erro ao alterar a inscrição: ' + erro.message
+                        });
+                        await client.query('ROLLBACK');
                     });
-                }).catch((erro) => {
-                    resposta.status(500).json({
-                        "status": false,
-                        "mensagem": 'Erro ao alterar a inscrição: ' + erro.message
-                    });
-                });
+                } catch (e) {
+                    await client.query('ROLLBACK');
+                    throw e;
+                } finally {
+                    client.release();
+                }
             }
             else {
                 resposta.status(400).json({
@@ -209,19 +231,30 @@ export default class InscricaoCtrl {
             const aluno = dados.aluno;
             if (aluno.codigo >= 0 && ano >= 0) {
                 const client = await poolConexao.connect();
-                const inscricao = new Inscricao(ano, aluno);
-                inscricao.excluir(client).then(() => {
-                    resposta.status(200).json({
-                        "status": true,
-                        "codigoGerado": inscricao.codigo,
-                        "mensagem": 'Inscrição excluída com sucesso!'
+                try {
+                    await client.query('BEGIN');
+                    const inscricao = new Inscricao(ano, aluno);
+                    inscricao.excluir(client).then(async () => {
+                        resposta.status(200).json({
+                            "status": true,
+                            "mensagem": 'Inscrição excluída com sucesso!'
+                        });
+                        await client.query('COMMIT');
+                    }).catch(async (erro) => {
+                        resposta.status(500).json({
+                            "status": false,
+                            "mensagem": 'Erro ao excluir a inscrição: ' + erro.message
+                        });
+                        await client.query('ROLLBACK');
                     });
-                }).catch((erro) => {
-                    resposta.status(500).json({
-                        "status": false,
-                        "mensagem": 'Erro ao excluir a inscrição: ' + erro.message
-                    });
-                });
+                }
+                catch (e) {
+                    await client.query('ROLLBACK');
+                    throw e;
+                }
+                finally {
+                    client.release();
+                }
             }
             else {
                 resposta.status(400).json({
@@ -258,6 +291,7 @@ export default class InscricaoCtrl {
                     "mensagem": 'Erro ao consultar as inscrições: ' + erro.message
                 });
             });
+            client.release();
         }
         else {
             resposta.status(400).json({

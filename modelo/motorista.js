@@ -47,6 +47,7 @@ export default class Motorista{
 
     toJson(){
         return {
+            id:this.#id,
             nome:this.#nome,
             cnh:this.#cnh,
             telefone:this.#telefone
