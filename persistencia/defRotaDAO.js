@@ -107,4 +107,36 @@ export default class defRotaDAO{
         rotaModelo.inscricoes = lista
     }
 
+
+    async atualizar(client,rotaModelo){
+        try{
+            let sql = "UPDATE rotas SET rot_nome=$2,rot_km=$3,rot_periodo=$4,rot_tempoInicio=$5,rot_tempoFinal=$6,vei_codigo=$7,mon_codigo=$8 WHERE rot_codigo = $1"
+            let values = [rotaModelo.codigo,rotaModelo.nome,rotaModelo.km,rotaModelo.periodo,rotaModelo.ida,rotaModelo.volta,rotaModelo.veiculo,rotaModelo.monitor]
+            await client.query(sql,values)
+            sql = "DELETE FROM rotas_tem_motoristas WHERE rot_codigo = $1"
+            values = [rotaModelo.codigo]
+            
+            await client.query(sql,values)
+            for(let i=0;i<rotaModelo.motoristas.length;i++){
+                sql = "INSERT INTO rotas_tem_motoristas(rot_codigo,moto_id) values ($1,$2)"
+                values = [rotaModelo.codigo,rotaModelo.motoristas[i]]
+                await client.query(sql,values)
+            }
+
+            sql = "DELETE FROM rotas_tem_pontosdeembarque WHERE rot_codigo = $1"
+            values = [rotaModelo.codigo]
+            await client.query(sql,values)
+            for(let i=0;i<rotaModelo.pontos.length;i++){
+                sql = "INSERT INTO rotas_tem_pontosdeembarque(rot_codigo,pde_codigo) values ($1,$2)"
+                values = [rotaModelo.codigo,rotaModelo.pontos[i]]
+                await client.query(sql,values)
+            }
+        }catch(erro){
+            console.error("Ocorreu um erro durante a atualização:", erro);
+            await client.query('ROLLBACK');
+            throw erro
+        }
+            
+    }
+
 }
