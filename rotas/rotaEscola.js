@@ -1,14 +1,14 @@
 import { Router } from 'express';
 import EscolaCtrl from '../controle/escolaCtrl.js';
 
-const escCtrl = new EscolaCtrl();
+//const escCtrl = new EscolaCtrl();
 const rotaEscola = new Router();
 
-rotaEscola.get('/', escCtrl.consultar)
-    .get('/:termo', escCtrl.consultar)
-    .post('/', escCtrl.gravar)
-    .patch('/', escCtrl.atualizar)
-    .put('/', escCtrl.atualizar)
-    .delete('/', escCtrl.excluir);
+rotaEscola.get('/', EscolaCtrl.consultar)
+    .get('/:termo', EscolaCtrl.consultar)
+    .post('/', EscolaCtrl.gravar)
+    .patch('/', EscolaCtrl.atualizar)
+    .put('/', EscolaCtrl.atualizar)
+    .delete('/', EscolaCtrl.excluir);
 
 export default rotaEscola;
