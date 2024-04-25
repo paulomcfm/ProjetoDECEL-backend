@@ -142,4 +142,31 @@ export default class EscolaCtrl {
             });
         }
     }
+    consultarPorPonto(requisicao, resposta) {
+        resposta.type('application/json');
+        let termo = requisicao.params.termo;
+        if (!termo) {
+            termo = '';
+        }
+        if (requisicao.method === 'GET') {
+            const escolas = new Escola();
+            escolas.consultarPorPonto(termo).then((listaEscolas) => {
+                resposta.json({
+                    "status": true,
+                    "listaEscolas": listaEscolas
+                });
+            }).catch((erro) => {
+                resposta.status(500).json({
+                    "status": false,
+                    "mensagem": 'Erro ao consultar as escolas: ' + erro.message
+                });
+            });
+        }
+        else {
+            resposta.status(400).json({
+                "status": false,
+                "mensagem": 'Por favor, utilize o método GET para consultar as escolas!'
+            });
+        }
+    }
 }
