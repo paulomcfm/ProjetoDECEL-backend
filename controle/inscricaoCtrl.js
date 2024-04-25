@@ -115,14 +115,16 @@ export default class InscricaoCtrl {
                 try {
                     await client.query('BEGIN');
                     const inscricao = new Inscricao();
-                    inscricao.consultarPorRota(client, dados[0].rota).then(async (inscricoes) => {
+                    try {
+                        const inscricoes = await inscricao.consultarPorRota(client, dados[0].rota);
                         for (const inscricaoEncontrada of inscricoes) {
                             const encontradaEmDados = dados.find(d => d.aluno.codigo === inscricaoEncontrada.aluno.codigo);
                             if (!encontradaEmDados) {
                                 inscricaoEncontrada.rota = null;
                                 inscricaoEncontrada.dataAlocacao = null;
-                                inscricaoEncontrada.atualizarRota(client).catch((erro) => {
+                                await inscricaoEncontrada.atualizarRota(client).catch((erro) => {
                                     ok = false;
+                                    client.query('ROLLBACK');
                                     resposta.status(500).json({
                                         "status": false,
                                         "mensagem": 'Erro ao atualizar a inscrição: ' + erro.message
@@ -130,7 +132,7 @@ export default class InscricaoCtrl {
                                 });
                             }
                         }
-                        if (ok) {
+                        if (ok && dados[0].aluno.codigo!=0) {
                             for (const inscricao of dados) {
                                 const naoEncontradaNaConsulta = inscricoes.every(i => i.aluno.codigo !== inscricao.aluno.codigo);
                                 if (naoEncontradaNaConsulta) {
@@ -150,56 +152,54 @@ export default class InscricaoCtrl {
                                         inscricao.turma,
                                         inscricao.dataAlocacao
                                     );
-                                    novaInscricao.atualizarRota(client).catch((erro) => {
+                                    await novaInscricao.atualizarRota(client).catch((erro) => {
                                         ok = false;
+                                        client.query('ROLLBACK');
                                         resposta.status(500).json({
                                             "status": false,
                                             "mensagem": 'Erro ao atualizar a inscrição: ' + erro.message
                                         });
-                                    });
+                                    })
                                 }
                             }
-                            if (ok) {
-                                resposta.status(200).json({
-                                    "status": true,
-                                    "mensagem": 'Inscrições alteradas com sucesso!'
-                                });
-                                await client.query('COMMIT');
-                            }
-                            else {
-                                await client.query('ROLLBACK');
-                            }
                         }
-                        else {
-                            await client.query('ROLLBACK');
+                        if (ok) {
+                            resposta.status(200).json({
+                                "status": true,
+                                "mensagem": 'Inscrições alteradas com sucesso!'
+                            });
+                            await client.query('COMMIT');
                         }
-                    }).catch((erro) => {
+                    } catch (erro) {
+                        await client.query('ROLLBACK');
                         resposta.status(500).json({
                             "status": false,
-                            "mensagem": 'Erro ao alterar as inscrições: ' + erro.message
+                            "mensagem": 'Erro ao atualizar a inscrição: ' + erro.message
                         });
-                    });
-                } catch (e) {
+                    }
+                } catch (erro) {
                     await client.query('ROLLBACK');
-                    throw e;
+                    resposta.status(500).json({
+                        "status": false,
+                        "mensagem": 'Erro ao atualizar a inscrição: ' + erro.message
+                    });
                 } finally {
                     client.release();
                 }
-            }
-            else {
+            } else {
                 resposta.status(400).json({
                     "status": false,
                     "mensagem": 'Por favor, informe inscrições!'
                 });
             }
-        }
-        else {
+        } else {
             resposta.status(400).json({
                 "status": false,
                 "mensagem": 'Por favor, utilize os métodos PUT ou PATCH para atualizar uma inscrição!'
             });
         }
     }
+
 
     static async excluir(requisicao, resposta) {
         resposta.type('application/json');
