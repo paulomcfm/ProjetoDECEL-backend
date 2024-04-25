@@ -143,8 +143,9 @@ export default class defRota{
 
     }
 
-    async atualizar(){
-
+    async atualizar(client){
+        const dao = new defRotaDAO()
+        await dao.atualizar(client,this)
     }
 
     async consultar(client,termo){

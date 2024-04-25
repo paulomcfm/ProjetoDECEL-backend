@@ -16,7 +16,6 @@ export default class defRotaCtrl{
         resposta.type('application/json');
         if (requisicao.method === 'POST') {
             const dados = requisicao.body;
-            console.log(dados)
             const nome = dados.nome
             const km = dados.km
             const periodo = dados.periodo
@@ -159,4 +158,37 @@ export default class defRotaCtrl{
             })
         }
     } 
+
+    static async atualizar(requisao,resposta){
+        const dados = requisao.body
+        console.log('entrouuu')
+        const rota = new defRota(dados.codigo,dados.nome,dados.km,dados.periodo,dados.ida,dados.volta,dados.veiculo,dados.monitor,JSON.parse(dados.pontos),JSON.parse(dados.motoristas),[])
+        console.log("salve "+JSON.stringify(rota))
+        try{
+            const client = await poolConexao.connect()
+            await client.query('BEGIN')
+            await rota.atualizar(client).then(()=>{
+                console.log('salvou')
+                client.query('COMMIT')
+                resposta.status(200).json({
+                    status:true,
+                    mensagem:"Rota atualizada com sucesso!!!"
+                })
+            }).catch(async (erro)=>{
+                console.log('errooo')
+                await client.query('ROLLBACK');
+                resposta.status(500).json({
+                    status:false,
+                    mensagem:'Erro ao atualizar a rota: '+erro,
+                })
+            }).finally(()=>{
+                client.release()
+            })
+        }catch(erro){
+            resposta.status(500).json({
+                status:false,
+                mensagem:'Erro ao atualizar a rota: '+erro,
+            })
+        }
+    }
 }
