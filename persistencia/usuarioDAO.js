@@ -29,17 +29,11 @@ export default class UsuarioDAO {
     async consultar(parametroConsulta) {
         let sql = '';
         let parametros = [];
-        if (!isNaN(parseInt(parametroConsulta))) {
-            sql = 'SELECT * FROM Usuarios WHERE user_codigo = $1 ORDER BY user_nome';
-            parametros = [parametroConsulta];
+        if (!parametroConsulta) {
+            parametroConsulta = '';
         }
-        else {
-            if (!parametroConsulta) {
-                parametroConsulta = '';
-            }
-            sql = "SELECT * FROM Usuarios WHERE user_nome LIKE $1 ORDER BY user_nome";
-            parametros = ['%' + parametroConsulta + '%'];
-        }
+        sql = "SELECT * FROM Usuarios WHERE user_nome LIKE $1 ORDER BY user_nome";
+        parametros = ['%' + parametroConsulta + '%'];
         const { rows: registros, fields:campos } = await poolConexao.query(sql, parametros);
         let listaUsuarios = [];
         for(const registro of registros){

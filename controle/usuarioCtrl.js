@@ -40,16 +40,17 @@ export default class UsuarioCtrl {
         }
     }
 
-    autenticarUsuario(requisicao, resposta) {
+    autenticar(requisicao, resposta) {
         resposta.type('application/json');
-        if (requisicao.method === 'POST' && requisicao.is('application/json')) {
+        if (requisicao.method === 'GET' && requisicao.is('application/json')) {
             const dados = requisicao.body;
             const nome = dados.nome;
             const cpf = dados.cpf;
             if (nome && cpf) {
+                console.log(cpf)
                 const usuario = new Usuario(nome);
-                usuario.consultarPorNome().then((usuarioConsultado) => {
-                    if (usuarioConsultado && usuarioConsultado.cpf === cpf) {
+                usuario.consultar(nome).then((usuarioConsultado) => {
+                    if (usuarioConsultado && usuarioConsultado[0].cpf === cpf) {
                         resposta.status(200).json({
                             "status": true,
                             "mensagem": 'Usuário autenticado com sucesso!'
