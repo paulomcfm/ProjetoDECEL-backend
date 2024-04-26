@@ -136,7 +136,22 @@ export default class defRotaDAO{
             await client.query('ROLLBACK');
             throw erro
         }
-            
+    }
+
+    async deletar(client,rotaModelo){
+
+        try{
+            let sql = 'DELETE FROM rotas_tem_motoristas WHERE rot_codigo = $1'
+            let values = [rotaModelo.codigo]
+            await client.query(sql,values)
+            sql = 'DELETE FROM rotas_tem_pontosdeembarque WHERE rot_codigo = $1'
+            await client.query(sql,values)
+            sql = 'DELETE FROM rotas WHERE rot_codigo = $1'
+            await client.query(sql,values)
+        }catch(erro){
+            await client.query('ROLLBACK')
+            throw erro
+        }
     }
 
 }
