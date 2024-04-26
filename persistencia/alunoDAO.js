@@ -5,7 +5,7 @@ export default class AlunoDAO {
         if (aluno instanceof Aluno) {
             const sql = "INSERT INTO alunos(alu_nome, alu_rg, alu_observacoes, alu_dataNasc, alu_celular) VALUES($1,$2,$3,$4,$5) RETURNING alu_codigo;";
             const parametros = [aluno.nome, aluno.rg, aluno.observacoes, aluno.dataNasc, aluno.celular];
-            
+
             const retorno = await client.query(sql, parametros);
             aluno.codigo = retorno.rows[0].alu_codigo;
         }
@@ -15,9 +15,9 @@ export default class AlunoDAO {
         if (aluno instanceof Aluno) {
             const sql = "UPDATE alunos SET alu_nome = $1, alu_rg = $2, alu_observacoes = $3, alu_dataNasc = $4, alu_celular = $5 WHERE alu_codigo = $6";
             const parametros = [aluno.nome, aluno.rg, aluno.observacoes, aluno.dataNasc, aluno.celular, aluno.codigo];
-            
+
             await client.query(sql, parametros);
-            
+
         }
     }
 
@@ -25,9 +25,9 @@ export default class AlunoDAO {
         if (aluno instanceof Aluno) {
             const sql = "DELETE FROM alunos WHERE alu_codigo = $1";
             const parametros = [aluno.codigo];
-            
+
             await client.query(sql, parametros);
-            
+
         }
     }
 
@@ -54,7 +54,7 @@ export default class AlunoDAO {
                 ORDER BY alunos.alu_nome, responsaveis.resp_nome;`;
             parametros = ['%' + parametroConsulta + '%'];
         }
-    
+
         const { rows: registros, fields: campos } = await client.query(sql, parametros);
         let listaAlunos = [];
         let alunoAtual = null;
@@ -82,12 +82,14 @@ export default class AlunoDAO {
                 telefone: registro.resp_telefone,
                 celular: registro.resp_celular
             };
-            alunoAtual.responsaveis.push(responsavel);
+            if (registro.resp_codigo !== null) {
+                alunoAtual.responsaveis.push(responsavel);
+            }
         }
         if (alunoAtual) {
             listaAlunos.push(alunoAtual);
         }
         return listaAlunos;
     }
-    
+
 }

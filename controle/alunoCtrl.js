@@ -5,13 +5,18 @@ import poolConexao from "../persistencia/conexao.js";
 export default class AlunoCtrl {
     static _instance = null;
 
-    constructor() {
-        if (AlunoCtrl._instance) {
-            return AlunoCtrl._instance
-        }
+    constructor()
+    {
         AlunoCtrl._instance = this;
     }
-    static async gravar(requisicao, resposta) {
+
+    static getInstance()
+    {
+        if(AlunoCtrl._instance==null)
+            new AlunoCtrl();
+        return AlunoCtrl._instance;
+    }
+    async gravar(requisicao, resposta) {
         var ok = true;
         resposta.type('application/json');
         if (requisicao.method === 'POST') {
@@ -93,7 +98,7 @@ export default class AlunoCtrl {
         }
     }
 
-    static async atualizar(requisicao, resposta) {
+    async atualizar(requisicao, resposta) {
         var ok = true;
         resposta.type('application/json');
         if ((requisicao.method === 'PUT' || requisicao.method === 'PATCH') && requisicao.is('application/json')) {
@@ -217,7 +222,7 @@ export default class AlunoCtrl {
         }
     }
 
-    static async excluir(requisicao, resposta) {
+    async excluir(requisicao, resposta) {
         resposta.type('application/json');
         if (requisicao.method === 'DELETE' && requisicao.is('application/json')) {
             const dados = requisicao.body;
@@ -271,7 +276,7 @@ export default class AlunoCtrl {
         }
     }
 
-    static async consultar(requisicao, resposta) {
+    async consultar(requisicao, resposta) {
         let termo = requisicao.params.termo;
         if (!termo) {
             termo = '';
