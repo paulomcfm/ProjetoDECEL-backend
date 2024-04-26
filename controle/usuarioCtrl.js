@@ -4,11 +4,16 @@ import poolConexao from "../persistencia/conexao.js";
 export default class UsuarioCtrl {
     static _instance = null;
 
-    constructor() {
-        if (UsuarioCtrl._instance) {
-            return UsuarioCtrl._instance;
-        }
+    constructor() 
+    {
         UsuarioCtrl._instance = this;
+    }
+
+    static getInstance()
+    {
+        if(UsuarioCtrl._instance==null)
+            new UsuarioCtrl();
+        return UsuarioCtrl._instance;
     }
 
     async gravar(requisicao, resposta) {
