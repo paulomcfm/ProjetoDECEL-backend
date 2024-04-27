@@ -2,13 +2,19 @@ import Escola from "../modelo/escola.js";
 import poolConexao from "../persistencia/conexao.js";
 
 export default class EscolaCtrl {
+    static _instance = null;
+
     constructor() {
-        if (EscolaCtrl._instance) {
-            return EscolaCtrl._instance
-        }
         EscolaCtrl._instance = this;
     }
-    static async gravar(requisicao, resposta) {
+
+    static getInstance() {
+        if (EscolaCtrl._instance == null)
+            new EscolaCtrl();
+        return EscolaCtrl._instance;
+    }
+
+    async gravar(requisicao, resposta) {
         resposta.type('application/json');
         if (requisicao.method === 'POST' && requisicao.is('application/json')) {
             const dados = requisicao.body;
@@ -58,7 +64,7 @@ export default class EscolaCtrl {
         }
     }
 
-    static async atualizar(requisicao, resposta) {
+    async atualizar(requisicao, resposta) {
         resposta.type('application/json');
         if ((requisicao.method === 'PUT' || requisicao.method === 'PATCH') && requisicao.is('application/json')) {
             const dados = requisicao.body;
@@ -109,7 +115,7 @@ export default class EscolaCtrl {
         }
     }
 
-    static async excluir(requisicao, resposta) {
+    async excluir(requisicao, resposta) {
         resposta.type('application/json');
         if (requisicao.method === 'DELETE' && requisicao.is('application/json')) {
             const dados = requisicao.body;
@@ -155,7 +161,7 @@ export default class EscolaCtrl {
         }
     }
 
-    static async consultar(requisicao, resposta) {
+    async consultar(requisicao, resposta) {
         resposta.type('application/json');
         let termo = requisicao.params.termo;
         if (!termo) {

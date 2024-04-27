@@ -2,13 +2,19 @@ import PontoEmbarque from "../modelo/pontoEmbarque.js";
 import poolConexao from "../persistencia/conexao.js";
 
 export default class PontoEmbarqueCtrl {
+    static _instance = null;
+
     constructor() {
-        if (PontoEmbarqueCtrl._instance) {
-            return PontoEmbarqueCtrl._instance
-        }
         PontoEmbarqueCtrl._instance = this;
     }
-    static async gravar(requisicao, resposta) {
+
+    static getInstance() {
+        if (PontoEmbarqueCtrl._instance == null)
+            new PontoEmbarqueCtrl();
+        return PontoEmbarqueCtrl._instance;
+    }
+
+    async gravar(requisicao, resposta) {
         resposta.type('application/json');
         if (requisicao.method === 'POST' && requisicao.is('application/json')) {
             const dados = requisicao.body;
@@ -57,7 +63,7 @@ export default class PontoEmbarqueCtrl {
         }
     }
 
-    static async atualizar(requisicao, resposta) {
+    async atualizar(requisicao, resposta) {
         resposta.type('application/json');
         if ((requisicao.method === 'PUT' || requisicao.method === 'PATCH') && requisicao.is('application/json')) {
             const dados = requisicao.body;
@@ -107,7 +113,7 @@ export default class PontoEmbarqueCtrl {
         }
     }
 
-    static async excluir(requisicao, resposta) {
+    async excluir(requisicao, resposta) {
         resposta.type('application/json');
         if (requisicao.method === 'DELETE' && requisicao.is('application/json')) {
             const dados = requisicao.body;
@@ -153,7 +159,7 @@ export default class PontoEmbarqueCtrl {
         }
     }
 
-    static async consultar(requisicao, resposta) {
+    async consultar(requisicao, resposta) {
         resposta.type('application/json');
         let termo = requisicao.params.termo;
         if (!termo) {
