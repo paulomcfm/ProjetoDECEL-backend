@@ -86,6 +86,14 @@ export default class defRotaDAO{
     }
 
 
+    async consultarQtdInscricoes(client,rotaModelo){
+        let sql = "select count(rot_codigo) as qtd from inscricoes where rot_codigo = $1 Group by rot_codigo;"
+        let values = [rotaModelo.codigo]
+        const { rows: registros, fields: campos } = await client.query(sql,values)
+        return registros
+    }
+
+
     async consultarInscricoes(client,rotaModelo){
         let lista = []
         let sql = "SELECT * FROM inscricoes WHERE inscricoes.rot_codigo = $1"
@@ -139,11 +147,12 @@ export default class defRotaDAO{
     }
 
     async deletar(client,rotaModelo){
-
         try{
             let sql = 'DELETE FROM rotas_tem_motoristas WHERE rot_codigo = $1'
+            console.log(rotaModelo.codigo)
             let values = [rotaModelo.codigo]
             await client.query(sql,values)
+            console.log('oi')
             sql = 'DELETE FROM rotas_tem_pontosdeembarque WHERE rot_codigo = $1'
             await client.query(sql,values)
             sql = 'DELETE FROM rotas WHERE rot_codigo = $1'

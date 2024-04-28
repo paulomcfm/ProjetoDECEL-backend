@@ -140,7 +140,6 @@ export default class defRotaCtrl{
                     })
                 }
 
-                // console.log(JSON.stringify(listaRotas))
             }).catch((erro)=>{
                 resposta.status(500).json({
                     status:false,
@@ -185,6 +184,41 @@ export default class defRotaCtrl{
             resposta.status(500).json({
                 status:false,
                 mensagem:'Erro ao atualizar a rota: '+erro,
+            })
+        }
+    }
+
+    static async excluir(requisicao,resposta){
+        const termo = requisicao.params.termo
+        const rota = new defRota(termo)
+        try{
+            const client = await poolConexao.connect()
+            const qtdInscr = await rota.consultarQtdInscricoes(client)
+            if(qtdInscr.length===0){
+                rota.deletar(client).then(()=>{
+                    console.log("deletou")
+                    resposta.status(200).json({
+                        status:true,
+                        mensagem:"Rota deletada com sucesso"
+                    })
+                }).catch((erro)=>{
+                    console.log("nao deletou")
+                    resposta.status(500).json({
+                        status:false,
+                        mensagem:"Erro ao deletar rota: "+erro
+                    })
+                })
+            }else{
+                console.log("nao deletou aluno")
+                resposta.status(500).json({
+                    status:false,
+                    mensagem:"Rota não pode ser deletada (contém inscrições vinculadas a ela)"
+                })
+            }
+        }catch(erro){
+            resposta.status(500).json({
+                status:false,
+                mensagem:"Erro ao deletar rota: "+erro
             })
         }
     }
