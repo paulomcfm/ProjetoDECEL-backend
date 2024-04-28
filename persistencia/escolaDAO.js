@@ -68,7 +68,7 @@ export default class EscolaDAO {
         return listaEscolas;
     }
 
-    async consultarPorPonto(parametroConsulta) {
+    async consultarPorPonto(client, parametroConsulta) {
         let sql = '';
         const listaEscolas = [];
 
@@ -79,7 +79,7 @@ export default class EscolaDAO {
             WHERE esc.pde_codigo = $1
             ORDER BY esc.esc_nome  
             `;
-            const { rows: registros, fields: campos } = await poolConexao.query(sql, [parametroConsulta]);
+            const { rows: registros, fields: campos } = await client.query(sql, [parametroConsulta]);
             for (const registro of registros) {
             const pontoEmbarque = new PontoEmbarque(registro.pde_codigo, registro.pde_rua, registro.pde_numero, registro.pde_bairro, registro.pde_cep);
             const escola = new Escola(registro.esc_codigo, registro.esc_nome, registro.esc_tipo, registro.esc_email, registro.esc_telefone, pontoEmbarque);
