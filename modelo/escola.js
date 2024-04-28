@@ -95,4 +95,9 @@ export default class Escola {
         const escDAO = new EscolaDAO();
         return await escDAO.consultar(client, parametro);
     }
+
+    async consultarPorPonto(parametro) {
+        const escDAO = new EscolaDAO();
+        return await escDAO.consultarPorPonto(parametro);
+    }
 }

@@ -101,7 +101,7 @@ export default class defRotaDAO{
             sql = 'SELECT * FROM escolas WHERE esc_codigo = $1'
             values = [registro.esc_codigo]
             const { rows: registroE, fields: camposE } = await client.query(sql,values)
-            const inscricoes = new inscricao(registro.insc_ano,{aluno_codigo:registroA[0].alu_codigo,aluno_nome:registroA[0].alu_nome,aluno_rg:registroA[0].alu_rg,aluno_observacoes:registroA[0].alu_observacoes,aluno_datanasc:registroA[0].alu_datanasc,aluno_celular:registroA[0].alu_celular},{ponto_codigo:registroP[0].pde_codigo,ponto_cep:registroP[0].pde_cep,ponto_numero:registroP[0].pde_numero},{escola_codigo:registroE[0].esc_codigo,escola_nome:registroE[0].esc_nome,escola_tipo:registroE[0].esc_tipo},[],registro.insc_cep,registro.insc_rua,registro.insc_numero,registro.insc_bairro,registro.insc_periodo,registro.insc_etapa,registro.insc_anoletivo,registro.insc_turma,registro.insc_dataalocacao)
+            const inscricoes = new inscricao(registro.insc_ano,{codigo:registroA[0].alu_codigo,nome:registroA[0].alu_nome,rg:registroA[0].alu_rg,observacoes:registroA[0].alu_observacoes,dataNasc:registroA[0].alu_datanasc,celular:registroA[0].alu_celular},{ponto_codigo:registroP[0].pde_codigo,ponto_cep:registroP[0].pde_cep,ponto_numero:registroP[0].pde_numero},{escola_codigo:registroE[0].esc_codigo,escola_nome:registroE[0].esc_nome,escola_tipo:registroE[0].esc_tipo},[],registro.insc_cep,registro.insc_rua,registro.insc_numero,registro.insc_bairro,registro.insc_periodo,registro.insc_etapa,registro.insc_anoletivo,registro.insc_turma,registro.insc_dataalocacao)
             lista.push(inscricoes)
         }
         rotaModelo.inscricoes = lista

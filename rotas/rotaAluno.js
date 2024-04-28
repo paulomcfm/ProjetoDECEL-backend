@@ -1,14 +1,14 @@
 import { Router } from 'express';
 import AlunoCtrl from '../controle/alunoCtrl.js';
 
-// const aluCtrl = new AlunoCtrl();
+const aluCtrl = AlunoCtrl.getInstance();
 const rotaAluno = new Router();
 
-rotaAluno.get('/', AlunoCtrl.consultar)
-    .get('/:termo', AlunoCtrl.consultar)
-    .post('/', AlunoCtrl.gravar)
-    .patch('/', AlunoCtrl.atualizar)
-    .put('/', AlunoCtrl.atualizar)
-    .delete('/', AlunoCtrl.excluir);
+rotaAluno.get('/', aluCtrl.consultar)
+    .get('/:termo', aluCtrl.consultar)
+    .post('/', aluCtrl.gravar)
+    .patch('/', aluCtrl.atualizar)
+    .put('/', aluCtrl.atualizar)
+    .delete('/', aluCtrl.excluir);
 
 export default rotaAluno;

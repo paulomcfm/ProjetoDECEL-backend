@@ -67,4 +67,25 @@ export default class EscolaDAO {
         }
         return listaEscolas;
     }
+
+    async consultarPorPonto(parametroConsulta) {
+        let sql = '';
+        const listaEscolas = [];
+
+        sql = `SELECT esc.esc_codigo, esc.esc_nome, esc.esc_tipo, esc.esc_email, esc.esc_telefone,
+            pde.pde_codigo, pde.pde_rua, pde.pde_numero, pde.pde_bairro, pde.pde_cep
+             FROM escolas esc 
+            INNER JOIN pontosdeembarque pde ON esc.pde_codigo = pde.pde_codigo
+            WHERE esc.pde_codigo = $1
+            ORDER BY esc.esc_nome  
+            `;
+            const { rows: registros, fields: campos } = await poolConexao.query(sql, [parametroConsulta]);
+            for (const registro of registros) {
+            const pontoEmbarque = new PontoEmbarque(registro.pde_codigo, registro.pde_rua, registro.pde_numero, registro.pde_bairro, registro.pde_cep);
+            const escola = new Escola(registro.esc_codigo, registro.esc_nome, registro.esc_tipo, registro.esc_email, registro.esc_telefone, pontoEmbarque);
+            listaEscolas.push(escola);
+        }
+        return listaEscolas;
+    }
+        
 }
