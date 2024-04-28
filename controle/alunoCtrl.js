@@ -5,14 +5,12 @@ import poolConexao from "../persistencia/conexao.js";
 export default class AlunoCtrl {
     static _instance = null;
 
-    constructor()
-    {
+    constructor() {
         AlunoCtrl._instance = this;
     }
 
-    static getInstance()
-    {
-        if(AlunoCtrl._instance==null)
+    static getInstance() {
+        if (AlunoCtrl._instance == null)
             new AlunoCtrl();
         return AlunoCtrl._instance;
     }
@@ -32,10 +30,10 @@ export default class AlunoCtrl {
                 const client = await poolConexao.connect();
                 try {
                     await client.query('BEGIN');
-                    aluno.gravar(client).then(() => {
+                    aluno.gravar(client).then(async () => {
                         for (const responsavel of aluno.responsaveis) {
                             const parentesco = new Parentesco(aluno.codigo, responsavel.codigo, responsavel.parentesco);
-                            parentesco.gravar(client).catch((err) => {
+                            await parentesco.gravar(client).catch((err) => {
                                 ok = false;
                                 resposta.status(500).json({
                                     "status": false,
@@ -131,7 +129,7 @@ export default class AlunoCtrl {
                             ok = false;
                             resposta.status(500).json({
                                 "status": false,
-                                "mensagem": 'Erro ao registrar o aluno: ' + err.message
+                                "mensagem": 'Erro ao atualizar o aluno: ' + err.message
                             });
                         }
                     }
@@ -140,16 +138,18 @@ export default class AlunoCtrl {
                         return !res.some(parentesco => parentesco.codigoResponsavel === responsavel.codigo);
                     });
 
-                    for (const responsavel of responsaveisNovos) {
-                        const par = new Parentesco(aluno.codigo, responsavel.codigo, responsavel.parentesco);
-                        try {
-                            await par.gravar(client);
-                        } catch (err) {
-                            ok = false;
-                            resposta.status(500).json({
-                                "status": false,
-                                "mensagem": 'Erro ao registrar o aluno: ' + err.message
-                            });
+                    if (ok) {
+                        for (const responsavel of responsaveisNovos) {
+                            const par = new Parentesco(aluno.codigo, responsavel.codigo, responsavel.parentesco);
+                            try {
+                                await par.gravar(client);
+                            } catch (err) {
+                                ok = false;
+                                resposta.status(500).json({
+                                    "status": false,
+                                    "mensagem": 'Erro ao atualizar o aluno: ' + err.message
+                                });
+                            }
                         }
                     }
 
@@ -157,18 +157,20 @@ export default class AlunoCtrl {
                         return aluno.responsaveis.some(alunoResponsavel => alunoResponsavel.codigo === responsavel.codigoResponsavel);
                     });
 
-                    for (const responsavel of parentescosAtuais) {
-                        const responsavelAtualizado = aluno.responsaveis.find(alunoResponsavel => alunoResponsavel.codigo === responsavel.codigoResponsavel);
-                        if (responsavel.parentesco !== responsavelAtualizado.parentesco) {
-                            const par = new Parentesco(aluno.codigo, responsavel.codigoResponsavel, responsavelAtualizado.parentesco);
-                            try {
-                                await par.atualizar(client);
-                            } catch (err) {
-                                ok = false;
-                                resposta.status(500).json({
-                                    "status": false,
-                                    "mensagem": 'Erro ao registrar o aluno: ' + err.message
-                                });
+                    if (ok) {
+                        for (const responsavel of parentescosAtuais) {
+                            const responsavelAtualizado = aluno.responsaveis.find(alunoResponsavel => alunoResponsavel.codigo === responsavel.codigoResponsavel);
+                            if (responsavel.parentesco !== responsavelAtualizado.parentesco) {
+                                const par = new Parentesco(aluno.codigo, responsavel.codigoResponsavel, responsavelAtualizado.parentesco);
+                                try {
+                                    await par.atualizar(client);
+                                } catch (err) {
+                                    ok = false;
+                                    resposta.status(500).json({
+                                        "status": false,
+                                        "mensagem": 'Erro ao atualizar o aluno: ' + err.message
+                                    });
+                                }
                             }
                         }
                     }
@@ -190,10 +192,17 @@ export default class AlunoCtrl {
                             } else {
                                 resposta.status(500).json({
                                     "status": false,
-                                    "mensagem": 'Erro ao registrar o aluno: ' + erro.message
+                                    "mensagem": 'Erro ao atualizar o aluno: ' + erro.message
                                 });
                             }
                         });
+                    }
+                    else {
+                        resposta.status(500).json({
+                            "status": false,
+                            "mensagem": 'Erro ao atualizar o aluno.'
+                        });
+                        client.query('ROLLBACK');
                     }
                 } catch (e) {
                     await client.query('ROLLBACK');

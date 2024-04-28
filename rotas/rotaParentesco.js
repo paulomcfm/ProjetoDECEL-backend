@@ -1,15 +1,11 @@
 import { Router } from 'express';
 import ParentescoCtrl from '../controle/parentescoCtrl.js';
 
+const parCtrl = ParentescoCtrl.getInstance();
 const rotaParentesco = new Router();
 
-rotaParentesco.get('/', ParentescoCtrl.consultar)
-    .get('/:termo', ParentescoCtrl.consultar)
-    .get('/aluno/:termo', ParentescoCtrl.consultarAluno)
-    .get('/responsavel/:termo', ParentescoCtrl.consultarResponsavel)
-    .post('/', ParentescoCtrl.gravar)
-    .patch('/', ParentescoCtrl.atualizar)
-    .put('/', ParentescoCtrl.atualizar)
-    .delete('/', ParentescoCtrl.excluir);
+rotaParentesco
+    .get('/aluno/:termo', parCtrl.consultarAluno)
+    .get('/responsavel/:termo', parCtrl.consultarResponsavel)
 
 export default rotaParentesco;

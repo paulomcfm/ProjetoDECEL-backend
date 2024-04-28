@@ -5,14 +5,12 @@ export default class AlocarCtrl {
 
     static _instance = null;
 
-    constructor()
-    {
+    constructor() {
         AlocarCtrl._instance = this;
     }
 
-    static getInstance()
-    {
-        if(AlocarCtrl._instance==null)
+    static getInstance() {
+        if (AlocarCtrl._instance == null)
             new AlocarCtrl();
         return AlocarCtrl._instance;
     }
@@ -27,68 +25,67 @@ export default class AlocarCtrl {
                 try {
                     await client.query('BEGIN');
                     const inscricao = new Inscricao();
-                    try {
-                        const inscricoes = await inscricao.consultarPorRota(client, dados[0].rota);
-                        //Remove das rotas as incricoes que eram da rota que foi alterada mas não são mais
-                        for (const inscricaoEncontrada of inscricoes) {
-                            const encontradaEmDados = dados.find(d => d.aluno.codigo === inscricaoEncontrada.aluno.codigo);
-                            if (!encontradaEmDados) {
-                                inscricaoEncontrada.rota = null;
-                                inscricaoEncontrada.dataAlocacao = null;
-                                await inscricaoEncontrada.atualizarRota(client).catch((erro) => {
+                    const inscricoes = await inscricao.consultarPorRota(client, dados[0].rota);
+                    //Remove das rotas as incricoes que eram da rota que foi alterada mas não são mais
+                    for (const inscricaoEncontrada of inscricoes) {
+                        const encontradaEmDados = dados.find(d => d.aluno.codigo === inscricaoEncontrada.aluno.codigo);
+                        if (!encontradaEmDados) {
+                            inscricaoEncontrada.rota = null;
+                            inscricaoEncontrada.dataAlocacao = null;
+                            await inscricaoEncontrada.atualizarRota(client).catch((erro) => {
+                                ok = false;
+                                client.query('ROLLBACK');
+                                resposta.status(500).json({
+                                    "status": false,
+                                    "mensagem": 'Erro ao atualizar a inscrição: ' + erro.message
+                                });
+                            });
+                        }
+                    }
+                    if (ok && dados[0].aluno.codigo != 0) {
+                        //Coloca na rota as inscricoes
+                        for (const inscricao of dados) {
+                            const naoEncontradaNaConsulta = inscricoes.every(i => i.aluno.codigo !== inscricao.aluno.codigo);
+                            if (naoEncontradaNaConsulta) {
+                                const novaInscricao = new Inscricao(
+                                    inscricao.ano,
+                                    inscricao.aluno,
+                                    inscricao.pontoEmbarque,
+                                    inscricao.escola,
+                                    inscricao.rota,
+                                    inscricao.cep,
+                                    inscricao.rua,
+                                    inscricao.numero,
+                                    inscricao.bairro,
+                                    inscricao.periodo,
+                                    inscricao.etapa,
+                                    inscricao.anoLetivo,
+                                    inscricao.turma,
+                                    inscricao.dataAlocacao
+                                );
+                                await novaInscricao.atualizarRota(client).catch((erro) => {
                                     ok = false;
                                     client.query('ROLLBACK');
                                     resposta.status(500).json({
                                         "status": false,
                                         "mensagem": 'Erro ao atualizar a inscrição: ' + erro.message
                                     });
-                                });
+                                })
                             }
                         }
-                        if (ok && dados[0].aluno.codigo!=0) {
-                            //Coloca na rota as inscricoes
-                            for (const inscricao of dados) {
-                                const naoEncontradaNaConsulta = inscricoes.every(i => i.aluno.codigo !== inscricao.aluno.codigo);
-                                if (naoEncontradaNaConsulta) {
-                                    const novaInscricao = new Inscricao(
-                                        inscricao.ano,
-                                        inscricao.aluno,
-                                        inscricao.pontoEmbarque,
-                                        inscricao.escola,
-                                        inscricao.rota,
-                                        inscricao.cep,
-                                        inscricao.rua,
-                                        inscricao.numero,
-                                        inscricao.bairro,
-                                        inscricao.periodo,
-                                        inscricao.etapa,
-                                        inscricao.anoLetivo,
-                                        inscricao.turma,
-                                        inscricao.dataAlocacao
-                                    );
-                                    await novaInscricao.atualizarRota(client).catch((erro) => {
-                                        ok = false;
-                                        client.query('ROLLBACK');
-                                        resposta.status(500).json({
-                                            "status": false,
-                                            "mensagem": 'Erro ao atualizar a inscrição: ' + erro.message
-                                        });
-                                    })
-                                }
-                            }
-                        }
-                        if (ok) {
-                            resposta.status(200).json({
-                                "status": true,
-                                "mensagem": 'Inscrições alteradas com sucesso!'
-                            });
-                            await client.query('COMMIT');
-                        }
-                    } catch (erro) {
+                    }
+                    if (ok) {
+                        resposta.status(200).json({
+                            "status": true,
+                            "mensagem": 'Inscrições alteradas com sucesso!'
+                        });
+                        await client.query('COMMIT');
+                    }
+                    else{
                         await client.query('ROLLBACK');
                         resposta.status(500).json({
                             "status": false,
-                            "mensagem": 'Erro ao atualizar a inscrição: ' + erro.message
+                            "mensagem": 'Erro ao atualizar a inscrição.'
                         });
                     }
                 } catch (erro) {

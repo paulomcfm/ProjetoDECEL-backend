@@ -125,8 +125,8 @@ export default class Responsavel {
         await respDAO.atualizar(this);
     }
 
-    async consultar(parametro) {
+    async consultar(parametro, client) {
         const respDAO = new ResponsavelDAO();
-        return await respDAO.consultar(parametro);
+        return await respDAO.consultar(parametro, client);
     }
 }
