@@ -76,24 +76,24 @@ export default class Escola {
         }
     }
 
-    async gravar() {
+    async gravar(client) {
         const escDAO = new EscolaDAO();
-        await escDAO.gravar(this);
+        await escDAO.gravar(client, this);
     }
 
-    async excluir() {
+    async excluir(client) {
         const escDAO = new EscolaDAO();
-        await escDAO.excluir(this);
+        await escDAO.excluir(client, this);
     }
 
-    async atualizar() {
+    async atualizar(client) {
         const escDAO = new EscolaDAO();
-        await escDAO.atualizar(this);
+        await escDAO.atualizar(client, this);
     }
 
-    async consultar(parametro) {
+    async consultar(client, parametro) {
         const escDAO = new EscolaDAO();
-        return await escDAO.consultar(parametro);
+        return await escDAO.consultar(client, parametro);
     }
 
     async consultarPorPonto(parametro) {

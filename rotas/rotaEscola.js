@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import EscolaCtrl from '../controle/escolaCtrl.js';
 
-const escCtrl = new EscolaCtrl();
+//const escCtrl = new EscolaCtrl();
 const rotaEscola = new Router();
 
 rotaEscola.get('/', escCtrl.consultar)

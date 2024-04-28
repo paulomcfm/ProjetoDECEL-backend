@@ -166,9 +166,9 @@ VALUES (1, 1, 'Pai'),
 
 -- Inserts para a tabela PontosdeEmbarque
 INSERT INTO PontosdeEmbarque (pde_rua, pde_bairro, pde_numero, pde_cep)
-VALUES ('Rua 1', 'Bairro 1', '123', '12345-678'),
-       ('Rua 2', 'Bairro 2', '456', '98765-432'),
-       ('Rua 3', 'Bairro 3', '789', '54321-876');
+VALUES ('R. Guarucaia','Álvares Machado', '290-362', '19160-000'),
+       ('R. Alfredo Marcondes','Álvares Machado','113', '19160-000'),
+       ('José alexandre','Jardim Antonio Pichione', '72', '19160-000');
 
 -- Inserts para a tabela Escolas
 INSERT INTO Escolas (esc_nome, esc_tipo, esc_email, esc_telefone, pde_codigo)

@@ -55,8 +55,8 @@ export default class InscricaoDAO {
 			LEFT JOIN  rotas r ON i.rot_codigo = r.rot_codigo
             INNER JOIN  escolas e ON i.esc_codigo = e.esc_codigo
             INNER JOIN  alunos a ON i.alu_codigo = a.alu_codigo
-            WHERE a.alu_nome LIKE '$1'
-            ORDER BY i.insc_ano DESC, a.alu_nome;;             
+            WHERE LOWER(UNACCENT(a.alu_nome)) LIKE LOWER(UNACCENT('$1'));
+            ORDER BY i.insc_ano DESC, a.alu_nome;          
             `;
             parametros = ['%' + parametroConsulta + '%'];
             const { rows: registros, fields: campos } = await client.query(sql, parametros);

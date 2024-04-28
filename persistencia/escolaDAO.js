@@ -1,33 +1,32 @@
 import Escola from "../modelo/escola.js";
 import PontoEmbarque from "../modelo/pontoEmbarque.js";
-import poolConexao from "./conexao.js";
 
 export default class EscolaDAO {
-    async gravar(escola) {
+    async gravar(client, escola) {
         if (escola instanceof Escola) {
             const sql = "INSERT INTO escolas(esc_nome, esc_tipo, esc_email, esc_telefone, pde_codigo) VALUES($1,$2,$3,$4,$5)";
             const parametros = [escola.nome, escola.tipo, escola.email, escola.telefone, escola.pontoEmbarque.codigo];
-            const retorno = await poolConexao.query(sql, parametros);
+            const retorno = await client.query(sql, parametros);
         }
     }
 
-    async atualizar(escola) {
+    async atualizar(client, escola) {
         if (escola instanceof Escola) {
             const sql = "UPDATE escolas SET esc_nome = $1, esc_tipo = $2, esc_email = $3, esc_telefone = $4, pde_codigo = $5 WHERE esc_codigo = $6";
             const parametros = [escola.nome, escola.tipo, escola.email, escola.telefone, escola.pontoEmbarque.codigo, escola.codigo];
-            const retorno = await poolConexao.query(sql, parametros);
+            await client.query(sql, parametros);
         }
     }
 
-    async excluir(escola) {
+    async excluir(client, escola) {
         if (escola instanceof Escola) {
             const sql = "DELETE FROM escolas WHERE esc_codigo = $1";
             const parametros = [escola.codigo];
-            const retorno = await poolConexao.query(sql, parametros);
+            await client.query(sql, parametros);
         }
     }
 
-    async consultar(parametroConsulta) {
+    async consultar(client, parametroConsulta) {
         let sql = '';
         let parametros = [];
         const listaEscolas = [];
@@ -40,7 +39,7 @@ export default class EscolaDAO {
             ORDER BY esc.esc_nome               
             `;
             parametros = [parametroConsulta];
-            const { rows: registros, fields: campos } = await poolConexao.query(sql, parametros);
+            const { rows: registros, fields: campos } = await client.query(sql, parametros);
             for (const registro of registros) {
                 const pontoEmbarque = new PontoEmbarque(registro.pde_codigo, registro.pde_rua, registro.pde_numero, registro.pde_bairro, registro.pde_cep);
                 const escola = new Escola(registro.esc_codigo, registro.esc_nome, registro.esc_tipo, registro.esc_email, registro.esc_telefone, pontoEmbarque);
@@ -59,7 +58,7 @@ export default class EscolaDAO {
             ORDER BY esc.esc_nome  
             `;
             parametros = ['%' + parametroConsulta + '%'];
-            const { rows: registros, fields: campos } = await poolConexao.query(sql, parametros);
+            const { rows: registros, fields: campos } = await client.query(sql, parametros);
             for (const registro of registros) {
                 const pontoEmbarque = new PontoEmbarque(registro.pde_codigo, registro.pde_rua, registro.pde_numero, registro.pde_bairro, registro.pde_cep);
                 const escola = new Escola(registro.esc_codigo, registro.esc_nome, registro.esc_tipo, registro.esc_email, registro.esc_telefone, pontoEmbarque);

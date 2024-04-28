@@ -1,7 +1,14 @@
 import PontoEmbarque from "../modelo/pontoEmbarque.js";
+import poolConexao from "../persistencia/conexao.js";
 
 export default class PontoEmbarqueCtrl {
-    gravar(requisicao, resposta) {
+    constructor() {
+        if (PontoEmbarqueCtrl._instance) {
+            return PontoEmbarqueCtrl._instance
+        }
+        PontoEmbarqueCtrl._instance = this;
+    }
+    static async gravar(requisicao, resposta) {
         resposta.type('application/json');
         if (requisicao.method === 'POST' && requisicao.is('application/json')) {
             const dados = requisicao.body;
@@ -11,18 +18,29 @@ export default class PontoEmbarqueCtrl {
             const cep = dados.cep;
             if (rua && numero && bairro && cep) {
                 const pontoEmbarque = new PontoEmbarque(0, rua, numero, bairro, cep);
-                pontoEmbarque.gravar().then(() => {
-                    resposta.status(200).json({
-                        "status": true,
-                        "codigoGerado": pontoEmbarque.codigo,
-                        "mensagem": 'Ponto de embarque incluido com sucesso!'
+                const client = await poolConexao.connect();
+                try {
+                    await client.query('BEGIN');
+                    pontoEmbarque.gravar(client).then(async () => {
+                        resposta.status(200).json({
+                            "status": true,
+                            "codigoGerado": pontoEmbarque.codigo,
+                            "mensagem": 'Ponto de embarque incluido com sucesso!'
+                        });
+                        await client.query('COMMIT');
+                    }).catch(async (erro) => {
+                        resposta.status(500).json({
+                            "status": false,
+                            "mensagem": 'Erro ao registrar o ponto de embarque: ' + erro.message
+                        });
+                        await client.query('ROLLBACK');
                     });
-                }).catch((erro) => {
-                    resposta.status(500).json({
-                        "status": false,
-                        "mensagem": 'Erro ao registrar o ponto de embarque: ' + erro.message
-                    });
-                });
+                } catch (e) {
+                    await client.query('ROLLBACK');
+                    throw e;
+                } finally {
+                    client.release();
+                }
             }
             else {
                 resposta.status(400).json({
@@ -39,7 +57,7 @@ export default class PontoEmbarqueCtrl {
         }
     }
 
-    atualizar(requisicao, resposta) {
+    static async atualizar(requisicao, resposta) {
         resposta.type('application/json');
         if ((requisicao.method === 'PUT' || requisicao.method === 'PATCH') && requisicao.is('application/json')) {
             const dados = requisicao.body;
@@ -48,20 +66,31 @@ export default class PontoEmbarqueCtrl {
             const numero = dados.numero;
             const bairro = dados.bairro;
             const cep = dados.cep;
-            if (codigo>=0 && rua && numero && bairro && cep) {
+            if (codigo >= 0 && rua && numero && bairro && cep) {
                 const pontoEmbarque = new PontoEmbarque(codigo, rua, numero, bairro, cep);
-                pontoEmbarque.atualizar().then(() => {
-                    resposta.status(200).json({
-                        "status": true,
-                        "codigoGerado": pontoEmbarque.codigo,
-                        "mensagem": 'Ponto de embarque alterado com sucesso!'
+                const client = await poolConexao.connect();
+                try {
+                    await client.query('BEGIN');
+                    pontoEmbarque.atualizar(client).then(async () => {
+                        resposta.status(200).json({
+                            "status": true,
+                            "codigoGerado": pontoEmbarque.codigo,
+                            "mensagem": 'Ponto de embarque alterado com sucesso!'
+                        });
+                        await client.query('COMMIT');
+                    }).catch(async (erro) => {
+                        resposta.status(500).json({
+                            "status": false,
+                            "mensagem": 'Erro ao alterar o ponto de embarque: ' + erro.message
+                        });
+                        await client.query('ROLLBACK');
                     });
-                }).catch((erro) => {
-                    resposta.status(500).json({
-                        "status": false,
-                        "mensagem": 'Erro ao alterar o ponto de embarque: ' + erro.message
-                    });
-                });
+                } catch (e) {
+                    await client.query('ROLLBACK');
+                    throw e;
+                } finally {
+                    client.release();
+                }
             }
             else {
                 resposta.status(400).json({
@@ -78,25 +107,36 @@ export default class PontoEmbarqueCtrl {
         }
     }
 
-    excluir(requisicao, resposta) {
+    static async excluir(requisicao, resposta) {
         resposta.type('application/json');
         if (requisicao.method === 'DELETE' && requisicao.is('application/json')) {
             const dados = requisicao.body;
             const codigo = dados.codigo;
-            if (codigo>=0) {
+            if (codigo >= 0) {
                 const pontoEmbarque = new PontoEmbarque(codigo);
-                pontoEmbarque.excluir().then(() => {
-                    resposta.status(200).json({
-                        "status": true,
-                        "codigoGerado": pontoEmbarque.codigo,
-                        "mensagem": 'Ponto de embarque excluído com sucesso!'
+                const client = await poolConexao.connect();
+                try {
+                    await client.query('BEGIN');
+                    pontoEmbarque.excluir(client).then(async () => {
+                        resposta.status(200).json({
+                            "status": true,
+                            "codigoGerado": pontoEmbarque.codigo,
+                            "mensagem": 'Ponto de embarque excluído com sucesso!'
+                        });
+                        await client.query('COMMIT');
+                    }).catch(async (erro) => {
+                        resposta.status(500).json({
+                            "status": false,
+                            "mensagem": 'Erro ao excluir o ponto de embarque: ' + erro.message
+                        });
+                        await client.query('ROLLBACK');
                     });
-                }).catch((erro) => {
-                    resposta.status(500).json({
-                        "status": false,
-                        "mensagem": 'Erro ao excluir o ponto de embarque: ' + erro.message
-                    });
-                });
+                } catch (e) {
+                    await client.query('ROLLBACK');
+                    throw e;
+                } finally {
+                    client.release();
+                }
             }
             else {
                 resposta.status(400).json({
@@ -113,15 +153,16 @@ export default class PontoEmbarqueCtrl {
         }
     }
 
-    consultar(requisicao, resposta) {
+    static async consultar(requisicao, resposta) {
         resposta.type('application/json');
         let termo = requisicao.params.termo;
         if (!termo) {
             termo = '';
         }
         if (requisicao.method === 'GET') {
+            const client = await poolConexao.connect();
             const pontosEmbarque = new PontoEmbarque();
-            pontosEmbarque.consultar(termo).then((listaPontosEmbarque) => {
+            pontosEmbarque.consultar(client, termo).then((listaPontosEmbarque) => {
                 resposta.json({
                     "status": true,
                     "listaPontosEmbarque": listaPontosEmbarque
@@ -132,6 +173,7 @@ export default class PontoEmbarqueCtrl {
                     "mensagem": 'Erro ao consultar os pontos de embarque: ' + erro.message
                 });
             });
+            client.release();
         }
         else {
             resposta.status(400).json({
