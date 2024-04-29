@@ -196,7 +196,6 @@ export default class defRotaCtrl{
             const qtdInscr = await rota.consultarQtdInscricoes(client)
             if(qtdInscr.length===0){
                 rota.deletar(client).then(()=>{
-                    console.log("deletou")
                     resposta.status(200).json({
                         status:true,
                         mensagem:"Rota deletada com sucesso"
@@ -209,7 +208,6 @@ export default class defRotaCtrl{
                     })
                 })
             }else{
-                console.log("nao deletou aluno")
                 resposta.status(500).json({
                     status:false,
                     mensagem:"Rota não pode ser deletada (contém inscrições vinculadas a ela)"
