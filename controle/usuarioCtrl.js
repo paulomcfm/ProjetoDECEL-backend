@@ -73,8 +73,8 @@ export default class UsuarioCtrl {
                 "mensagem": 'Por favor, utilize o método GET e envie os dados no formato JSON para autenticar o usuário!'
             });
         }
-        const { nome, cpf } = requisicao.body;
-        if (!nome || !cpf) {
+        const { nome, cpf, senha } = requisicao.body;
+        if (!nome || !cpf || !senha) {
             return resposta.status(400).json({
                 "status": false,
                 "mensagem": 'Por favor, informe o nome de usuário e o CPF!'
@@ -224,7 +224,7 @@ export default class UsuarioCtrl {
             usuarios.consultar(termo, client).then((listaUsuarios) => {
                 resposta.json({
                     "status": true,
-                    "listausuarios": listaUsuarios
+                    "listaUsuarios": listaUsuarios
                 });
             }).catch(async (erro) => {
                 resposta.status(500).json({
