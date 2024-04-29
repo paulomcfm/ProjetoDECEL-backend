@@ -13,6 +13,7 @@ export default class EscolaCtrl {
             new EscolaCtrl();
         return EscolaCtrl._instance;
     }
+  
     async gravar(requisicao, resposta) {
         resposta.type('application/json');
         if (requisicao.method === 'POST' && requisicao.is('application/json')) {

@@ -2,18 +2,19 @@ import Inscricao from "../modelo/inscricao.js";
 import poolConexao from "../persistencia/conexao.js";
 
 export default class InscricaoCtrl {
-
     static _instance = null;
 
     constructor() {
-        if (InscricaoCtrl._instance) {
-            return InscricaoCtrl._instance
-        }
         InscricaoCtrl._instance = this;
     }
 
-    static async gravar(requisicao, resposta) {
-        var ok = true;
+    static getInstance() {
+        if (InscricaoCtrl._instance == null)
+            new InscricaoCtrl();
+        return InscricaoCtrl._instance;
+    }
+
+    async gravar(requisicao, resposta) {
         resposta.type('application/json');
         if (requisicao.method === 'POST' && requisicao.is('application/json')) {
             const dados = requisicao.body;
@@ -70,8 +71,7 @@ export default class InscricaoCtrl {
         }
     }
 
-    static async atualizar(requisicao, resposta) {
-        var ok = true;
+    async atualizar(requisicao, resposta) {
         resposta.type('application/json');
         if ((requisicao.method === 'PUT' || requisicao.method === 'PATCH') && requisicao.is('application/json')) {
             const dados = requisicao.body;
@@ -127,7 +127,7 @@ export default class InscricaoCtrl {
         }
     }
 
-    static async excluir(requisicao, resposta) {
+    async excluir(requisicao, resposta) {
         resposta.type('application/json');
         if (requisicao.method === 'DELETE' && requisicao.is('application/json')) {
             const dados = requisicao.body;
@@ -175,7 +175,7 @@ export default class InscricaoCtrl {
         }
     }
 
-    static async consultar(requisicao, resposta) {
+    async consultar(requisicao, resposta) {
         resposta.type('application/json');
         let termo = requisicao.params.termo;
         if (!termo) {
