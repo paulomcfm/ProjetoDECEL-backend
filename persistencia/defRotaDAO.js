@@ -17,9 +17,11 @@ export default class defRotaDAO{
     async gravarPontos(client,rotaModelo){
         let sql = ''
         let values = []
+        let ordem=0
         for(const ponto of rotaModelo.pontos){
-            sql = 'INSERT INTO rotas_tem_pontosdeembarque(rot_codigo,pde_codigo) values ($1,$2)'
-            values = [rotaModelo.codigo,ponto]
+            ordem++;
+            sql = 'INSERT INTO rotas_tem_pontosdeembarque(rot_codigo,pde_codigo,ordem) values ($1,$2,$3)'
+            values = [rotaModelo.codigo,ponto,''+ordem]
             await client.query(sql,values)
         }
     }
@@ -63,7 +65,7 @@ export default class defRotaDAO{
 
     async consultarPontos(client,rotaModelo){
         let lista = []
-        let sql = "SELECT * FROM rotas_tem_pontosdeembarque INNER JOIN pontosdeembarque ON pontosdeembarque.pde_codigo = rotas_tem_pontosdeembarque.pde_codigo where rot_codigo = $1 "
+        let sql = "SELECT * FROM rotas_tem_pontosdeembarque INNER JOIN pontosdeembarque ON pontosdeembarque.pde_codigo = rotas_tem_pontosdeembarque.pde_codigo where rot_codigo = $1 order by ordem asc"
         let values = [rotaModelo.codigo]
         const { rows: registros, fields: campos } = await client.query(sql,values)
         for(const registro of registros){
@@ -149,10 +151,8 @@ export default class defRotaDAO{
     async deletar(client,rotaModelo){
         try{
             let sql = 'DELETE FROM rotas_tem_motoristas WHERE rot_codigo = $1'
-            console.log(rotaModelo.codigo)
             let values = [rotaModelo.codigo]
             await client.query(sql,values)
-            console.log('oi')
             sql = 'DELETE FROM rotas_tem_pontosdeembarque WHERE rot_codigo = $1'
             await client.query(sql,values)
             sql = 'DELETE FROM rotas WHERE rot_codigo = $1'
