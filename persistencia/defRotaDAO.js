@@ -65,7 +65,7 @@ export default class defRotaDAO{
 
     async consultarPontos(client,rotaModelo){
         let lista = []
-        let sql = "SELECT * FROM rotas_tem_pontosdeembarque INNER JOIN pontosdeembarque ON pontosdeembarque.pde_codigo = rotas_tem_pontosdeembarque.pde_codigo where rot_codigo = $1 order by ordem asc"
+        let sql = "SELECT * FROM rotas_tem_pontosdeembarque INNER JOIN pontosdeembarque ON pontosdeembarque.pde_codigo = rotas_tem_pontosdeembarque.pde_codigo where rot_codigo = $1 order by ordem asc "
         let values = [rotaModelo.codigo]
         const { rows: registros, fields: campos } = await client.query(sql,values)
         for(const registro of registros){
