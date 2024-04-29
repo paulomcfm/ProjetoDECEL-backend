@@ -139,12 +139,14 @@ export default class defRota{
         await dao.gravar(client,this)
     }
 
-    async deletar(){
-
+    async deletar(client){
+        const dao = new defRotaDAO()
+        await dao.deletar(client,this)
     }
 
-    async atualizar(){
-
+    async atualizar(client){
+        const dao = new defRotaDAO()
+        await dao.atualizar(client,this)
     }
 
     async consultar(client,termo){
@@ -175,6 +177,11 @@ export default class defRota{
     async consultarInscricoes(client){
         const dao = new defRotaDAO()
         await dao.consultarInscricoes(client,this)
+    }
+
+    async consultarQtdInscricoes(client){
+        const dao = new defRotaDAO()
+        return await dao.consultarQtdInscricoes(client,this)
     }
 
 

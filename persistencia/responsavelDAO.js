@@ -26,7 +26,7 @@ export default class ResponsavelDAO {
         }
     }
 
-    async consultar(parametroConsulta) {
+    async consultar(parametroConsulta, client) {
         let sql = '';
         let parametros = [];
         if (!isNaN(parseInt(parametroConsulta))) {
@@ -40,7 +40,7 @@ export default class ResponsavelDAO {
             sql = "SELECT * FROM responsaveis WHERE resp_nome like $1";
             parametros = ['%' + parametroConsulta + '%'];
         }
-        const { rows: registros, fields: campos } = await poolConexao.query(sql, parametros);
+        const { rows: registros, fields: campos } = await client.query(sql, parametros);
         let listaResponsaveis = [];
         for (const registro of registros) {
             const responsavel = new Responsavel(registro.resp_codigo, registro.resp_nome, registro.resp_rg, registro.resp_cpf, registro.resp_email, registro.resp_telefone, registro.resp_celular);

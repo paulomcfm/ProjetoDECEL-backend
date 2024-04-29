@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import ResponsavelCtrl from '../controle/responsavelCtrl.js';
 
-const respCtrl = new ResponsavelCtrl();
+const respCtrl = ResponsavelCtrl.getInstance();
 const rotaResponsavel = new Router();
 
 rotaResponsavel.get('/', respCtrl.consultar)

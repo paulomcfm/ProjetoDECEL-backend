@@ -13,7 +13,7 @@ export default class EscolaCtrl {
             new EscolaCtrl();
         return EscolaCtrl._instance;
     }
-
+  
     async gravar(requisicao, resposta) {
         resposta.type('application/json');
         if (requisicao.method === 'POST' && requisicao.is('application/json')) {
@@ -171,6 +171,35 @@ export default class EscolaCtrl {
             const client = await poolConexao.connect();
             const escolas = new Escola();
             escolas.consultar(client, termo).then((listaEscolas) => {
+                resposta.json({
+                    "status": true,
+                    "listaEscolas": listaEscolas
+                });
+            }).catch((erro) => {
+                resposta.status(500).json({
+                    "status": false,
+                    "mensagem": 'Erro ao consultar as escolas: ' + erro.message
+                });
+            });
+            client.release();
+        }
+        else {
+            resposta.status(400).json({
+                "status": false,
+                "mensagem": 'Por favor, utilize o método GET para consultar as escolas!'
+            });
+        }
+    }
+    async consultarPorPonto(requisicao, resposta) {
+        resposta.type('application/json');
+        let termo = requisicao.params.termo;
+        if (!termo) {
+            termo = '';
+        }
+        if (requisicao.method === 'GET') {
+            const client = await poolConexao.connect();
+            const escolas = new Escola();
+            escolas.consultarPorPonto(client, termo).then((listaEscolas) => {
                 resposta.json({
                     "status": true,
                     "listaEscolas": listaEscolas

@@ -86,6 +86,14 @@ export default class defRotaDAO{
     }
 
 
+    async consultarQtdInscricoes(client,rotaModelo){
+        let sql = "select count(rot_codigo) as qtd from inscricoes where rot_codigo = $1 Group by rot_codigo;"
+        let values = [rotaModelo.codigo]
+        const { rows: registros, fields: campos } = await client.query(sql,values)
+        return registros
+    }
+
+
     async consultarInscricoes(client,rotaModelo){
         let lista = []
         let sql = "SELECT * FROM inscricoes WHERE inscricoes.rot_codigo = $1"
@@ -101,10 +109,58 @@ export default class defRotaDAO{
             sql = 'SELECT * FROM escolas WHERE esc_codigo = $1'
             values = [registro.esc_codigo]
             const { rows: registroE, fields: camposE } = await client.query(sql,values)
-            const inscricoes = new inscricao(registro.insc_ano,{aluno_codigo:registroA[0].alu_codigo,aluno_nome:registroA[0].alu_nome,aluno_rg:registroA[0].alu_rg,aluno_observacoes:registroA[0].alu_observacoes,aluno_datanasc:registroA[0].alu_datanasc,aluno_celular:registroA[0].alu_celular},{ponto_codigo:registroP[0].pde_codigo,ponto_cep:registroP[0].pde_cep,ponto_numero:registroP[0].pde_numero},{escola_codigo:registroE[0].esc_codigo,escola_nome:registroE[0].esc_nome,escola_tipo:registroE[0].esc_tipo},[],registro.insc_cep,registro.insc_rua,registro.insc_numero,registro.insc_bairro,registro.insc_periodo,registro.insc_etapa,registro.insc_anoletivo,registro.insc_turma,registro.insc_dataalocacao)
+            const inscricoes = new inscricao(registro.insc_ano,{codigo:registroA[0].alu_codigo,nome:registroA[0].alu_nome,rg:registroA[0].alu_rg,observacoes:registroA[0].alu_observacoes,dataNasc:registroA[0].alu_datanasc,celular:registroA[0].alu_celular},{ponto_codigo:registroP[0].pde_codigo,ponto_cep:registroP[0].pde_cep,ponto_numero:registroP[0].pde_numero},{escola_codigo:registroE[0].esc_codigo,escola_nome:registroE[0].esc_nome,escola_tipo:registroE[0].esc_tipo},[],registro.insc_cep,registro.insc_rua,registro.insc_numero,registro.insc_bairro,registro.insc_periodo,registro.insc_etapa,registro.insc_anoletivo,registro.insc_turma,registro.insc_dataalocacao)
             lista.push(inscricoes)
         }
         rotaModelo.inscricoes = lista
+    }
+
+
+    async atualizar(client,rotaModelo){
+        try{
+            let sql = "UPDATE rotas SET rot_nome=$2,rot_km=$3,rot_periodo=$4,rot_tempoInicio=$5,rot_tempoFinal=$6,vei_codigo=$7,mon_codigo=$8 WHERE rot_codigo = $1"
+            let values = [rotaModelo.codigo,rotaModelo.nome,rotaModelo.km,rotaModelo.periodo,rotaModelo.ida,rotaModelo.volta,rotaModelo.veiculo,rotaModelo.monitor]
+            await client.query(sql,values)
+            sql = "DELETE FROM rotas_tem_motoristas WHERE rot_codigo = $1"
+            values = [rotaModelo.codigo]
+            
+            await client.query(sql,values)
+            for(let i=0;i<rotaModelo.motoristas.length;i++){
+                sql = "INSERT INTO rotas_tem_motoristas(rot_codigo,moto_id) values ($1,$2)"
+                values = [rotaModelo.codigo,rotaModelo.motoristas[i]]
+                await client.query(sql,values)
+            }
+
+            sql = "DELETE FROM rotas_tem_pontosdeembarque WHERE rot_codigo = $1"
+            values = [rotaModelo.codigo]
+            await client.query(sql,values)
+            for(let i=0;i<rotaModelo.pontos.length;i++){
+                sql = "INSERT INTO rotas_tem_pontosdeembarque(rot_codigo,pde_codigo) values ($1,$2)"
+                values = [rotaModelo.codigo,rotaModelo.pontos[i]]
+                await client.query(sql,values)
+            }
+        }catch(erro){
+            console.error("Ocorreu um erro durante a atualização:", erro);
+            await client.query('ROLLBACK');
+            throw erro
+        }
+    }
+
+    async deletar(client,rotaModelo){
+        try{
+            let sql = 'DELETE FROM rotas_tem_motoristas WHERE rot_codigo = $1'
+            console.log(rotaModelo.codigo)
+            let values = [rotaModelo.codigo]
+            await client.query(sql,values)
+            console.log('oi')
+            sql = 'DELETE FROM rotas_tem_pontosdeembarque WHERE rot_codigo = $1'
+            await client.query(sql,values)
+            sql = 'DELETE FROM rotas WHERE rot_codigo = $1'
+            await client.query(sql,values)
+        }catch(erro){
+            await client.query('ROLLBACK')
+            throw erro
+        }
     }
 
 }

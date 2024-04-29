@@ -142,9 +142,10 @@ VALUES ('usuario1', 'senha123', '123.456.789-00', 'usuario1@email.com', '(123) 4
 
 -- Inserts para a tabela Veiculos
 INSERT INTO Veiculos (vei_renavam, vei_placa, vei_modelo, vei_capacidade, vei_tipo)
-VALUES ('12345678901', 'ABC1234', 'Modelo 1', 5, 'C'),
-       ('98765432109', 'DEF5678', 'Modelo 2', 7, 'V'),
-       ('11122233344', 'GHI9012', 'Modelo 3', 9, 'C');
+VALUES ('12345678901', 'ABC123', 'Ônibus', 5, 'C'),
+       ('98765432109', 'XYZ789', 'Micro', 7, 'V'),
+       ('11122233344', 'DEF456', 'Micro', 9, 'C');
+       ('99726698546', 'GHI789', 'Ônibus', 9, 'C');
 
 -- Inserts para a tabela Responsaveis
 INSERT INTO Responsaveis (resp_nome, resp_rg, resp_cpf, resp_email, resp_telefone, resp_celular)
@@ -166,9 +167,12 @@ VALUES (1, 1, 'Pai'),
 
 -- Inserts para a tabela PontosdeEmbarque
 INSERT INTO PontosdeEmbarque (pde_rua, pde_bairro, pde_numero, pde_cep)
-VALUES ('Rua 1', 'Bairro 1', '123', '12345-678'),
-       ('Rua 2', 'Bairro 2', '456', '98765-432'),
-       ('Rua 3', 'Bairro 3', '789', '54321-876');
+VALUES ('R. Guarucaia','Jardim Bela Vista','649', '19160-000'),
+       ('R. Alfredo Marcondes','Álvares Machado','113', '19160-000'),
+       ('José alexandre','Jardim Antonio Pichione', '72', '19160-000');
+       ('R. Geraldo Cândido Martins','Álvares Machado','220','19160-000')
+       ('R. Almeida Cardoso','Álvares Machado','135','19160-000')
+       ('R. Iansã','Álvares Machado','22','19160-000')
 
 -- Inserts para a tabela Escolas
 INSERT INTO Escolas (esc_nome, esc_tipo, esc_email, esc_telefone, pde_codigo)
@@ -184,9 +188,10 @@ VALUES ('12345678901', '(123) 456-7890', 'Motorista 1'),
 
 -- Inserts para a tabela Monitores
 INSERT INTO Monitores (mon_nome, mon_cpf, mon_celular)
-VALUES ('Monitor 1', '123.456.789-00', '(123) 456-7890'),
-       ('Monitor 2', '987.654.321-00', '(987) 654-3210'),
-       ('Monitor 3', '111.222.333-44', '(111) 222-3333');
+VALUES ('Valdemar', '123.456.789-00', '(123) 456-7890'),
+       ('Antonio', '987.654.321-00', '(987) 654-3210'),
+       ('Joao', '111.222.333-44', '(111) 222-3333');
+       ('Maria', '111.222.333-55', '(111) 222-4444');
 
 -- Inserts para a tabela Rotas
 INSERT INTO Rotas (rot_nome, rot_km, rot_periodo, rot_tempoInicio, rot_tempoFinal, vei_codigo, mon_codigo)

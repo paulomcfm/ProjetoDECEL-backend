@@ -1,6 +1,20 @@
 import Responsavel from "../modelo/responsavel.js";
+import poolConexao from "../persistencia/conexao.js";
 
 export default class ResponsavelCtrl {
+    static _instance = null;
+
+    constructor()
+    {
+        ResponsavelCtrl._instance = this;
+    }
+
+    static getInstance()
+    {
+        if(ResponsavelCtrl._instance==null)
+            new ResponsavelCtrl();
+        return ResponsavelCtrl._instance;
+    }
     gravar(requisicao, resposta) {
         resposta.type('application/json');
         if (requisicao.method === 'POST' && requisicao.is('application/json')) {
@@ -117,15 +131,16 @@ export default class ResponsavelCtrl {
         }
     }
 
-    consultar(requisicao, resposta) {
+    async consultar(requisicao, resposta) {
         resposta.type('application/json');
         let termo = requisicao.params.termo;
         if (!termo) {
             termo = '';
         }
         if (requisicao.method === 'GET') {
+            const client = await poolConexao.connect();
             const responsaveis = new Responsavel();
-            responsaveis.consultar(termo).then((listaResponsaveis) => {
+            responsaveis.consultar(termo, client).then((listaResponsaveis) => {
                 resposta.json({
                     "status": true,
                     "listaResponsaveis": listaResponsaveis
@@ -136,6 +151,7 @@ export default class ResponsavelCtrl {
                     "mensagem": 'Erro ao consultar as responsaveis: ' + erro.message
                 });
             });
+            client.release();
         }
         else {
             resposta.status(400).json({
