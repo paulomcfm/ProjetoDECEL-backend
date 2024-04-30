@@ -16,7 +16,6 @@ export default class AlocarCtrl {
     }
 
     async atualizarInscricoes(requisicao, resposta) {
-        var ok = true;
         resposta.type('application/json');
         if ((requisicao.method === 'PUT' || requisicao.method === 'PATCH') && requisicao.is('application/json')) {
             const dados = requisicao.body;
@@ -30,19 +29,12 @@ export default class AlocarCtrl {
                     for (const inscricaoEncontrada of inscricoes) {
                         const encontradaEmDados = dados.find(d => d.aluno.codigo === inscricaoEncontrada.aluno.codigo);
                         if (!encontradaEmDados) {
-                            inscricaoEncontrada.rota = null;
-                            inscricaoEncontrada.dataAlocacao = null;
-                            await inscricaoEncontrada.atualizarRota(client).catch((erro) => {
-                                ok = false;
-                                client.query('ROLLBACK');
-                                resposta.status(500).json({
-                                    "status": false,
-                                    "mensagem": 'Erro ao atualizar a inscrição: ' + erro.message
-                                });
-                            });
+                            inscricaoEncontrada.rota(rota) = null;
+                            inscricaoEncontrada.dataAlocacao(dataAlocacao) = null;
+                            await inscricaoEncontrada.atualizarRota(client);
                         }
                     }
-                    if (ok && dados[0].aluno.codigo != 0) {
+                    if (dados[0].aluno.codigo != 0) {
                         //Coloca na rota as inscricoes
                         for (const inscricao of dados) {
                             const naoEncontradaNaConsulta = inscricoes.every(i => i.aluno.codigo !== inscricao.aluno.codigo);
@@ -63,31 +55,15 @@ export default class AlocarCtrl {
                                     inscricao.turma,
                                     inscricao.dataAlocacao
                                 );
-                                await novaInscricao.atualizarRota(client).catch((erro) => {
-                                    ok = false;
-                                    client.query('ROLLBACK');
-                                    resposta.status(500).json({
-                                        "status": false,
-                                        "mensagem": 'Erro ao atualizar a inscrição: ' + erro.message
-                                    });
-                                })
+                                await novaInscricao.atualizarRota(client);
                             }
                         }
                     }
-                    if (ok) {
-                        resposta.status(200).json({
-                            "status": true,
-                            "mensagem": 'Inscrições alteradas com sucesso!'
-                        });
-                        await client.query('COMMIT');
-                    }
-                    else{
-                        await client.query('ROLLBACK');
-                        resposta.status(500).json({
-                            "status": false,
-                            "mensagem": 'Erro ao atualizar a inscrição.'
-                        });
-                    }
+                    resposta.status(200).json({
+                        "status": true,
+                        "mensagem": 'Inscrições alteradas com sucesso!'
+                    });
+                    await client.query('COMMIT');
                 } catch (erro) {
                     await client.query('ROLLBACK');
                     resposta.status(500).json({
