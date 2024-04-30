@@ -138,7 +138,7 @@ export default class ResponsavelCtrl {
             termo = '';
         }
         if (requisicao.method === 'GET') {
-            const client = await poolConexao.connect();
+            const client = await poolConexao.getInstance().connect();
             const responsaveis = new Responsavel();
             responsaveis.consultar(termo, client).then((listaResponsaveis) => {
                 resposta.json({
