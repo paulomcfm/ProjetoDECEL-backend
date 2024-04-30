@@ -12,16 +12,16 @@ export default class UsuarioDAO {
 
     async atualizar(usuario) {
         if(usuario instanceof Usuario){
-            const sql = "UPDATE Usuarios SET user_senha = $2, user_email = $3, user_celular = $4 WHERE user_nome = $1";
-            const parametros = [usuario.nome, usuario.senha, usuario.email, usuario.celular];
+            const sql = "UPDATE Usuarios SET user_nome = $1, user_senha = $2, user_email = $4, user_celular = $5 WHERE user_cpf = " + usuario.cpf;
+            const parametros = [usuario.nome, usuario.senha, usuario.cpf, usuario.email, usuario.celular];
             await poolConexao.query(sql, parametros);
         }
     }
 
     async excluir(usuario) {
         if(usuario instanceof Usuario){
-            const sql = "DELETE FROM Usuarios WHERE user_nome = $1";
-            const parametros = [usuario.nome];
+            const sql = "DELETE FROM Usuarios WHERE user_cpf = " + usuario.cpf;
+            const parametros = [usuario.cpf];
             await poolConexao.query(sql, parametros);
         }
     }
@@ -32,7 +32,7 @@ export default class UsuarioDAO {
         if (!parametroConsulta) {
             parametroConsulta = '';
         }
-        sql = "SELECT * FROM Usuarios WHERE user_nome LIKE $1 ORDER BY user_nome";
+        sql = "SELECT * FROM Usuarios WHERE user_cpf LIKE $1 ORDER BY user_nome";
         parametros = ['%' + parametroConsulta + '%'];
         const { rows: registros, fields:campos } = await poolConexao.query(sql, parametros);
         let listaUsuarios = [];
@@ -41,5 +41,5 @@ export default class UsuarioDAO {
             listaUsuarios.push(usuario);
         }
         return listaUsuarios;
-    }
+    }    
 }

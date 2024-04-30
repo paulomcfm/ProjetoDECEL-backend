@@ -85,7 +85,7 @@ export default class UsuarioCtrl {
             const client = await poolConexao.connect();
             await client.query('BEGIN');
             const usuarioConsultado = await usuario.consultar(nome);
-            if (usuarioConsultado && usuarioConsultado[0].cpf === cpf) {
+            if (usuarioConsultado && usuarioConsultado[0].cpf === cpf && usuarioConsultado[0].senha === senha) {
                 resposta.status(200).json({
                     "status": true,
                     "mensagem": 'Usuario autenticado com sucesso!'
@@ -93,7 +93,7 @@ export default class UsuarioCtrl {
             } else {
                 resposta.status(401).json({
                     "status": false,
-                    "mensagem": 'Nome de usuario ou CPF inválido!'
+                    "mensagem": 'Nome de usuario ou CPF ou senha inválidos!'
                 });
             }
             await client.query('COMMIT');
@@ -108,7 +108,6 @@ export default class UsuarioCtrl {
         }
     }
     
-
     async atualizar(requisicao, resposta) {
         resposta.type('application/json');
         if ((requisicao.method === 'PUT' || requisicao.method === 'PATCH') && requisicao.is('application/json')) {
@@ -154,7 +153,7 @@ export default class UsuarioCtrl {
             else {
                 resposta.status(400).json({
                     "status": false,
-                    "mensagem": 'Por favor, informe o nome e o cpf do usuario!'
+                    "mensagem": 'Por favor, informe os campos do usuario!'
                 });
             }
         }
@@ -170,16 +169,16 @@ export default class UsuarioCtrl {
         resposta.type('application/json');
         if (requisicao.method === 'DELETE' && requisicao.is('application/json')) {
             const dados = requisicao.body;
-            const nome = dados.nome;
-            if (nome) {
+            const cpf = dados.cpf;
+            if (cpf) {
                 const client = await poolConexao.connect();
                 try {
                     await client.query('BEGIN');
-                    const usuario = new Usuario(nome);
+                    const usuario = new Usuario('','',cpf);
                     usuario.excluir(client).then(() => {
                         resposta.status(200).json({
                             "status": true,
-                            "codigoGerado": usuario.codigo,
+                            "cpfUsuario": usuario.cpf,
                             "mensagem": 'Usuario excluído com sucesso!'
                         });
                         client.query('COMMIT');
@@ -222,6 +221,7 @@ export default class UsuarioCtrl {
             const client = await poolConexao.connect();
             const usuarios = new Usuario();
             usuarios.consultar(termo, client).then((listaUsuarios) => {
+                console.log(listaUsuarios);
                 resposta.json({
                     "status": true,
                     "listaUsuarios": listaUsuarios
