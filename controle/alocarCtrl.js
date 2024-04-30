@@ -21,7 +21,7 @@ export default class AlocarCtrl {
         if ((requisicao.method === 'PUT' || requisicao.method === 'PATCH') && requisicao.is('application/json')) {
             const dados = requisicao.body;
             if (dados.length > 0) {
-                const client = await poolConexao.connect();
+                const client = await poolConexao.getInstance().connect();
                 try {
                     await client.query('BEGIN');
                     const inscricao = new Inscricao();

@@ -4,18 +4,24 @@ import dotenv from 'dotenv';
 
 // Carregar variáveis de ambiente do arquivo .env
 dotenv.config();
-
-
 // Puxar a URL do PostgreSQL do arquivo .env
-
 const postgresUrl = process.env.DATABASE_URL;
 
-// Criar uma pool de clientes PostgreSQL
-const poolConexao = new Pool({
-  connectionString: postgresUrl,
-  //  ssl: {
-  //    rejectUnauthorized: false, // Dependendo da sua configuração de SSL, você pode precisar ajustar isso
-  //  }
-});
+export default class poolConexao{
+  static _instance = null;
 
-export default poolConexao;
+  constructor(){
+    poolConexao._instance = new Pool({
+      connectionString: postgresUrl,
+      //  ssl: {
+      //    rejectUnauthorized: false, // Dependendo da sua configuração de SSL, você pode precisar ajustar isso
+      //  }
+    });
+  }
+
+  static getInstance(){
+    if(poolConexao._instance==null)
+      new poolConexao();
+    return poolConexao._instance;
+  }
+}

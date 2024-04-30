@@ -197,7 +197,7 @@ export default class EscolaCtrl {
             termo = '';
         }
         if (requisicao.method === 'GET') {
-            const client = await poolConexao.connect();
+            const client = await poolConexao.getInstance().connect();
             const escolas = new Escola();
             escolas.consultarPorPonto(client, termo).then((listaEscolas) => {
                 resposta.json({

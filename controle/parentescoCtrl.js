@@ -23,7 +23,7 @@ export default class ParentescoCtrl {
             termo = '';
         }
         if (requisicao.method === 'GET') {
-            const client = await poolConexao.connect();
+            const client = await poolConexao.getInstance().connect();
             const parentescos = new Parentesco();
             parentescos.consultarAluno(termo, client).then((listaParentescos) => {
                 resposta.json({
