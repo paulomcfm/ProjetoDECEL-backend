@@ -4,7 +4,7 @@ CREATE TABLE Usuarios (
     user_cpf VARCHAR(14) NOT NULL,
     user_email VARCHAR(255) NOT NULL,
     user_celular VARCHAR(20) NOT NULL,
-    CONSTRAINT pk_parentesco PRIMARY KEY (user_cpf)
+    CONSTRAINT pk_usuarios PRIMARY KEY (user_cpf)
 );
 
 CREATE TABLE Veiculos (

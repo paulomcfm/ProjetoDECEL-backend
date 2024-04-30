@@ -169,16 +169,16 @@ export default class UsuarioCtrl {
         resposta.type('application/json');
         if (requisicao.method === 'DELETE' && requisicao.is('application/json')) {
             const dados = requisicao.body;
-            const cpf = dados.cpf;
-            if (cpf) {
+            const nome = dados.nome;
+            if (nome) {
                 const client = await poolConexao.connect();
                 try {
                     await client.query('BEGIN');
-                    const usuario = new Usuario('','',cpf);
+                    const usuario = new Usuario(nome);
                     usuario.excluir(client).then(() => {
                         resposta.status(200).json({
                             "status": true,
-                            "cpfUsuario": usuario.cpf,
+                            "nomeUsuario": usuario.nome,
                             "mensagem": 'Usuario excluído com sucesso!'
                         });
                         client.query('COMMIT');
