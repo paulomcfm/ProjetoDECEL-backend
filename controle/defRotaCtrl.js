@@ -22,7 +22,6 @@ export default class defRotaCtrl{
             const ida = dados.ida
             const volta = dados.volta
             const veiculo = dados.veiculo
-            console.log("veiculo: "+veiculo)
             const monitor = dados.monitor
             const motoristas = JSON.parse(dados.motoristas)
             const pontos = JSON.parse(dados.pontos)
@@ -201,7 +200,6 @@ export default class defRotaCtrl{
                         mensagem:"Rota deletada com sucesso"
                     })
                 }).catch((erro)=>{
-                    console.log("nao deletou")
                     resposta.status(500).json({
                         status:false,
                         mensagem:"Erro ao deletar rota: "+erro
