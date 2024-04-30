@@ -3,13 +3,13 @@ export default class Motorista{
     #id;
     #nome;
     #cnh;
-    #telefone;
+    #celular;
 
-    constructor(id,nome,cnh,telefone){
+    constructor(id,nome,cnh,celular){
         this.#id = id;
         this.#nome = nome;
         this.#cnh = cnh;
-        this.#telefone = telefone;
+        this.#celular = celular;
     }
 
     get Id(){
@@ -36,12 +36,12 @@ export default class Motorista{
         this.#cnh = novoCnh;
     }
 
-    get Telefone(){
-        return this.#telefone;
+    get celular(){
+        return this.#celular;
     }
 
-    set Telefone(novoTelefone){
-        this.#telefone = novoTelefone;
+    set celular(novocelular){
+        this.#celular = novocelular;
     }
     
 
@@ -50,7 +50,7 @@ export default class Motorista{
             id:this.#id,
             nome:this.#nome,
             cnh:this.#cnh,
-            telefone:this.#telefone
+            celular:this.#celular
         } 
     }
 
