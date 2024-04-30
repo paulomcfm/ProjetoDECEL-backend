@@ -1,10 +1,25 @@
 import Inscricao from "../modelo/inscricao.js";
+import poolConexao from "../persistencia/conexao.js";
 
 export default class InscricaoCtrl {
-    gravar(requisicao, resposta) {
+    static _instance = null;
+
+    constructor() {
+        InscricaoCtrl._instance = this;
+    }
+
+    static getInstance() {
+        if (InscricaoCtrl._instance == null)
+            new InscricaoCtrl();
+        return InscricaoCtrl._instance;
+    }
+
+    async gravar(requisicao, resposta) {
         resposta.type('application/json');
         if (requisicao.method === 'POST' && requisicao.is('application/json')) {
             const dados = requisicao.body;
+            const data = new Date();
+            const ano = data.getFullYear();
             const aluno = dados.aluno;
             const pontoEmbarque = dados.pontoEmbarque;
             const escola = dados.escola;
@@ -16,20 +31,30 @@ export default class InscricaoCtrl {
             const etapa = dados.etapa;
             const anoLetivo = dados.anoLetivo;
             const turma = dados.turma;
-            if (aluno && pontoEmbarque && escola && cep && rua && numero && bairro && periodo && etapa && anoLetivo && turma) {
-                const inscricao = new Inscricao(0, aluno, pontoEmbarque, escola, null, '', cep, rua, numero, bairro, periodo, etapa, anoLetivo, turma, '');
-                inscricao.gravar().then(() => {
-                    resposta.status(200).json({
-                        "status": true,
-                        "codigoGerado": inscricao.codigo,
-                        "mensagem": 'Inscrição incluida com sucesso!'
+            if (ano >= 0 && aluno && pontoEmbarque && escola && cep && rua && numero && bairro && periodo && etapa && anoLetivo && turma) {
+                const client = await poolConexao.connect();
+                try {
+                    await client.query('BEGIN');
+                    const inscricao = new Inscricao(ano, aluno, pontoEmbarque, escola, null, cep, rua, numero, bairro, periodo, etapa, anoLetivo, turma, '');
+                    inscricao.gravar(client).then(async () => {
+                        resposta.status(200).json({
+                            "status": true,
+                            "mensagem": 'Inscrição incluida com sucesso!'
+                        });
+                        await client.query('COMMIT');
+                    }).catch(async (erro) => {
+                        await client.query('ROLLBACK');
+                        resposta.status(500).json({
+                            "status": false,
+                            "mensagem": 'Erro ao registrar a inscrição: ' + erro.message
+                        });
                     });
-                }).catch((erro) => {
-                    resposta.status(500).json({
-                        "status": false,
-                        "mensagem": 'Erro ao registrar a inscrição: ' + erro.message
-                    });
-                });
+                } catch (e) {
+                    await client.query('ROLLBACK');
+                    throw e;
+                } finally {
+                    client.release();
+                }
             }
             else {
                 resposta.status(400).json({
@@ -46,11 +71,11 @@ export default class InscricaoCtrl {
         }
     }
 
-    atualizar(requisicao, resposta) {
+    async atualizar(requisicao, resposta) {
         resposta.type('application/json');
         if ((requisicao.method === 'PUT' || requisicao.method === 'PATCH') && requisicao.is('application/json')) {
             const dados = requisicao.body;
-            const codigo = dados.codigo;
+            const ano = dados.ano;
             const aluno = dados.aluno;
             const pontoEmbarque = dados.pontoEmbarque;
             const escola = dados.escola;
@@ -62,20 +87,30 @@ export default class InscricaoCtrl {
             const etapa = dados.etapa;
             const anoLetivo = dados.anoLetivo;
             const turma = dados.turma;
-            if (codigo >= 0 && aluno && pontoEmbarque && escola && cep && rua && numero && bairro && periodo && etapa && anoLetivo && turma) {
-                const inscricao = new Inscricao(codigo, aluno, pontoEmbarque, escola, null, '', cep, rua, numero, bairro, periodo, etapa, anoLetivo, turma, '');
-                inscricao.atualizar().then(() => {
-                    resposta.status(200).json({
-                        "status": true,
-                        "codigoGerado": inscricao.codigo,
-                        "mensagem": 'Inscrição alterada com sucesso!'
+            if (ano >= 0 && aluno && pontoEmbarque && escola && cep && rua && numero && bairro && periodo && etapa && anoLetivo && turma) {
+                const client = await poolConexao.connect();
+                try {
+                    await client.query('BEGIN');
+                    const inscricao = new Inscricao(ano, aluno, pontoEmbarque, escola, null, cep, rua, numero, bairro, periodo, etapa, anoLetivo, turma, '');
+                    inscricao.atualizar(client).then(async () => {
+                        resposta.status(200).json({
+                            "status": true,
+                            "mensagem": 'Inscrição alterada com sucesso!'
+                        });
+                        await client.query('COMMIT');
+                    }).catch(async (erro) => {
+                        resposta.status(500).json({
+                            "status": false,
+                            "mensagem": 'Erro ao alterar a inscrição: ' + erro.message
+                        });
+                        await client.query('ROLLBACK');
                     });
-                }).catch((erro) => {
-                    resposta.status(500).json({
-                        "status": false,
-                        "mensagem": 'Erro ao alterar a inscrição: ' + erro.message
-                    });
-                });
+                } catch (e) {
+                    await client.query('ROLLBACK');
+                    throw e;
+                } finally {
+                    client.release();
+                }
             }
             else {
                 resposta.status(400).json({
@@ -92,89 +127,38 @@ export default class InscricaoCtrl {
         }
     }
 
-    atualizarInscricoes(requisicao, resposta) {
-        resposta.type('application/json');
-        if ((requisicao.method === 'PUT' || requisicao.method === 'PATCH') && requisicao.is('application/json')) {
-            const dados = requisicao.body;
-            if (dados.length > 0) {
-                const inscricao = new Inscricao();
-                inscricao.consultarPorRota(dados[0].rota).then((inscricoes) => {
-                    for (const inscricaoEncontrada of inscricoes) {
-                        const encontradaEmDados = dados.find(d => d.aluno.codigo === inscricaoEncontrada.aluno.codigo);
-                        if (!encontradaEmDados) {
-                            inscricaoEncontrada.rota = null;
-                            inscricaoEncontrada.dataAlocacao = null;
-                            inscricaoEncontrada.novaAtualizar();
-                        }
-                    }
-                    for (const inscricao of dados) {
-                        const naoEncontradaNaConsulta = inscricoes.every(i => i.aluno.codigo !== inscricao.aluno.codigo);
-                        if (naoEncontradaNaConsulta) {
-                            const novaInscricao = new Inscricao(
-                                inscricao.codigo,
-                                inscricao.aluno,
-                                inscricao.pontoEmbarque,
-                                inscricao.escola,
-                                inscricao.rota,
-                                inscricao.ano,
-                                inscricao.cep,
-                                inscricao.rua,
-                                inscricao.numero,
-                                inscricao.bairro,
-                                inscricao.periodo,
-                                inscricao.etapa,
-                                inscricao.anoLetivo,
-                                inscricao.turma,
-                                inscricao.dataAlocacao
-                            );
-                            novaInscricao.novaAtualizar();
-                        }
-                    }
-                    resposta.status(200).json({
-                        "status": true,
-                        "mensagem": 'Inscrições alteradas com sucesso!'
-                    });
-                }).catch((erro) => {
-                    resposta.status(500).json({
-                        "status": false,
-                        "mensagem": 'Erro ao alterar as inscrições: ' + erro.message
-                    });
-                });
-            }
-            else {
-                resposta.status(400).json({
-                    "status": false,
-                    "mensagem": 'Por favor, informe inscrições!'
-                });
-            }
-        }
-        else {
-            resposta.status(400).json({
-                "status": false,
-                "mensagem": 'Por favor, utilize os métodos PUT ou PATCH para atualizar uma inscrição!'
-            });
-        }
-    }
-
-    excluir(requisicao, resposta) {
+    async excluir(requisicao, resposta) {
         resposta.type('application/json');
         if (requisicao.method === 'DELETE' && requisicao.is('application/json')) {
             const dados = requisicao.body;
-            const codigo = dados.codigo;
-            if (codigo >= 0) {
-                const inscricao = new Inscricao(codigo);
-                inscricao.excluir().then(() => {
-                    resposta.status(200).json({
-                        "status": true,
-                        "codigoGerado": inscricao.codigo,
-                        "mensagem": 'Inscrição excluída com sucesso!'
+            const ano = dados.ano;
+            const aluno = dados.aluno;
+            if (aluno.codigo >= 0 && ano >= 0) {
+                const client = await poolConexao.connect();
+                try {
+                    await client.query('BEGIN');
+                    const inscricao = new Inscricao(ano, aluno);
+                    inscricao.excluir(client).then(async () => {
+                        resposta.status(200).json({
+                            "status": true,
+                            "mensagem": 'Inscrição excluída com sucesso!'
+                        });
+                        await client.query('COMMIT');
+                    }).catch(async (erro) => {
+                        resposta.status(500).json({
+                            "status": false,
+                            "mensagem": 'Erro ao excluir a inscrição: ' + erro.message
+                        });
+                        await client.query('ROLLBACK');
                     });
-                }).catch((erro) => {
-                    resposta.status(500).json({
-                        "status": false,
-                        "mensagem": 'Erro ao excluir a inscrição: ' + erro.message
-                    });
-                });
+                }
+                catch (e) {
+                    await client.query('ROLLBACK');
+                    throw e;
+                }
+                finally {
+                    client.release();
+                }
             }
             else {
                 resposta.status(400).json({
@@ -191,15 +175,16 @@ export default class InscricaoCtrl {
         }
     }
 
-    consultar(requisicao, resposta) {
+    async consultar(requisicao, resposta) {
         resposta.type('application/json');
         let termo = requisicao.params.termo;
         if (!termo) {
             termo = '';
         }
         if (requisicao.method === 'GET') {
+            const client = await poolConexao.getInstance().connect();
             const inscricoes = new Inscricao();
-            inscricoes.consultar(termo).then((listaInscricoes) => {
+            inscricoes.consultar(client, termo).then((listaInscricoes) => {
                 resposta.json({
                     "status": true,
                     "listaInscricoes": listaInscricoes
@@ -210,6 +195,7 @@ export default class InscricaoCtrl {
                     "mensagem": 'Erro ao consultar as inscrições: ' + erro.message
                 });
             });
+            client.release();
         }
         else {
             resposta.status(400).json({

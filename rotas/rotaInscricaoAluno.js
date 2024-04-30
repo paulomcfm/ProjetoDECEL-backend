@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import InscricaoCtrl from '../controle/inscricaoCtrl.js';
 
-const inscCtrl = new InscricaoCtrl();
+const inscCtrl = InscricaoCtrl.getInstance();
 const rotaInscricaoAluno = new Router();
 
 rotaInscricaoAluno.get('/', inscCtrl.consultar)
@@ -10,5 +10,5 @@ rotaInscricaoAluno.get('/', inscCtrl.consultar)
     .patch('/', inscCtrl.atualizar)
     .put('/', inscCtrl.atualizar)
     .delete('/', inscCtrl.excluir)
-    .put('/atualizar-inscricoes', inscCtrl.atualizarInscricoes);
+
 export default rotaInscricaoAluno;

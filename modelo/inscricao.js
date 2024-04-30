@@ -1,12 +1,11 @@
 import InscricaoDAO from "../persistencia/inscricaoDAO.js";
 
 export default class Inscricao {
-    #codigo;
+    #ano
     #aluno;
     #pontoEmbarque;
     #escola;
     #rota
-    #ano
     #cep;
     #rua;
     #numero;
@@ -17,13 +16,12 @@ export default class Inscricao {
     #turma;
     #dataAlocacao;
 
-    constructor(codigo = 0, aluno = [], pontoEmbarque = [], escola = [], rota = [], ano = '', cep = '', rua = '', numero = 0, bairro = '', periodo = '', etapa = '', anoLetivo = '', turma = '', dataAlocacao = '') {
-        this.#codigo = codigo;
+    constructor(ano='', aluno, pontoEmbarque = [], escola = [], rota = [], cep = '', rua = '', numero = 0, bairro = '', periodo = '', etapa = '', anoLetivo = '', turma = '', dataAlocacao = '') {
+        this.#ano = ano;
         this.#aluno = aluno;
         this.#pontoEmbarque = pontoEmbarque;
         this.#escola = escola;
         this.#rota = rota;
-        this.#ano = ano;
         this.#cep = cep;
         this.#rua = rua;
         this.#numero = numero;
@@ -35,12 +33,12 @@ export default class Inscricao {
         this.#dataAlocacao = dataAlocacao;
     }
 
-    get codigo() {
-        return this.#codigo;
+    get ano() {
+        return this.#ano;
     }
 
-    set codigo(novoCodigo) {
-        this.#codigo = novoCodigo;
+    set ano(novoAno) {
+        this.#ano = novoAno;
     }
 
     get aluno() {
@@ -71,17 +69,9 @@ export default class Inscricao {
         return this.#rota;
     }
 
-    get ano() {
-        return this.#ano;
-    }
-
     set rota(novaRota) {
         this.#rota = novaRota;
-    }
-
-    set ano(novoAno) {
-        this.#ano = novoAno;
-    }
+    }   
 
     get cep() {
         return this.#cep;
@@ -157,12 +147,11 @@ export default class Inscricao {
 
     toJSON() {
         return {
-            codigo: this.#codigo,
+            ano: this.#ano,
             aluno: this.#aluno,
             pontoEmbarque: this.#pontoEmbarque,
             escola: this.#escola,
             rota: this.#rota,
-            ano: this.#ano,
             cep: this.#cep,
             rua: this.#rua,
             numero: this.#numero,
@@ -175,33 +164,33 @@ export default class Inscricao {
         }
     }
 
-    async gravar() {
+    async gravar(client) {
         const inscDAO = new InscricaoDAO();
-        await inscDAO.gravar(this);
+        await inscDAO.gravar(client, this);
     }
 
-    async excluir() {
+    async excluir(client) {
         const inscDAO = new InscricaoDAO();
-        await inscDAO.excluir(this);
+        await inscDAO.excluir(client, this);
     }
 
-    async atualizar() {
+    async atualizar(client) {
         const inscDAO = new InscricaoDAO();
-        await inscDAO.atualizar(this);
+        await inscDAO.atualizar(client, this);
     }
 
-    async consultar(parametro) {
+    async consultar(client, parametro) {
         const inscDAO = new InscricaoDAO();
-        return await inscDAO.consultar(parametro);
+        return await inscDAO.consultar(client, parametro);
     }
 
-    async novaAtualizar() {
+    async atualizarRota(client) {
         const inscDAO = new InscricaoDAO();
-        await inscDAO.novaAtualizar(this);
+        await inscDAO.atualizarRota(client, this);
     }
 
-    async consultarPorRota(parametro) {
+    async consultarPorRota(client, parametro) {
         const inscDAO = new InscricaoDAO();
-        return await inscDAO.consultarPorRota(parametro);
+        return await inscDAO.consultarPorRota(client, parametro);
     }
 }

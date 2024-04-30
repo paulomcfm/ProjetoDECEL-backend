@@ -3,53 +3,54 @@ export default class Motorista{
     #id;
     #nome;
     #cnh;
-    #telefone;
+    #celular;
 
-    constructor(id,nome,cnh,telefone){
+    constructor(id,nome,cnh,celular){
         this.#id = id;
         this.#nome = nome;
         this.#cnh = cnh;
-        this.#telefone = telefone;
+        this.#celular = celular;
     }
 
-    getId(){
+    get Id(){
         return this.#id;
     }
 
-    setId(novoId){
+    set Id(novoId){
         this.#id = novoId;
     }
 
-    getNome(){
+    get Nome(){
         return this.#nome;
     }
 
-    setNome(novoNome){
+    set Nome(novoNome){
         this.#nome = novoNome;
     }
 
-    getCnh(){
+    get Cnh(){
         return this.#cnh;
     }
 
-    setCnh(novoCnh){
+    set Cnh(novoCnh){
         this.#cnh = novoCnh;
     }
 
-    getTelefone(){
-        return this.#telefone;
+    get celular(){
+        return this.#celular;
     }
 
-    setTelefone(novoTelefone){
-        this.#telefone = novoTelefone;
+    set celular(novocelular){
+        this.#celular = novocelular;
     }
     
 
     toJson(){
         return {
+            id:this.#id,
             nome:this.#nome,
             cnh:this.#cnh,
-            telefone:this.#telefone
+            celular:this.#celular
         } 
     }
 

@@ -1,7 +1,20 @@
 import Escola from "../modelo/escola.js";
+import poolConexao from "../persistencia/conexao.js";
 
 export default class EscolaCtrl {
-    gravar(requisicao, resposta) {
+    static _instance = null;
+
+    constructor() {
+        EscolaCtrl._instance = this;
+    }
+
+    static getInstance() {
+        if (EscolaCtrl._instance == null)
+            new EscolaCtrl();
+        return EscolaCtrl._instance;
+    }
+  
+    async gravar(requisicao, resposta) {
         resposta.type('application/json');
         if (requisicao.method === 'POST' && requisicao.is('application/json')) {
             const dados = requisicao.body;
@@ -12,18 +25,29 @@ export default class EscolaCtrl {
             const pontoEmbarque = dados.pontoEmbarque;
             if (nome && tipo && email && telefone && pontoEmbarque) {
                 const escola = new Escola(0, nome, tipo, email, telefone, pontoEmbarque);
-                escola.gravar().then(() => {
-                    resposta.status(200).json({
-                        "status": true,
-                        "codigoGerado": escola.codigo,
-                        "mensagem": 'Escola incluida com sucesso!'
+                const client = await poolConexao.connect();
+                try {
+                    await client.query('BEGIN');
+                    escola.gravar(client).then(async () => {
+                        resposta.status(200).json({
+                            "status": true,
+                            "codigoGerado": escola.codigo,
+                            "mensagem": 'Escola incluida com sucesso!'
+                        });
+                        await client.query('COMMIT');
+                    }).catch(async (erro) => {
+                        resposta.status(500).json({
+                            "status": false,
+                            "mensagem": 'Erro ao registrar a escola: ' + erro.message
+                        });
+                        await client.query('ROLLBACK');
                     });
-                }).catch((erro) => {
-                    resposta.status(500).json({
-                        "status": false,
-                        "mensagem": 'Erro ao registrar a escola: ' + erro.message
-                    });
-                });
+                } catch (e) {
+                    await client.query('ROLLBACK');
+                    throw e;
+                } finally {
+                    client.release();
+                }
             }
             else {
                 resposta.status(400).json({
@@ -40,7 +64,7 @@ export default class EscolaCtrl {
         }
     }
 
-    atualizar(requisicao, resposta) {
+    async atualizar(requisicao, resposta) {
         resposta.type('application/json');
         if ((requisicao.method === 'PUT' || requisicao.method === 'PATCH') && requisicao.is('application/json')) {
             const dados = requisicao.body;
@@ -50,20 +74,31 @@ export default class EscolaCtrl {
             const email = dados.email;
             const telefone = dados.telefone;
             const pontoEmbarque = dados.pontoEmbarque;
-            if (codigo>=0 && nome && tipo && email && telefone && pontoEmbarque) {
+            if (codigo >= 0 && nome && tipo && email && telefone && pontoEmbarque) {
                 const escola = new Escola(codigo, nome, tipo, email, telefone, pontoEmbarque);
-                escola.atualizar().then(() => {
-                    resposta.status(200).json({
-                        "status": true,
-                        "codigoGerado": escola.codigo,
-                        "mensagem": 'Escola alterada com sucesso!'
+                const client = await poolConexao.connect();
+                try {
+                    await client.query('BEGIN');
+                    escola.atualizar(client).then(async () => {
+                        resposta.status(200).json({
+                            "status": true,
+                            "codigoGerado": escola.codigo,
+                            "mensagem": 'Escola alterada com sucesso!'
+                        });
+                        await client.query('COMMIT');
+                    }).catch(async (erro) => {
+                        resposta.status(500).json({
+                            "status": false,
+                            "mensagem": 'Erro ao alterar a escola: ' + erro.message
+                        });
+                        await client.query('ROLLBACK');
                     });
-                }).catch((erro) => {
-                    resposta.status(500).json({
-                        "status": false,
-                        "mensagem": 'Erro ao alterar a escola: ' + erro.message
-                    });
-                });
+                } catch (e) {
+                    await client.query('ROLLBACK');
+                    throw e;
+                } finally {
+                    client.release();
+                }
             }
             else {
                 resposta.status(400).json({
@@ -80,25 +115,36 @@ export default class EscolaCtrl {
         }
     }
 
-    excluir(requisicao, resposta) {
+    async excluir(requisicao, resposta) {
         resposta.type('application/json');
         if (requisicao.method === 'DELETE' && requisicao.is('application/json')) {
             const dados = requisicao.body;
             const codigo = dados.codigo;
-            if (codigo>=0) {
+            if (codigo >= 0) {
                 const escola = new Escola(codigo);
-                escola.excluir().then(() => {
-                    resposta.status(200).json({
-                        "status": true,
-                        "codigoGerado": escola.codigo,
-                        "mensagem": 'Escola excluída com sucesso!'
+                const client = await poolConexao.connect();
+                try {
+                    await client.query('BEGIN');
+                    escola.excluir(client).then(async () => {
+                        resposta.status(200).json({
+                            "status": true,
+                            "codigoGerado": escola.codigo,
+                            "mensagem": 'Escola excluída com sucesso!'
+                        });
+                        await client.query('COMMIT');
+                    }).catch(async (erro) => {
+                        resposta.status(500).json({
+                            "status": false,
+                            "mensagem": 'Erro ao excluir a escola: ' + erro.message
+                        });
+                        await client.query('ROLLBACK');
                     });
-                }).catch((erro) => {
-                    resposta.status(500).json({
-                        "status": false,
-                        "mensagem": 'Erro ao excluir a escola: ' + erro.message
-                    });
-                });
+                } catch (e) {
+                    await client.query('ROLLBACK');
+                    throw e;
+                } finally {
+                    client.release();
+                }
             }
             else {
                 resposta.status(400).json({
@@ -115,15 +161,16 @@ export default class EscolaCtrl {
         }
     }
 
-    consultar(requisicao, resposta) {
+    async consultar(requisicao, resposta) {
         resposta.type('application/json');
         let termo = requisicao.params.termo;
         if (!termo) {
             termo = '';
         }
         if (requisicao.method === 'GET') {
+            const client = await poolConexao.connect();
             const escolas = new Escola();
-            escolas.consultar(termo).then((listaEscolas) => {
+            escolas.consultar(client, termo).then((listaEscolas) => {
                 resposta.json({
                     "status": true,
                     "listaEscolas": listaEscolas
@@ -134,6 +181,36 @@ export default class EscolaCtrl {
                     "mensagem": 'Erro ao consultar as escolas: ' + erro.message
                 });
             });
+            client.release();
+        }
+        else {
+            resposta.status(400).json({
+                "status": false,
+                "mensagem": 'Por favor, utilize o método GET para consultar as escolas!'
+            });
+        }
+    }
+    async consultarPorPonto(requisicao, resposta) {
+        resposta.type('application/json');
+        let termo = requisicao.params.termo;
+        if (!termo) {
+            termo = '';
+        }
+        if (requisicao.method === 'GET') {
+            const client = await poolConexao.getInstance().connect();
+            const escolas = new Escola();
+            escolas.consultarPorPonto(client, termo).then((listaEscolas) => {
+                resposta.json({
+                    "status": true,
+                    "listaEscolas": listaEscolas
+                });
+            }).catch((erro) => {
+                resposta.status(500).json({
+                    "status": false,
+                    "mensagem": 'Erro ao consultar as escolas: ' + erro.message
+                });
+            });
+            client.release();
         }
         else {
             resposta.status(400).json({

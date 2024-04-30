@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import PontoEmbarqueCtrl from '../controle/pontoEmbarqueCtrl.js';
 
-const pdeCtrl = new PontoEmbarqueCtrl();
+const pdeCtrl = PontoEmbarqueCtrl.getInstance();
 const rotaPontoEmbarque = new Router();
 
 rotaPontoEmbarque.get('/', pdeCtrl.consultar)

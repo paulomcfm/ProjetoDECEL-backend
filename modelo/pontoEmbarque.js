@@ -65,23 +65,23 @@ export default class PontoEmbarque {
         }
     }
 
-    async gravar() {
+    async gravar(client) {
         const pdeDAO = new pontoEmbarqueDAO();
-        await pdeDAO.gravar(this);
+        await pdeDAO.gravar(client, this);
     }
 
-    async excluir() {
+    async excluir(client) {
         const pdeDAO = new pontoEmbarqueDAO();
-        await pdeDAO.excluir(this);
+        await pdeDAO.excluir(client, this);
     }
 
-    async atualizar() {
+    async atualizar(client) {
         const pdeDAO = new pontoEmbarqueDAO();
-        await pdeDAO.atualizar(this);
+        await pdeDAO.atualizar(client, this);
     }
 
-    async consultar(parametro) {
+    async consultar(client, parametro) {
         const pdeDAO = new pontoEmbarqueDAO();
-        return await pdeDAO.consultar(parametro);
+        return await pdeDAO.consultar(client, parametro);
     }
 }
