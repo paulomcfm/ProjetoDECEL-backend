@@ -1,7 +1,22 @@
-import Usuario from "../modelo/usuario";
+import Usuario from "../modelo/usuario.js";
+import poolConexao from "../persistencia/conexao.js";
 
 export default class UsuarioCtrl {
-    gravar(requisicao, resposta) {
+    static _instance = null;
+
+    constructor() 
+    {
+        UsuarioCtrl._instance = this;
+    }
+
+    static getInstance()
+    {
+        if(UsuarioCtrl._instance==null)
+            new UsuarioCtrl();
+        return UsuarioCtrl._instance;
+    }
+
+    async gravar(requisicao, resposta) {
         resposta.type('application/json');
         if (requisicao.method === 'POST' && requisicao.is('application/json')) {
             const dados = requisicao.body;
@@ -12,35 +27,88 @@ export default class UsuarioCtrl {
             const celular = dados.celular;
             if (nome && senha && cpf && email && celular) {
                 const usuario = new Usuario(nome, senha, cpf, email, celular);
-                usuario.gravar().then(() => {
-                    resposta.status(200).json({
-                        "status": true,
-                        "nomeUsuario": usuario.nome,
-                        "mensagem": 'usuario incluida com sucesso!'
+                const client = await poolConexao.connect();
+                try {
+                    await client.query('BEGIN');
+                    usuario.gravar(client).then(() => {
+                        resposta.status(200).json({
+                            "status": true,
+                            "nomeUsuario": usuario.nome,
+                            "mensagem": 'Usuario incluído com sucesso!'
+                        });
+                        client.query('COMMIT');
+                    }).catch(async (erro) => {
+                        await client.query('ROLLBACK');
+                        resposta.status(500).json({
+                            "status": false,
+                            "mensagem": 'Erro ao registrar o usuario: ' + erro.message
+                        });
                     });
-                }).catch((erro) => {
-                    resposta.status(500).json({
-                        "status": false,
-                        "mensagem": 'Erro ao registrar a usuario: ' + erro.message
-                    });
-                });
-            }
-            else {
+                } catch (e) {
+                    await client.query('ROLLBACK');
+                    throw e;
+                } finally {
+                    client.release();
+                }
+            } else {
                 resposta.status(400).json({
                     "status": false,
-                    "mensagem": 'Por favor, informe o nome da usuario!'
+                    "mensagem": 'Por favor, preencha todos os campos!'
                 });
             }
-        }
-        else {
+        } else {
             resposta.status(400).json({
                 "status": false,
-                "mensagem": 'Por favor, utilize o método POST para cadastrar uma usuario!'
+                "mensagem": 'Por favor, utilize o método POST e envie os dados no formato JSON para cadastrar um usuário!'
             });
         }
     }
 
-    atualizar(requisicao, resposta) {
+    async autenticar(requisicao, resposta) {
+        resposta.type('application/json');
+    
+        if (requisicao.method !== 'GET' || !requisicao.is('application/json')) {
+            return resposta.status(400).json({
+                "status": false,
+                "mensagem": 'Por favor, utilize o método GET e envie os dados no formato JSON para autenticar o usuário!'
+            });
+        }
+        const { nome, cpf, senha } = requisicao.body;
+        if (!nome || !cpf || !senha) {
+            return resposta.status(400).json({
+                "status": false,
+                "mensagem": 'Por favor, informe o nome de usuário e o CPF!'
+            });
+        }
+        try {
+            const usuario = new Usuario(nome);
+            const client = await poolConexao.connect();
+            await client.query('BEGIN');
+            const usuarioConsultado = await usuario.consultar(nome);
+            if (usuarioConsultado && usuarioConsultado[0].cpf === cpf && usuarioConsultado[0].senha === senha) {
+                resposta.status(200).json({
+                    "status": true,
+                    "mensagem": 'Usuario autenticado com sucesso!'
+                });
+            } else {
+                resposta.status(401).json({
+                    "status": false,
+                    "mensagem": 'Nome de usuario ou CPF ou senha inválidos!'
+                });
+            }
+            await client.query('COMMIT');
+        } catch (erro) {
+            await client.query('ROLLBACK');
+            resposta.status(500).json({
+                "status": false,
+                "mensagem": 'Erro ao autenticar o usuario: ' + erro.message
+            });
+        } finally {
+            client.release();
+        }
+    }
+    
+    async atualizar(requisicao, resposta) {
         resposta.type('application/json');
         if ((requisicao.method === 'PUT' || requisicao.method === 'PATCH') && requisicao.is('application/json')) {
             const dados = requisicao.body;
@@ -49,25 +117,43 @@ export default class UsuarioCtrl {
             const cpf = dados.cpf;
             const email = dados.email;
             const celular = dados.celular;
+            const usuario = new Usuario(nome, senha, cpf, email, celular);
             if (nome && senha && cpf && email && celular) {
-                const usuario = new Usuario(nome, senha, cpf, email, celular);
-                usuario.atualizar().then(() => {
-                    resposta.status(200).json({
-                        "status": true,
-                        "codigoGerado": usuario.codigo,
-                        "mensagem": 'usuario alterada com sucesso!'
+                const client = await poolConexao.connect();
+                try {
+                    await client.query('BEGIN');
+                    usuario.atualizar(client).then(() => {
+                        resposta.status(200).json({
+                            "status": true,
+                            "nomeUsuario": usuario.nome,
+                            "mensagem": 'Usuario alterado com sucesso!'
+                        });
+                        client.query('COMMIT');
+                    }).catch(async (erro) => {
+                        await client.query('ROLLBACK');
+                        if (erro.code === '23505') {
+                            resposta.status(400).json({
+                                "status": false,
+                                "mensagem": 'CPF já cadastrado.'
+                            });
+                        } else {
+                            resposta.status(500).json({
+                                "status": false,
+                                "mensagem": 'Erro ao alterar o usuario: ' + erro.message
+                            });
+                        }
                     });
-                }).catch((erro) => {
-                    resposta.status(500).json({
-                        "status": false,
-                        "mensagem": 'Erro ao alterar a usuario: ' + erro.message
-                    });
-                });
+                } catch (e) {
+                    await client.query('ROLLBACK');
+                    throw e;
+                } finally {
+                    client.release();
+                }
             }
             else {
                 resposta.status(400).json({
                     "status": false,
-                    "mensagem": 'Por favor, informe o nome e o cpf do usuario!'
+                    "mensagem": 'Por favor, informe os campos do usuario!'
                 });
             }
         }
@@ -79,25 +165,36 @@ export default class UsuarioCtrl {
         }
     }
 
-    excluir(requisicao, resposta) {
+    async excluir(requisicao, resposta) {
         resposta.type('application/json');
         if (requisicao.method === 'DELETE' && requisicao.is('application/json')) {
             const dados = requisicao.body;
             const nome = dados.nome;
             if (nome) {
-                const usuario = new Usuario(nome);
-                usuario.excluir().then(() => {
-                    resposta.status(200).json({
-                        "status": true,
-                        "nomeGerado": usuario.nome,
-                        "mensagem": 'usuario excluída com sucesso!'
+                const client = await poolConexao.connect();
+                try {
+                    await client.query('BEGIN');
+                    const usuario = new Usuario(nome);
+                    usuario.excluir(client).then(() => {
+                        resposta.status(200).json({
+                            "status": true,
+                            "nomeUsuario": usuario.nome,
+                            "mensagem": 'Usuario excluído com sucesso!'
+                        });
+                        client.query('COMMIT');
+                    }).catch(async (erro) => {
+                        await client.query('ROLLBACK');
+                        resposta.status(500).json({
+                            "status": false,
+                            "mensagem": 'Erro ao excluir o usuario: ' + erro.message
+                        });
                     });
-                }).catch((erro) => {
-                    resposta.status(500).json({
-                        "status": false,
-                        "mensagem": 'Erro ao excluir a usuario: ' + erro.message
-                    });
-                });
+                } catch (e) {
+                    await client.query('ROLLBACK');
+                    throw e;
+                } finally {
+                    client.release();
+                }
             }
             else {
                 resposta.status(400).json({
@@ -114,30 +211,33 @@ export default class UsuarioCtrl {
         }
     }
 
-    consultar(requisicao, resposta) {
+    async consultar(requisicao, resposta) {
         resposta.type('application/json');
         let termo = requisicao.params.termo;
         if (!termo) {
             termo = '';
         }
         if (requisicao.method === 'GET') {
+            const client = await poolConexao.connect();
             const usuarios = new Usuario();
-            usuarios.consultar(termo).then((listaUsuarios) => {
+            usuarios.consultar(termo, client).then((listaUsuarios) => {
+                console.log(listaUsuarios);
                 resposta.json({
                     "status": true,
                     "listaUsuarios": listaUsuarios
                 });
-            }).catch((erro) => {
+            }).catch(async (erro) => {
                 resposta.status(500).json({
                     "status": false,
-                    "mensagem": 'Erro ao consultar as usuarios: ' + erro.message
+                    "mensagem": 'Erro ao consultar os usuarios: ' + erro.message
                 });
             });
+            client.release();
         }
         else {
             resposta.status(400).json({
                 "status": false,
-                "mensagem": 'Por favor, utilize o método GET para consultar as usuarios!'
+                "mensagem": 'Por favor, utilize o método GET para consultar os usuarios!'
             });
         }
     }
