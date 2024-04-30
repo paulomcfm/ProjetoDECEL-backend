@@ -27,7 +27,7 @@ export default class AlunoCtrl {
             const responsaveis = dados.responsaveis;
             const aluno = new Aluno(0, nome, rg, observacoes, dataNasc, celular, responsaveis);
             if (nome && rg && aluno.validarDataNascimento(dataNasc)) {
-                const client = await poolConexao.connect();
+                const client = await poolConexao.getInstance().connect();
                 try {
                     await client.query('BEGIN');
                     aluno.gravar(client).then(async () => {
@@ -110,7 +110,7 @@ export default class AlunoCtrl {
             const responsaveis = dados.responsaveis;
             const aluno = new Aluno(codigo, nome, rg, observacoes, dataNasc, celular, responsaveis);
             if (codigo >= 0 && nome && rg && aluno.validarDataNascimento(dataNasc)) {
-                const client = await poolConexao.connect();
+                const client = await poolConexao.getInstance().connect();
                 try {
                     await client.query('BEGIN');
 
@@ -237,7 +237,7 @@ export default class AlunoCtrl {
             const dados = requisicao.body;
             const codigo = dados.codigo;
             if (codigo >= 0) {
-                const client = await poolConexao.connect();
+                const client = await poolConexao.getInstance().connect();
                 try {
                     await client.query('BEGIN');
                     const aluno = new Aluno(codigo);
@@ -291,7 +291,7 @@ export default class AlunoCtrl {
             termo = '';
         }
         if (requisicao.method === 'GET') {
-            const client = await poolConexao.connect();
+            const client = await poolConexao.getInstance().connect();
             const alunos = new Aluno();
             alunos.consultar(termo, client).then((listaAlunos) => {
                 resposta.json({

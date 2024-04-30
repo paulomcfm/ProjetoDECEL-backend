@@ -87,7 +87,7 @@ export default class defRotaCtrl{
             if(termo === undefined)
                 termo = ""
             const rota = new defRota()
-            const client = await poolConexao.connect()
+            const client = await poolConexao.getInstance().connect()
             rota.consultar(client,termo).then((listaRotas)=>{
                 let flag = true
                 let num = 0

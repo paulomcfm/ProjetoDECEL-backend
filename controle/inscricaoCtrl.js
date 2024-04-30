@@ -182,7 +182,7 @@ export default class InscricaoCtrl {
             termo = '';
         }
         if (requisicao.method === 'GET') {
-            const client = await poolConexao.connect();
+            const client = await poolConexao.getInstance().connect();
             const inscricoes = new Inscricao();
             inscricoes.consultar(client, termo).then((listaInscricoes) => {
                 resposta.json({
