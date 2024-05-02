@@ -1,3 +1,5 @@
+import MonitorDAO from "../persistencia/monitorDAO.js"
+
 export default class Monitor{
     #codigo
     #nome
@@ -46,19 +48,35 @@ export default class Monitor{
 
 
     async gravar(client){
-
+        try{
+            await new MonitorDAO().gravar(client,this)
+        }catch(erro){
+            
+        }
     }
 
     async atualizar(client){
-
+        try{
+            await new MonitorDAO().atualizar(client,this)
+        }catch(erro){
+            
+        }
     }
 
     async excluir(client){
+        try{
+            await new MonitorDAO().excluir(client,this)
+        }catch(erro){
 
+        }
     }
 
-    async consultar(client){
-
+    async consultar(client,termo){
+        try{
+            return await new MonitorDAO().consultar(client,termo)
+        }catch(erro){
+            throw erro
+        }
     }
 
 }
