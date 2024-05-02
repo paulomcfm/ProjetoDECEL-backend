@@ -25,7 +25,7 @@ export default class EscolaCtrl {
             const pontoEmbarque = dados.pontoEmbarque;
             if (nome && tipo && email && telefone && pontoEmbarque) {
                 const escola = new Escola(0, nome, tipo, email, telefone, pontoEmbarque);
-                const client = await poolConexao.connect();
+                const client = await poolConexao.getInstance().connect();
                 try {
                     await client.query('BEGIN');
                     escola.gravar(client).then(async () => {
@@ -76,7 +76,7 @@ export default class EscolaCtrl {
             const pontoEmbarque = dados.pontoEmbarque;
             if (codigo >= 0 && nome && tipo && email && telefone && pontoEmbarque) {
                 const escola = new Escola(codigo, nome, tipo, email, telefone, pontoEmbarque);
-                const client = await poolConexao.connect();
+                const client = await poolConexao.getInstance().connect();
                 try {
                     await client.query('BEGIN');
                     escola.atualizar(client).then(async () => {
@@ -122,7 +122,7 @@ export default class EscolaCtrl {
             const codigo = dados.codigo;
             if (codigo >= 0) {
                 const escola = new Escola(codigo);
-                const client = await poolConexao.connect();
+                const client = await poolConexao.getInstance().connect();
                 try {
                     await client.query('BEGIN');
                     escola.excluir(client).then(async () => {
@@ -133,10 +133,18 @@ export default class EscolaCtrl {
                         });
                         await client.query('COMMIT');
                     }).catch(async (erro) => {
-                        resposta.status(500).json({
-                            "status": false,
-                            "mensagem": 'Erro ao excluir a escola: ' + erro.message
-                        });
+                        if (erro.code === '23503') {
+                            resposta.status(400).json({
+                                "status": false,
+                                "mensagem": 'Escola não pode ser excluída pois está sendo usada.'
+                            });
+                        }
+                        else {
+                            resposta.status(500).json({
+                                "status": false,
+                                "mensagem": 'Erro ao excluir a escola: ' + erro.message
+                            });
+                        }
                         await client.query('ROLLBACK');
                     });
                 } catch (e) {
@@ -168,7 +176,7 @@ export default class EscolaCtrl {
             termo = '';
         }
         if (requisicao.method === 'GET') {
-            const client = await poolConexao.connect();
+            const client = await poolConexao.getInstance().connect();
             const escolas = new Escola();
             escolas.consultar(client, termo).then((listaEscolas) => {
                 resposta.json({

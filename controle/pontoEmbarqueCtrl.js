@@ -24,7 +24,7 @@ export default class PontoEmbarqueCtrl {
             const cep = dados.cep;
             if (rua && numero && bairro && cep) {
                 const pontoEmbarque = new PontoEmbarque(0, rua, numero, bairro, cep);
-                const client = await poolConexao.connect();
+                const client = await poolConexao.getInstance().connect();
                 try {
                     await client.query('BEGIN');
                     pontoEmbarque.gravar(client).then(async () => {
@@ -74,7 +74,7 @@ export default class PontoEmbarqueCtrl {
             const cep = dados.cep;
             if (codigo >= 0 && rua && numero && bairro && cep) {
                 const pontoEmbarque = new PontoEmbarque(codigo, rua, numero, bairro, cep);
-                const client = await poolConexao.connect();
+                const client = await poolConexao.getInstance().connect();
                 try {
                     await client.query('BEGIN');
                     pontoEmbarque.atualizar(client).then(async () => {
@@ -120,7 +120,7 @@ export default class PontoEmbarqueCtrl {
             const codigo = dados.codigo;
             if (codigo >= 0) {
                 const pontoEmbarque = new PontoEmbarque(codigo);
-                const client = await poolConexao.connect();
+                const client = await poolConexao.getInstance().connect();
                 try {
                     await client.query('BEGIN');
                     pontoEmbarque.excluir(client).then(async () => {
@@ -131,11 +131,18 @@ export default class PontoEmbarqueCtrl {
                         });
                         await client.query('COMMIT');
                     }).catch(async (erro) => {
-                        resposta.status(500).json({
-                            "status": false,
-                            "mensagem": 'Erro ao excluir o ponto de embarque: ' + erro.message
-                        });
-                        await client.query('ROLLBACK');
+                        if (erro.code === '23503') {
+                            resposta.status(400).json({
+                                "status": false,
+                                "mensagem": 'Ponto de embarque não pode ser excluído pois está sendo usado.'
+                            });
+                        }
+                        else {
+                            resposta.status(500).json({
+                                "status": false,
+                                "mensagem": 'Erro ao excluir ponto de embarque: ' + erro.message
+                            });
+                        }
                     });
                 } catch (e) {
                     await client.query('ROLLBACK');
@@ -166,7 +173,7 @@ export default class PontoEmbarqueCtrl {
             termo = '';
         }
         if (requisicao.method === 'GET') {
-            const client = await poolConexao.connect();
+            const client = await poolConexao.getInstance().connect();
             const pontosEmbarque = new PontoEmbarque();
             pontosEmbarque.consultar(client, termo).then((listaPontosEmbarque) => {
                 resposta.json({
