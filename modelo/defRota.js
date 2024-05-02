@@ -135,8 +135,12 @@ export default class defRota{
 
 
     async gravar(client){
-        const dao = new defRotaDAO()
-        await dao.gravar(client,this)
+        try{
+            const dao = new defRotaDAO()
+            await dao.gravar(client,this)
+        }catch(erro){
+            throw erro
+        }
     }
 
     async deletar(client){
@@ -150,8 +154,13 @@ export default class defRota{
     }
 
     async consultar(client,termo){
-        const dao = new defRotaDAO()
-        return await dao.consultar(client,termo)
+        try{
+            const dao = new defRotaDAO()
+            return await dao.consultar(client,termo)
+        }catch(erro){
+            console.log(erro)
+            throw erro
+        }
     }
 
     async gravarPontos(client){

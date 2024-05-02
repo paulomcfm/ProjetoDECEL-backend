@@ -23,5 +23,5 @@ export default class poolConexao{
     if(poolConexao._instance==null)
       new poolConexao();
     return poolConexao._instance;
-  }
+  }
 }
