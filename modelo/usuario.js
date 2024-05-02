@@ -65,23 +65,23 @@ export default class Usuario {
         }
     }
 
-    async gravar() {
+    async gravar(client) {
         const userDAO = new UsuarioDAO();
-        await userDAO.gravar(this);
+        await userDAO.gravar(this, client);
     }
 
-    async excluir() {
+    async excluir(client) {
         const userDAO = new UsuarioDAO();
-        await userDAO.excluir(this);
+        await userDAO.excluir(this, client);
     }
 
-    async atualizar() {
+    async atualizar(client) {
         const userDAO = new UsuarioDAO();
-        await userDAO.atualizar(this);
+        await userDAO.atualizar(this, client);
     }
 
-    async consultar(parametro) {
+    async consultar(parametro, client) {
         const userDAO = new UsuarioDAO();
-        return await userDAO.consultar(parametro);
+        return await userDAO.consultar(parametro, client);
     }
 }
