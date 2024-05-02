@@ -1,4 +1,4 @@
-import UsuarioDAO from "../persistencia/usuarioDAO";
+import UsuarioDAO from "../persistencia/usuarioDAO.js";
 
 export default class Usuario {
     #nome;

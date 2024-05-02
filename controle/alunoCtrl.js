@@ -1,5 +1,6 @@
 import Aluno from "../modelo/aluno.js";
 import Parentesco from "../modelo/parentesco.js";
+import Responsavel from "../modelo/responsavel.js";
 import poolConexao from "../persistencia/conexao.js";
 
 export default class AlunoCtrl {
@@ -15,7 +16,6 @@ export default class AlunoCtrl {
         return AlunoCtrl._instance;
     }
     async gravar(requisicao, resposta) {
-        var ok = true;
         resposta.type('application/json');
         if (requisicao.method === 'POST') {
             const dados = requisicao.body;
@@ -30,51 +30,33 @@ export default class AlunoCtrl {
                 const client = await poolConexao.getInstance().connect();
                 try {
                     await client.query('BEGIN');
-                    aluno.gravar(client).then(async () => {
-                        for (const responsavel of aluno.responsaveis) {
-                            const parentesco = new Parentesco(aluno.codigo, responsavel.codigo, responsavel.parentesco);
-                            await parentesco.gravar(client).catch((err) => {
-                                ok = false;
-                                resposta.status(500).json({
-                                    "status": false,
-                                    "mensagem": 'Erro ao registrar o aluno: ' + err.message
-                                });
-                            })
-                        }
-                        if (ok) {
-                            resposta.status(200).json({
-                                "status": true,
-                                "codigoGerado": aluno.codigo,
-                                "mensagem": 'Aluno incluido com sucesso!'
-                            });
-                            client.query('COMMIT');
-                        }
-                        else {
-                            resposta.status(500).json({
-                                "status": false,
-                                "mensagem": 'Erro ao registrar o aluno.'
-                            });
-                            client.query('ROLLBACK');
-                        }
-                    }).catch(async (erro) => {
-                        await client.query('ROLLBACK');
-                        if (erro.code === '23505') {
-                            resposta.status(400).json({
-                                "status": false,
-                                "mensagem": 'CPF já cadastrado.'
-                            });
-                        } else {
-                            resposta.status(500).json({
-                                "status": false,
-                                "mensagem": 'Erro ao registrar o aluno: ' + erro.message
-                            });
-                        }
+                    await aluno.gravar(client);
+                    for (const responsavel of aluno.responsaveis) {
+                        const resp = new Responsavel(responsavel.codigo);
+                        const parentesco = new Parentesco(aluno.codigo, resp.codigo, responsavel.parentesco);
+                        await parentesco.gravar(client);
+                    }
+                    await client.query('COMMIT');
+                    resposta.status(200).json({
+                        "status": true,
+                        "codigoGerado": aluno.codigo,
+                        "mensagem": 'Aluno incluido com sucesso!'
                     });
                 } catch (e) {
                     await client.query('ROLLBACK');
-                    throw e;
+                    if (e.code === '23505') {
+                        resposta.status(400).json({
+                            "status": false,
+                            "mensagem": 'RG já cadastrado.'
+                        });
+                    } else {
+                        resposta.status(500).json({
+                            "status": false,
+                            "mensagem": 'Erro ao atualizar o aluno: ' + e.message
+                        });
+                    }
                 } finally {
-                    client.release();
+                    await client.release();
                 }
             } else if (!aluno.validarDataNascimento(dataNasc)) {
                 resposta.status(400).json({
@@ -97,7 +79,6 @@ export default class AlunoCtrl {
     }
 
     async atualizar(requisicao, resposta) {
-        var ok = true;
         resposta.type('application/json');
         if ((requisicao.method === 'PUT' || requisicao.method === 'PATCH') && requisicao.is('application/json')) {
             const dados = requisicao.body;
@@ -113,100 +94,56 @@ export default class AlunoCtrl {
                 const client = await poolConexao.getInstance().connect();
                 try {
                     await client.query('BEGIN');
-
                     const parentescos = new Parentesco();
                     const res = await parentescos.consultarAluno(aluno.codigo, client);
-
                     const responsaveisFaltantes = res.filter(responsavel => {
                         return !aluno.responsaveis.some(alunoResponsavel => alunoResponsavel.codigo === responsavel.codigoResponsavel);
                     });
-
-                    for (const responsavel of responsaveisFaltantes) {
-                        const par = new Parentesco(aluno.codigo, responsavel.codigoResponsavel, responsavel.parentesco);
-                        try {
-                            await par.excluir(client);
-                        } catch (err) {
-                            ok = false;
-                            resposta.status(500).json({
-                                "status": false,
-                                "mensagem": 'Erro ao atualizar o aluno: ' + err.message
-                            });
-                        }
+                    for (const responsavel of responsaveisFaltantes) { // remover parentescos que existiam mas não existem mais
+                        const resp = new Responsavel(responsavel.codigoResponsavel);
+                        const par = new Parentesco(aluno.codigo, resp.codigo, responsavel.parentesco);
+                        await par.excluir(client);
                     }
-
                     const responsaveisNovos = aluno.responsaveis.filter(responsavel => {
                         return !res.some(parentesco => parentesco.codigoResponsavel === responsavel.codigo);
                     });
-
-                    if (ok) {
-                        for (const responsavel of responsaveisNovos) {
-                            const par = new Parentesco(aluno.codigo, responsavel.codigo, responsavel.parentesco);
-                            try {
-                                await par.gravar(client);
-                            } catch (err) {
-                                ok = false;
-                                resposta.status(500).json({
-                                    "status": false,
-                                    "mensagem": 'Erro ao atualizar o aluno: ' + err.message
-                                });
-                            }
-                        }
+                    for (const responsavel of responsaveisNovos) { // incluir novos parentescos
+                        const resp = new Responsavel(responsavel.codigo);
+                        const par = new Parentesco(aluno.codigo, resp.codigo, responsavel.parentesco);
+                        await par.gravar(client);
                     }
-
                     const parentescosAtuais = res.filter(responsavel => {
                         return aluno.responsaveis.some(alunoResponsavel => alunoResponsavel.codigo === responsavel.codigoResponsavel);
                     });
-
-                    if (ok) {
-                        for (const responsavel of parentescosAtuais) {
-                            const responsavelAtualizado = aluno.responsaveis.find(alunoResponsavel => alunoResponsavel.codigo === responsavel.codigoResponsavel);
-                            if (responsavel.parentesco !== responsavelAtualizado.parentesco) {
-                                const par = new Parentesco(aluno.codigo, responsavel.codigoResponsavel, responsavelAtualizado.parentesco);
-                                try {
-                                    await par.atualizar(client);
-                                } catch (err) {
-                                    ok = false;
-                                    resposta.status(500).json({
-                                        "status": false,
-                                        "mensagem": 'Erro ao atualizar o aluno: ' + err.message
-                                    });
-                                }
-                            }
+                    for (const responsavel of parentescosAtuais) { // atualizar parentescos que já existiam
+                        const responsavelAtualizado = aluno.responsaveis.find(alunoResponsavel => alunoResponsavel.codigo === responsavel.codigoResponsavel);
+                        if (responsavel.parentesco !== responsavelAtualizado.parentesco) {
+                            const resp = new Responsavel(responsavel.codigoResponsavel);
+                            const par = new Parentesco(aluno.codigo, resp.codigo, responsavelAtualizado.parentesco);
+                            await par.atualizar(client);
                         }
                     }
-                    if (ok) {
-                        await aluno.atualizar(client).then(async () => {
-                            resposta.status(200).json({
-                                "status": true,
-                                "codigoGerado": aluno.codigo,
-                                "mensagem": 'Aluno alterado com sucesso!'
-                            });
-                            await client.query('COMMIT');
-                        }).catch(async (erro) => {
-                            await client.query('ROLLBACK');
-                            if (erro.code === '23505') {
-                                resposta.status(400).json({
-                                    "status": false,
-                                    "mensagem": 'CPF já cadastrado.'
-                                });
-                            } else {
-                                resposta.status(500).json({
-                                    "status": false,
-                                    "mensagem": 'Erro ao atualizar o aluno: ' + erro.message
-                                });
-                            }
-                        });
-                    }
-                    else {
-                        resposta.status(500).json({
-                            "status": false,
-                            "mensagem": 'Erro ao atualizar o aluno.'
-                        });
-                        client.query('ROLLBACK');
-                    }
+                    await aluno.atualizar(client);
+                    resposta.status(200).json({
+                        "status": true,
+                        "codigoGerado": aluno.codigo,
+                        "mensagem": 'Aluno alterado com sucesso!'
+                    });
+                    await client.query('COMMIT');
+
                 } catch (e) {
                     await client.query('ROLLBACK');
-                    throw e;
+                    if (e.code === '23505') {
+                        resposta.status(400).json({
+                            "status": false,
+                            "mensagem": 'RG já cadastrado.'
+                        });
+                    } else {
+                        resposta.status(500).json({
+                            "status": false,
+                            "mensagem": 'Erro ao atualizar o aluno: ' + e.message
+                        });
+                    }
                 } finally {
                     client.release();
                 }
@@ -241,31 +178,27 @@ export default class AlunoCtrl {
                 try {
                     await client.query('BEGIN');
                     const aluno = new Aluno(codigo);
-                    aluno.excluir(client).then(async () => {
-                        resposta.status(200).json({
-                            "status": true,
-                            "codigoGerado": aluno.codigo,
-                            "mensagem": 'Aluno excluído com sucesso!'
-                        });
-                        await client.query('COMMIT');
-                    }).catch(async (erro) => {
-                        if (erro.code === '23503') {
-                            resposta.status(400).json({
-                                "status": false,
-                                "mensagem": 'Aluno não pode ser excluído pois está inscrito.'
-                            });
-                        }
-                        else {
-                            resposta.status(500).json({
-                                "status": false,
-                                "mensagem": 'Erro ao excluir o aluno: ' + erro.message
-                            });
-                        }
-                        await client.query('ROLLBACK');
+                    await aluno.excluir(client);
+                    resposta.status(200).json({
+                        "status": true,
+                        "codigoGerado": aluno.codigo,
+                        "mensagem": 'Aluno excluído com sucesso!'
                     });
+                    await client.query('COMMIT');
                 } catch (e) {
                     await client.query('ROLLBACK');
-                    throw e;
+                    if (e.code === '23503') {
+                        resposta.status(400).json({
+                            "status": false,
+                            "mensagem": 'Aluno não pode ser excluído pois está inscrito.'
+                        });
+                    }
+                    else {
+                        resposta.status(500).json({
+                            "status": false,
+                            "mensagem": 'Erro ao excluir o aluno: ' + e.message
+                        });
+                    }
                 } finally {
                     client.release();
                 }

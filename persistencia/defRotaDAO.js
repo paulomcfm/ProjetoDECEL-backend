@@ -136,9 +136,11 @@ export default class defRotaDAO{
             sql = "DELETE FROM rotas_tem_pontosdeembarque WHERE rot_codigo = $1"
             values = [rotaModelo.codigo]
             await client.query(sql,values)
+            let ordem = 0
             for(let i=0;i<rotaModelo.pontos.length;i++){
-                sql = "INSERT INTO rotas_tem_pontosdeembarque(rot_codigo,pde_codigo) values ($1,$2)"
-                values = [rotaModelo.codigo,rotaModelo.pontos[i]]
+                ordem++;
+                sql = "INSERT INTO rotas_tem_pontosdeembarque(rot_codigo,pde_codigo,ordem) values ($1,$2,$3)"
+                values = [rotaModelo.codigo,rotaModelo.pontos[i],ordem]
                 await client.query(sql,values)
             }
         }catch(erro){

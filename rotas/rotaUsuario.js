@@ -1,7 +1,7 @@
 import {Router} from 'express';
-import UsuarioCtrl from '../controle/usuarioCtrl';
+import UsuarioCtrl from '../controle/usuarioCtrl.js';
 
-const userCtrl = new UsuarioCtrl();
+const userCtrl = UsuarioCtrl.getInstance();
 const rotaUsuario = new Router();
 
 rotaUsuario.get('/', userCtrl.consultar)

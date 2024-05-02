@@ -6,13 +6,16 @@ export default class defRotaCtrl{
     static _instance = null;
 
     constructor() {
-        if (AlunoCtrl._instance) {
-            return AlunoCtrl._instance
-        }
-        AlunoCtrl._instance = this;
+        defRotaCtrl._instance = this;
     }
 
-    static async gravar(requisicao, resposta) {
+    static getInstance() {
+        if (defRotaCtrl._instance == null)
+            new defRotaCtrl();
+        return defRotaCtrl._instance;
+    }
+
+    async gravar(requisicao, resposta) {
         resposta.type('application/json');
         if (requisicao.method === 'POST') {
             const dados = requisicao.body;
@@ -22,7 +25,6 @@ export default class defRotaCtrl{
             const ida = dados.ida
             const volta = dados.volta
             const veiculo = dados.veiculo
-            console.log("veiculo: "+veiculo)
             const monitor = dados.monitor
             const motoristas = JSON.parse(dados.motoristas)
             const pontos = JSON.parse(dados.pontos)
@@ -81,7 +83,7 @@ export default class defRotaCtrl{
         }
     }
 
-    static async consultar(requisicao,resposta){
+    async consultar(requisicao,resposta){
         if(requisicao.method === 'GET'){
             let termo = requisicao.params.termo
             if(termo === undefined)
@@ -158,7 +160,7 @@ export default class defRotaCtrl{
         }
     } 
 
-    static async atualizar(requisao,resposta){
+    async atualizar(requisao,resposta){
         const dados = requisao.body
         const rota = new defRota(dados.codigo,dados.nome,dados.km,dados.periodo,dados.ida,dados.volta,dados.veiculo,dados.monitor,JSON.parse(dados.pontos),JSON.parse(dados.motoristas),[])
         
@@ -188,7 +190,7 @@ export default class defRotaCtrl{
         }
     }
 
-    static async excluir(requisicao,resposta){
+    async excluir(requisicao,resposta){
         const termo = requisicao.params.termo
         const rota = new defRota(termo)
         try{
@@ -201,7 +203,6 @@ export default class defRotaCtrl{
                         mensagem:"Rota deletada com sucesso"
                     })
                 }).catch((erro)=>{
-                    console.log("nao deletou")
                     resposta.status(500).json({
                         status:false,
                         mensagem:"Erro ao deletar rota: "+erro
