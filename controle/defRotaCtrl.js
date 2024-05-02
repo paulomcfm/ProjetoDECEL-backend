@@ -109,7 +109,7 @@ export default class defRotaCtrl{
                     listaRotas:[]
                 })
             }
-
+            await client.release()
         }
         catch(erro){
             resposta.status(500).json({
