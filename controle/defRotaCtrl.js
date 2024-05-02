@@ -1,6 +1,10 @@
 import poolConexao from "../persistencia/conexao.js";
 import defRota from "../modelo/defRota.js";
-
+import Rotas_Motoristas from '../modelo/rotas_motoristas.js'
+import Rotas_Pontos from "../modelo/rotas_pontos.js";
+import PontoEmbarque from "../modelo/pontoEmbarque.js";
+import Motorista from "../modelo/motorista.js";
+import Inscricao from "../modelo/inscricao.js";
 
 export default class defRotaCtrl{
     static _instance = null;
@@ -17,7 +21,7 @@ export default class defRotaCtrl{
 
     async gravar(requisicao, resposta) {
         resposta.type('application/json');
-        if (requisicao.method === 'POST') {
+        try{
             const dados = requisicao.body;
             const nome = dados.nome
             const km = dados.km
@@ -28,137 +32,131 @@ export default class defRotaCtrl{
             const monitor = dados.monitor
             const motoristas = JSON.parse(dados.motoristas)
             const pontos = JSON.parse(dados.pontos)
-            const rota = new defRota(0,nome,km,periodo,ida,volta,veiculo,monitor,pontos,motoristas)
-            const client = await poolConexao.connect();            
-
-            // se continua ou da rollback
-            let flag = true;
+            const rota = new defRota(0,nome,km,periodo,ida,volta,veiculo,monitor,[],[])
+            const client = await poolConexao.getInstance().connect()      
             try{
                 await client.query('BEGIN');
-                rota.gravar(client).then(()=>{
-                
-                    /// grava os pontos da rota
-                    rota.gravarPontos(client).then(()=>{
-                        // grava os motoristas
-                        rota.gravarMotoristas(client).then(()=>{
-                            // todos os dados foram gravados com sucesso
-                            client.query('COMMIT')
-                            resposta.status(200).json({
-                                status:true,
-                                mensagem:"Rota cadastrada com sucesso !!!"
-                            })
-                        }).catch(async (error)=>{
-                            resposta.status(500).json({
-                                status:false,
-                                mensagem:"Erro ao cadastrar rota: "+error
-                            })
-                            await client.query('ROLLBACK');
-                        })
-                        
-                        // se ocorrer erro no meio da transacao ocorre rollback
-                    }).catch(async (error)=>{
-                        resposta.status(500).json({
-                            status:false,
-                            mensagem:"Erro ao cadastrar rota: "+error
-                        })
-                        await client.query('ROLLBACK');
-                    })
-                }).catch((error)=>{
-                    resposta.status(500).json({
-                        status:false,
-                        mensagem:"Erro ao cadastrar rota: "+error
-                    })
+                await rota.gravar(client)
+                // lista sera usada para guardar os objetos de ponto de embarque
+                let lista = []
+                for(const ponto of pontos){
+                    lista.push(new PontoEmbarque(ponto))
+                }
+                const rotaP = new Rotas_Pontos(rota,lista)
+                await rotaP.gravar(client)
+                // lista sera usada para guardar os objetos de motoristas
+                lista = []
+                for(const motorista of motoristas){
+                    lista.push(new Motorista(motorista))
+                }
+                const rotaM = new Rotas_Motoristas(rota,lista)
+                await rotaM.gravar(client)
+
+                resposta.status(200).json({
+                    status:true,
+                    mensagem:"Rota gravada com sucesso"
                 })
-            }catch (e) {
+
+                await client.query('COMMIT')
+            }catch (erro) {
+                console.log(erro)
                 await client.query('ROLLBACK');
-            } finally {
-                client.release();
-            }        
+                resposta.status(500).json({
+                    "status": false,
+                    "mensagem": 'Erro ao cadastrar rota'
+                });
+            }
+            await client.release()
         }
-        else {
-            resposta.status(400).json({
+        catch(erro) {
+            resposta.status(500).json({
                 "status": false,
-                "mensagem": 'Por favor, utilize o método POST para cadastrar um aluno!'
+                "mensagem": 'Erro ao cadastrar rota'
             });
         }
     }
 
     async consultar(requisicao,resposta){
-        if(requisicao.method === 'GET'){
+        try{
             let termo = requisicao.params.termo
             if(termo === undefined)
                 termo = ""
             const rota = new defRota()
+            // usado para pegar qualquer erro que acontecer dentro das consultas
             const client = await poolConexao.getInstance().connect()
-            rota.consultar(client,termo).then((listaRotas)=>{
-                let flag = true
-                let num = 0
-                for(let i=0;i<listaRotas.length && flag;i++){
-                    const registro = listaRotas[i]
-                    registro.consultarPontos(client).then(()=>{
-                        registro.consultarMotoristas(client).then(()=>{
-                            registro.consultarInscricoes(client).then(()=>{
-                                num++;
-                                if(num>=listaRotas.length){
-                                    // resposta final com sucesso caso todos os registro foram consultados corretamente
-                                    resposta.status(200).json({
-                                        status:true,
-                                        mensagem:"Rota consultada com sucesso",
-                                        listaRotas:listaRotas
-                                    })
-                                }
-                            }).catch((erro)=>{
-                                flag = false
-                                resposta.status(500).json({
-                                    status:false,
-                                    mensagem:'Não foi possivel consultar as rotas na base de dados: '+erro,
-                                    listaRotas:[]
-                                })
-                            })
-                        }).catch((erro)=>{
-                            flag = false
-                            resposta.status(500).json({
-                                status:false,
-                                mensagem:'Não foi possivel consultar as rotas na base de dados: '+erro,
-                                listaRotas:[]
-                            })
-                        })
-                    }).catch((erro)=>{
-                        flag = false
-                        resposta.status(500).json({
-                            status:false,
-                            mensagem:'Não foi possivel consultar as rotas na base de dados: '+erro,
-                            listaRotas:[]
-                        })
-                    })
-
-                    
+            try{
+                await client.query('BEGIN');
+                const lista = await rota.consultar(client,termo)
+                const rotaP = new Rotas_Pontos()
+                const rotaM = new Rotas_Motoristas()
+                for(const reg of lista){
+                    reg.pontos = await rotaP.consultarPontos(client,reg.codigo)
+                    reg.motoristas = await rotaM.consultar(client,reg.codigo)
                 }
-                if(!flag){
-                    resposta.status(500).json({
-                        status:false,
-                        mensagem:'Erro ao consultar os pontos e motoristas da rota: ',
-                        listaRotas:[]
-                    })
-                }
-
-            }).catch((erro)=>{
+                
+                resposta.status(200).json({
+                    status:true,
+                    mensagem:"consultado com sucesso",
+                    listaRotas: lista
+                })
+            }catch(erro){
+                // ao entrar aqui fazer o rollback
+                await client.query('ROLLBACK')
+                console.log(erro)
                 resposta.status(500).json({
                     status:false,
-                    mensagem:'Não foi possivel consultar as rotas na base de dados: '+erro,
+                    mensagem:"Erro ao realizar consulta",
                     listaRotas:[]
                 })
-            })
-            client.release()
+            }
+
         }
-        else{
+        catch(erro){
             resposta.status(500).json({
                 status:false,
-                mensagem:'Utilize o método o GET para consultar os dados das rotas',
+                mensagem:'Erro ao realizar a consulta',
                 listaRotas:[]
             })
         }
     } 
+
+    async consultarInscricoesDaRota(requisicao,resposta){
+        try{
+            let termo = requisicao.params.termo
+            if(termo == undefined)
+                termo = ""
+            const rota = new defRota(termo)
+            let lista = []
+            const client = await poolConexao.getInstance().connect()
+            await client.query('BEGIN')
+            try{
+                lista = await rota.consultar(client,termo)
+                const inscricoes = new Inscricao()
+                for(const reg of lista){
+                    reg.inscricoes = await inscricoes.consultarPorRota(client,reg.codigo)
+                }
+                resposta.status(200).json({
+                    status:true,
+                    mensagem:'Consultado com sucesso',
+                    listaRotas:lista
+                })
+            }catch(erro){
+                resposta.status(500).json({
+                    status:false,
+                    mensagem:'Erro ao realizar a consulta',
+                    listaRotas:lista
+                })
+            }
+            await client.release()
+
+        }catch(erro){
+            resposta.status(500).json({
+                status:false,
+                mensagem:'Erro ao realizar a consulta',
+                listaRotas:lista
+            })
+        }
+    }
 
     async atualizar(requisao,resposta){
         const dados = requisao.body
@@ -194,19 +192,15 @@ export default class defRotaCtrl{
         const termo = requisicao.params.termo
         const rota = new defRota(termo)
         try{
-            const client = await poolConexao.connect()
+            const client = await poolConexao.getInstance().connect()
             const qtdInscr = await rota.consultarQtdInscricoes(client)
             if(qtdInscr.length===0){
-                rota.deletar(client).then(()=>{
-                    resposta.status(200).json({
-                        status:true,
-                        mensagem:"Rota deletada com sucesso"
-                    })
-                }).catch((erro)=>{
-                    resposta.status(500).json({
-                        status:false,
-                        mensagem:"Erro ao deletar rota: "+erro
-                    })
+                await new Rotas_Pontos().deletar(client,rota.codigo)
+                await new Rotas_Motoristas().deletar(client,rota.codigo)
+                await rota.deletar(client)
+                resposta.status(200).json({
+                    status:true,
+                    "mensagem":"Rota deletada com sucesso"
                 })
             }else{
                 resposta.status(500).json({

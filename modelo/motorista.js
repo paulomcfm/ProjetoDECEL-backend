@@ -1,67 +1,69 @@
 import motoristaDAO from "../persistencia/motoristaDAO.js"
+
 export default class Motorista{
     #id;
     #nome;
     #cnh;
     #celular;
 
-    constructor(id,nome,cnh,celular){
+    constructor(id = 0, nome = '', cnh = '', celular = '') {
         this.#id = id;
         this.#nome = nome;
         this.#cnh = cnh;
         this.#celular = celular;
     }
 
-    get Id(){
+    get id() {
         return this.#id;
     }
 
-    set Id(novoId){
-        this.#id = novoId;
+    set id(novoid) {
+        this.#id = novoid;
     }
 
-    get Nome(){
-        return this.#nome;
+    get nome() {
+        return this.#nome
     }
 
-    set Nome(novoNome){
-        this.#nome = novoNome;
+    set nome(novanome) {
+        this.#nome = novanome
     }
 
-    get Cnh(){
+    get cnh() {
         return this.#cnh;
     }
 
-    set Cnh(novoCnh){
-        this.#cnh = novoCnh;
+    set cnh(novocnh) {
+        this.#cnh = novocnh;
     }
 
-    get celular(){
+    get celular() {
         return this.#celular;
     }
 
-    set celular(novocelular){
+    set celular(novocelular) {
         this.#celular = novocelular;
     }
-    
 
-    toJson(){
+    toJSON() {
         return {
-            id:this.#id,
-            nome:this.#nome,
-            cnh:this.#cnh,
-            celular:this.#celular
-        } 
+            id: this.#id,
+            nome: this.#nome,
+            cnh: this.#cnh,
+            celular: this.#celular
+        }
     }
+
+    
 
     async gravar(){
         const motoristaDao = new motoristaDAO()
-        await  motoristaDao.gravar(this.toJson())
+        await  motoristaDao.gravar(this)
     }
 
     async atualizar(){
         const motoristaDao = new motoristaDAO()
-        await motoristaDao.atualizar(this.toJson())
+        await motoristaDao.atualizar(this)
     }
 
     async deletar(){
