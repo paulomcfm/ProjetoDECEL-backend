@@ -19,10 +19,14 @@ export default class Rotas_PontosDAO{
         }
     }
     
-    async deletar(client,modelo){
-        let sql = 'DELETE FROM rotas_tem_pontosdeembarque WHERE rot_codigo = $1'
-        let values = [modelo.rota.codigo]
-        await client.query(sql,values)
+    async deletar(client,rotaCodigo){
+        try{
+            let sql = 'DELETE FROM rotas_tem_pontosdeembarque WHERE rot_codigo = $1'
+            let values = [rotaCodigo]
+            await client.query(sql,values)
+        }catch(erro){
+            throw erro
+        }
     }
     
     async consultar(client,modelo){

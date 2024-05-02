@@ -4,6 +4,7 @@ import Rotas_Motoristas from '../modelo/rotas_motoristas.js'
 import Rotas_Pontos from "../modelo/rotas_pontos.js";
 import PontoEmbarque from "../modelo/pontoEmbarque.js";
 import Motorista from "../modelo/motorista.js";
+import Inscricao from "../modelo/inscricao.js";
 
 export default class defRotaCtrl{
     static _instance = null;
@@ -119,6 +120,44 @@ export default class defRotaCtrl{
         }
     } 
 
+    async consultarInscricoesDaRota(requisicao,resposta){
+        try{
+            let termo = requisicao.params.termo
+            if(termo == undefined)
+                termo = ""
+            const rota = new defRota(termo)
+            let lista = []
+            const client = await poolConexao.getInstance().connect()
+            await client.query('BEGIN')
+            try{
+                lista = await rota.consultar(client,termo)
+                const inscricoes = new Inscricao()
+                for(const reg of lista){
+                    reg.inscricoes = await inscricoes.consultarPorRota(client,reg.codigo)
+                }
+                resposta.status(200).json({
+                    status:true,
+                    mensagem:'Consultado com sucesso',
+                    listaRotas:lista
+                })
+            }catch(erro){
+                resposta.status(500).json({
+                    status:false,
+                    mensagem:'Erro ao realizar a consulta',
+                    listaRotas:lista
+                })
+            }
+            await client.release()
+
+        }catch(erro){
+            resposta.status(500).json({
+                status:false,
+                mensagem:'Erro ao realizar a consulta',
+                listaRotas:lista
+            })
+        }
+    }
+
     async atualizar(requisao,resposta){
         const dados = requisao.body
         const rota = new defRota(dados.codigo,dados.nome,dados.km,dados.periodo,dados.ida,dados.volta,dados.veiculo,dados.monitor,JSON.parse(dados.pontos),JSON.parse(dados.motoristas),[])
@@ -153,19 +192,15 @@ export default class defRotaCtrl{
         const termo = requisicao.params.termo
         const rota = new defRota(termo)
         try{
-            const client = await poolConexao.connect()
+            const client = await poolConexao.getInstance().connect()
             const qtdInscr = await rota.consultarQtdInscricoes(client)
             if(qtdInscr.length===0){
-                rota.deletar(client).then(()=>{
-                    resposta.status(200).json({
-                        status:true,
-                        mensagem:"Rota deletada com sucesso"
-                    })
-                }).catch((erro)=>{
-                    resposta.status(500).json({
-                        status:false,
-                        mensagem:"Erro ao deletar rota: "+erro
-                    })
+                await new Rotas_Pontos().deletar(client,rota.codigo)
+                await new Rotas_Motoristas().deletar(client,rota.codigo)
+                await rota.deletar(client)
+                resposta.status(200).json({
+                    status:true,
+                    "mensagem":"Rota deletada com sucesso"
                 })
             }else{
                 resposta.status(500).json({

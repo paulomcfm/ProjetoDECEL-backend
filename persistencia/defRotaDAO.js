@@ -51,7 +51,8 @@ export default class defRotaDAO{
                 sql = 'SELECT * FROM rotas WHERE rot_nome ilike $1'
                 values = ['%'+termo+'%']
             }
-
+            
+            
             const { rows: registros, fields: campos } = await client.query(sql,values)
             for(const registro of registros){
                 sql = 'SELECT * FROM veiculos WHERE vei_codigo = $1'
@@ -160,12 +161,8 @@ export default class defRotaDAO{
 
     async deletar(client,rotaModelo){
         try{
-            let sql = 'DELETE FROM rotas_tem_motoristas WHERE rot_codigo = $1'
+            let sql = 'DELETE FROM rotas WHERE rot_codigo = $1'
             let values = [rotaModelo.codigo]
-            await client.query(sql,values)
-            sql = 'DELETE FROM rotas_tem_pontosdeembarque WHERE rot_codigo = $1'
-            await client.query(sql,values)
-            sql = 'DELETE FROM rotas WHERE rot_codigo = $1'
             await client.query(sql,values)
         }catch(erro){
             await client.query('ROLLBACK')

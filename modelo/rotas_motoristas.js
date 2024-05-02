@@ -41,9 +41,13 @@ export default class Rotas_Motoristas{
         const dao = new Rotas_MotoristasDAO()
         await dao.atualizar(client)
     }
-    async deletar(client){
-        const dao = new Rotas_MotoristasDAO()
-        await dao.deletar(client)
+    async deletar(client,rotaCodigo){
+        try{
+            const dao = new Rotas_MotoristasDAO()
+            await dao.deletar(client,rotaCodigo)
+        }catch(erro){
+            throw erro
+        }
     }
     async consultar(client,rotaCodigo){
         try{

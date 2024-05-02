@@ -144,8 +144,12 @@ export default class defRota{
     }
 
     async deletar(client){
-        const dao = new defRotaDAO()
-        await dao.deletar(client,this)
+        try{
+            const dao = new defRotaDAO()
+            await dao.deletar(client,this)
+        }catch(erro){
+            throw erro
+        }
     }
 
     async atualizar(client){
@@ -161,31 +165,6 @@ export default class defRota{
             console.log(erro)
             throw erro
         }
-    }
-
-    async gravarPontos(client){
-        const dao = new defRotaDAO()
-        await dao.gravarPontos(client,this)
-    }
-
-    async gravarMotoristas(client){
-        const dao = new defRotaDAO()
-        await dao.gravarMotoristas(client,this)
-    }
-
-    async consultarPontos(client){
-        const dao = new defRotaDAO()
-        await dao.consultarPontos(client,this)
-    }
-
-    async consultarMotoristas(client){
-        const dao = new defRotaDAO()
-        await dao.consultarMotoristas(client,this)
-    }
-
-    async consultarInscricoes(client){
-        const dao = new defRotaDAO()
-        await dao.consultarInscricoes(client,this)
     }
 
     async consultarQtdInscricoes(client){

@@ -42,9 +42,13 @@ export default class Rotas_Pontos{
         await dao.deletar(client,this)
         await dao.gravar(client,this)
     }
-    async deletar(client){
-        const dao = new Rotas_PontosDAO()
-        await dao.deletar(client,this)
+    async deletar(client,rotaCodigo){
+        try{
+            const dao = new Rotas_PontosDAO()
+            await dao.deletar(client,rotaCodigo)
+        }catch(erro){
+            throw erro
+        }
     }
 
     async consultar(client){
