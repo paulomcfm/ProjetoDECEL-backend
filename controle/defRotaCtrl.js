@@ -132,7 +132,11 @@ export default class defRotaCtrl{
             try{
                 lista = await rota.consultar(client,termo)
                 const inscricoes = new Inscricao()
+                const rotaP = new Rotas_Pontos()
+                const rotaM = new Rotas_Motoristas()
                 for(const reg of lista){
+                    reg.pontos = await rotaP.consultarPontos(client,reg.codigo)
+                    reg.motoristas = await rotaM.consultar(client,reg.codigo)
                     reg.inscricoes = await inscricoes.consultarPorRota(client,reg.codigo)
                 }
                 resposta.status(200).json({
