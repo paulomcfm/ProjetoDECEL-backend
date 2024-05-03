@@ -184,6 +184,11 @@ export default class Inscricao {
         return await inscDAO.consultar(client, parametro);
     }
 
+    async consultarFora(client, parametro) {
+        const inscDAO = new InscricaoDAO();
+        return await inscDAO.consultarFora(client, parametro);
+    }
+
     async atualizarRota(client) {
         const inscDAO = new InscricaoDAO();
         await inscDAO.atualizarRota(client, this);

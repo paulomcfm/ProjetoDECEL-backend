@@ -6,6 +6,7 @@ const rotaInscricaoAluno = new Router();
 
 rotaInscricaoAluno.get('/', inscCtrl.consultar)
     .get('/:termo', inscCtrl.consultar)
+    .get('/buscar-fora', inscCtrl.consultarFora)
     .post('/', inscCtrl.gravar)
     .patch('/', inscCtrl.atualizar)
     .put('/', inscCtrl.atualizar)
