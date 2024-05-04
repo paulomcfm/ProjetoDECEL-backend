@@ -98,15 +98,12 @@ export default class InscricaoDAO {
         let sql = '';
         let parametros = [];
         const listaInscricoes = [];
-        sql = `SELECT i.insc_ano,i.insc_anoletivo,i.insc_etapa,i.insc_turma,i.insc_periodo,i.insc_rua,i.insc_numero,i.insc_bairro,i.insc_cep,i.insc_dataAlocacao,
-            pd.pde_rua,pd.pde_numero, pd.pde_bairro, pd.pde_cep,
-            e.esc_nome,e.esc_tipo, e.esc_email, e.esc_telefone,
-            a.alu_nome, a.alu_rg,a.alu_observacoes,a.alu_dataNasc,a.alu_celular,
-            r.rot_nome, r.rot_km, r.rot_periodo, r.rot_tempoinicio, r.rot_tempofinal,
-            i.pde_codigo, i.esc_codigo, i.alu_codigo, i.rot_codigo
+        sql = `SELECT i.insc_ano, i.insc_anoletivo, i.insc_etapa, i.insc_turma, i.insc_periodo, i.insc_rua, i.insc_numero, i.insc_bairro, i.insc_cep, i.insc_dataAlocacao,
+            pd.pde_rua, pd.pde_numero, pd.pde_bairro, pd.pde_cep,
+            e.esc_nome, e.esc_tipo, e.esc_email, e.esc_telefone,
+            a.alu_nome, a.alu_rg, a.alu_observacoes, a.alu_dataNasc, a.alu_celular
             FROM inscricoes i
             INNER JOIN pontosdeembarque pd ON i.pde_codigo = pd.pde_codigo
-            LEFT JOIN rotas r ON i.rot_codigo = r.rot_codigo
             INNER JOIN escolas e ON i.esc_codigo = e.esc_codigo
             INNER JOIN alunos a ON i.alu_codigo = a.alu_codigo
             WHERE i.insc_dataAlocacao IS NOT NULL

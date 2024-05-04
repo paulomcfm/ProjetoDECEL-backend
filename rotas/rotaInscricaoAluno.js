@@ -4,9 +4,9 @@ import InscricaoCtrl from '../controle/inscricaoCtrl.js';
 const inscCtrl = InscricaoCtrl.getInstance();
 const rotaInscricaoAluno = new Router();
 
-rotaInscricaoAluno.get('/', inscCtrl.consultar)
+rotaInscricaoAluno.get('/buscar-fora/:termo', inscCtrl.consultarFora)
+    .get('/', inscCtrl.consultar)
     .get('/:termo', inscCtrl.consultar)
-    .get('/buscar-fora', inscCtrl.consultarFora)
     .post('/', inscCtrl.gravar)
     .patch('/', inscCtrl.atualizar)
     .put('/', inscCtrl.atualizar)

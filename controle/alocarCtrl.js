@@ -29,9 +29,10 @@ export default class AlocarCtrl {
                     for (const inscricaoEncontrada of inscricoes) {
                         const encontradaEmDados = dados.find(d => d.aluno.codigo === inscricaoEncontrada.aluno.codigo);
                         if (!encontradaEmDados) {
-                            inscricaoEncontrada.rota(rota) = null;
-                            inscricaoEncontrada.dataAlocacao(dataAlocacao) = null;
-                            await inscricaoEncontrada.atualizarRota(client);
+                            const insc = new Inscricao(inscricaoEncontrada.ano, inscricaoEncontrada.aluno, inscricaoEncontrada.pontoEmbarque, inscricaoEncontrada.escola, inscricaoEncontrada.rota, inscricaoEncontrada.cep, inscricaoEncontrada.rua, inscricaoEncontrada.numero, inscricaoEncontrada.bairro, inscricaoEncontrada.periodo, inscricaoEncontrada.etapa, inscricaoEncontrada.anoLetivo, inscricaoEncontrada.turma, inscricaoEncontrada.dataAlocacao);
+                            insc.rota = null;
+                            insc.dataAlocacao = null;
+                            await insc.atualizarRota(client);
                         }
                     }
                     if (dados[0].aluno.codigo != 0) {
