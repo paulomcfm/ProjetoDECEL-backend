@@ -36,28 +36,25 @@ export default class AlocarCtrl {
                         }
                     }
                     if (dados[0].aluno.codigo != 0) {
-                        //Coloca na rota as inscricoes
+                        //Coloca na rota novas inscricoes e atualiza as que já estavam na rota
                         for (const inscricao of dados) {
-                            const naoEncontradaNaConsulta = inscricoes.every(i => i.aluno.codigo !== inscricao.aluno.codigo);
-                            if (naoEncontradaNaConsulta) {
-                                const novaInscricao = new Inscricao(
-                                    inscricao.ano,
-                                    inscricao.aluno,
-                                    inscricao.pontoEmbarque,
-                                    inscricao.escola,
-                                    inscricao.rota,
-                                    inscricao.cep,
-                                    inscricao.rua,
-                                    inscricao.numero,
-                                    inscricao.bairro,
-                                    inscricao.periodo,
-                                    inscricao.etapa,
-                                    inscricao.anoLetivo,
-                                    inscricao.turma,
-                                    inscricao.dataAlocacao
-                                );
-                                await novaInscricao.atualizarRota(client);
-                            }
+                            const novaInscricao = new Inscricao(
+                                inscricao.ano,
+                                inscricao.aluno,
+                                inscricao.pontoEmbarque,
+                                inscricao.escola,
+                                inscricao.rota,
+                                inscricao.cep,
+                                inscricao.rua,
+                                inscricao.numero,
+                                inscricao.bairro,
+                                inscricao.periodo,
+                                inscricao.etapa,
+                                inscricao.anoLetivo,
+                                inscricao.turma,
+                                inscricao.dataAlocacao
+                            );
+                            await novaInscricao.atualizarRota(client);
                         }
                     }
                     resposta.status(200).json({
