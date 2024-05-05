@@ -64,7 +64,7 @@ export default class InscricaoDAO {
                 const escola = new Escola(registro.esc_codigo, registro.esc_nome, registro.esc_tipo, registro.esc_email, registro.esc_telefone);
                 const aluno = new Aluno(registro.alu_codigo, registro.alu_nome, registro.alu_rg, registro.alu_observacoes, registro.alu_datanasc, registro.alu_celular);
                 const pontoEmbarque = new PontoEmbarque(registro.pde_codigo, registro.pde_rua, registro.pde_numero, registro.pde_bairro, registro.pde_cep);
-                const inscricao = new Inscricao(registro.insc_ano, aluno, pontoEmbarque, escola, null, registro.insc_cep, registro.insc_rua, registro.insc_numero, registro.insc_bairro, registro.insc_periodo, registro.insc_etapa, registro.insc_anoletivo, registro.insc_turma, registro.insc_dataAlocacao);
+                const inscricao = new Inscricao(registro.insc_ano, aluno, pontoEmbarque, escola, registro.rot_codigo, registro.insc_cep, registro.insc_rua, registro.insc_numero, registro.insc_bairro, registro.insc_periodo, registro.insc_etapa, registro.insc_anoletivo, registro.insc_turma, registro.insc_dataalocacao);
                 listaInscricoes.push(inscricao);
             }
         }
@@ -87,7 +87,7 @@ export default class InscricaoDAO {
                 const escola = new Escola(registro.esc_codigo, registro.esc_nome, registro.esc_tipo, registro.esc_email, registro.esc_telefone);
                 const aluno = new Aluno(registro.alu_codigo, registro.alu_nome, registro.alu_rg, registro.alu_observacoes, registro.alu_datanasc, registro.alu_celular);
                 const pontoEmbarque = new PontoEmbarque(registro.pde_codigo, registro.pde_rua, registro.pde_numero, registro.pde_bairro, registro.pde_cep);
-                const inscricao = new Inscricao(registro.insc_ano, aluno, pontoEmbarque, escola, null, registro.insc_cep, registro.insc_rua, registro.insc_numero, registro.insc_bairro, registro.insc_periodo, registro.insc_etapa, registro.insc_anoletivo, registro.insc_turma, registro.insc_dataAlocacao);
+                const inscricao = new Inscricao(registro.insc_ano, aluno, pontoEmbarque, escola, registro.rot_codigo, registro.insc_cep, registro.insc_rua, registro.insc_numero, registro.insc_bairro, registro.insc_periodo, registro.insc_etapa, registro.insc_anoletivo, registro.insc_turma, registro.insc_dataalocacao);
                 listaInscricoes.push(inscricao);
             }
         }

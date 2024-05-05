@@ -16,7 +16,7 @@ export default class Inscricao {
     #turma;
     #dataAlocacao;
 
-    constructor(ano='', aluno, pontoEmbarque = [], escola = [], rota = [], cep = '', rua = '', numero = 0, bairro = '', periodo = '', etapa = '', anoLetivo = '', turma = '', dataAlocacao = '') {
+    constructor(ano='', aluno, pontoEmbarque = [], escola = [], rota = '', cep = '', rua = '', numero = 0, bairro = '', periodo = '', etapa = '', anoLetivo = '', turma = '', dataAlocacao = '') {
         this.#ano = ano;
         this.#aluno = aluno;
         this.#pontoEmbarque = pontoEmbarque;
