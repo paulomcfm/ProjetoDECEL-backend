@@ -46,6 +46,17 @@ export default class Monitor{
         this.#celular = novoCelular
     }
 
+    toJSON(){
+        return (
+                {
+                codigo:this.#codigo,
+                nome:this.#nome,
+                cpf:this.#cpf,
+                celular:this.#celular
+                }
+            )
+    }
+
 
     async gravar(client){
         try{
@@ -63,11 +74,11 @@ export default class Monitor{
         }
     }
 
-    async excluir(client){
+    async excluir(client,termo){
         try{
-            await new MonitorDAO().excluir(client,this)
+            await new MonitorDAO().excluir(client,termo)
         }catch(erro){
-
+            throw erro
         }
     }
 

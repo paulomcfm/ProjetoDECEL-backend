@@ -22,10 +22,10 @@ export default class MonitorDAO{
         }
      }
 
-     async excluir(client,monitor){
+     async excluir(client,termo){
         try{
             let sql = 'DELETE FROM monitores WHERE mon_codigo = $1'
-            let values = [monitor.codigo]
+            let values = [termo]
             await client.query(sql,values)
         }catch(erro){
             throw erro
@@ -47,7 +47,6 @@ export default class MonitorDAO{
             const {rows:registros,fields:campos} = await client.query(sql,values)
             let lista = []
             for(const registro of registros){
-                console.log(registro)
                 lista.push(new Monitor(registro.mon_codigo,registro.mon_nome,registro.mon_cpf,registro.mon_celular))
             }
             return lista
