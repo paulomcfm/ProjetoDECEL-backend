@@ -8,5 +8,6 @@ rotaMonitor.get('/',monitorCtrl.consultar)
 .get('/:termo',monitorCtrl.consultar)
 .post('/',monitorCtrl.gravar) 
 .delete('/:termo',monitorCtrl.excluir)
+.put('/',monitorCtrl.atualizar)
 
 export default rotaMonitor

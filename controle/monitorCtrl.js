@@ -86,11 +86,11 @@ export default class MonitorCtrl{
     async gravar(requisicao,resposta){
         const dados = requisicao.body
         try{
-            const monitorModelo = new Monitor(dados.codigo,dados.nome,dados.cpf,dados.celular)
+            const monitor = new Monitor(dados.codigo,dados.nome,dados.cpf,dados.celular)
             const client = await poolConexao.getInstance().connect()
             await client.query('BEGIN')
             try{
-                await monitorModelo.gravar(client)
+                await monitor.gravar(client)
                 resposta.status(200).json({
                     status:true,
                     mensagem:"Monitor gravado com sucesso!!!"
@@ -112,6 +112,38 @@ export default class MonitorCtrl{
             })
         }
     }
+
+
+    async atualizar(requisicao,resposta){
+        const dados = requisicao.body
+        try{
+            const monitor = new Monitor(dados.codigo,dados.nome,dados.cpf,dados.celular)
+            const client = await poolConexao.getInstance().connect()
+            await client.query('BEGIN')
+            try{
+                await monitor.atualizar(client)
+                resposta.status(200).json({
+                    status:true,
+                    mensagem:"Monitor atualizado com sucesso!!!"
+                })
+                await client.query('COMMIT')
+            }catch(erro){
+                await client.query('ROLLBACK')
+                resposta.status(500).json({
+                    status:false,
+                    mensagem:"Erro ao atualizar monitor: "+erro
+                })
+            }
+
+            await client.release()
+        }catch(erro){
+            resposta.status(500).json({
+                status:false,
+                mensagem:"Erro ao atualizar monitor: "+erro
+            })
+        }
+    }
+
 
 
 
