@@ -225,3 +225,15 @@ INSERT INTO Rotas_tem_Motoristas (moto_id, rot_codigo)
 VALUES (1, 1),
        (2, 2),
        (3, 3);
+
+      -- select para pegar as inscricoes que estão alocadas em rotas e que os pontos de embarque não estão na rota
+      -- SELECT * 
+      -- FROM Inscricoes
+      -- WHERE insc_dataAlocacao IS NOT NULL
+      --   AND EXTRACT(YEAR FROM insc_dataAlocacao) = 2024
+      --   AND NOT EXISTS (
+      --     SELECT 1
+      --     FROM Rotas_tem_PontosdeEmbarque
+      --     WHERE Rotas_tem_PontosdeEmbarque.rot_codigo = Inscricoes.rot_codigo
+      --       AND Rotas_tem_PontosdeEmbarque.pde_codigo = Inscricoes.pde_codigo
+      --   );

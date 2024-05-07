@@ -135,13 +135,21 @@ export default class defRota{
 
 
     async gravar(client){
-        const dao = new defRotaDAO()
-        await dao.gravar(client,this)
+        try{
+            const dao = new defRotaDAO()
+            await dao.gravar(client,this)
+        }catch(erro){
+            throw erro
+        }
     }
 
     async deletar(client){
-        const dao = new defRotaDAO()
-        await dao.deletar(client,this)
+        try{
+            const dao = new defRotaDAO()
+            await dao.deletar(client,this)
+        }catch(erro){
+            throw erro
+        }
     }
 
     async atualizar(client){
@@ -150,33 +158,13 @@ export default class defRota{
     }
 
     async consultar(client,termo){
-        const dao = new defRotaDAO()
-        return await dao.consultar(client,termo)
-    }
-
-    async gravarPontos(client){
-        const dao = new defRotaDAO()
-        await dao.gravarPontos(client,this)
-    }
-
-    async gravarMotoristas(client){
-        const dao = new defRotaDAO()
-        await dao.gravarMotoristas(client,this)
-    }
-
-    async consultarPontos(client){
-        const dao = new defRotaDAO()
-        await dao.consultarPontos(client,this)
-    }
-
-    async consultarMotoristas(client){
-        const dao = new defRotaDAO()
-        await dao.consultarMotoristas(client,this)
-    }
-
-    async consultarInscricoes(client){
-        const dao = new defRotaDAO()
-        await dao.consultarInscricoes(client,this)
+        try{
+            const dao = new defRotaDAO()
+            return await dao.consultar(client,termo)
+        }catch(erro){
+            console.log(erro)
+            throw erro
+        }
     }
 
     async consultarQtdInscricoes(client){

@@ -109,6 +109,40 @@ export default class InscricaoDAO {
         }
         return listaInscricoes;
     }
+    
+    async consultarFora(client, parametroConsulta) {
+        let sql = '';
+        let parametros = [];
+        const listaInscricoes = [];
+        sql = `SELECT i.insc_ano, i.insc_anoletivo, i.insc_etapa, i.insc_turma, i.insc_periodo, i.insc_rua, i.insc_numero, i.insc_bairro, i.insc_cep, i.insc_dataAlocacao,
+            pd.pde_rua, pd.pde_numero, pd.pde_bairro, pd.pde_cep,
+            e.esc_nome, e.esc_tipo, e.esc_email, e.esc_telefone,
+            a.alu_nome, a.alu_rg, a.alu_observacoes, a.alu_dataNasc, a.alu_celular
+            FROM inscricoes i
+            INNER JOIN pontosdeembarque pd ON i.pde_codigo = pd.pde_codigo
+            INNER JOIN escolas e ON i.esc_codigo = e.esc_codigo
+            INNER JOIN alunos a ON i.alu_codigo = a.alu_codigo
+            WHERE i.insc_dataAlocacao IS NOT NULL
+            AND EXTRACT(YEAR FROM i.insc_dataAlocacao) = $1
+            AND NOT EXISTS (
+              SELECT 1
+              FROM rotas_tem_pontosdeembarque rp
+              WHERE rp.rot_codigo = i.rot_codigo
+            AND rp.pde_codigo = i.pde_codigo
+            )
+            ORDER BY a.alu_nome;`;
+
+        parametros = [parametroConsulta];
+        const { rows: registros, fields: campos } = await client.query(sql, parametros);
+        for (const registro of registros) {
+            const escola = new Escola(registro.esc_codigo, registro.esc_nome, registro.esc_tipo, registro.esc_email, registro.esc_telefone);
+            const aluno = new Aluno(registro.alu_codigo, registro.alu_nome, registro.alu_rg, registro.alu_observacoes, registro.alu_dataNasc, registro.alu_celular);
+            const pontoEmbarque = new PontoEmbarque(registro.pde_codigo, registro.pde_rua, registro.pde_numero, registro.pde_bairro, registro.pde_cep);
+            const inscricao = new Inscricao(registro.insc_ano, aluno, pontoEmbarque, escola, registro.rot_codigo, registro.insc_cep, registro.insc_rua, registro.insc_numero, registro.insc_bairro, registro.insc_periodo, registro.insc_etapa, registro.insc_anoletivo, registro.insc_turma, registro.insc_dataAlocacao);
+            listaInscricoes.push(inscricao);
+        }
+        return listaInscricoes;
+    }
 
     async consultarPorRota(client, parametroConsulta) {
         let sql = '';
@@ -132,7 +166,7 @@ export default class InscricaoDAO {
         const { rows: registros, fields: campos } = await client.query(sql, parametros);
         for (const registro of registros) {
             const escola = new Escola(registro.esc_codigo, registro.esc_nome, registro.esc_tipo, registro.esc_email, registro.esc_telefone);
-            const aluno = new Aluno(registro.alu_codigo, registro.alu_nome, registro.alu_rg, registro.alu_observacoes, registro.alu_dataNasc, registro.alu_celular);
+            const aluno = new Aluno(registro.alu_codigo, registro.alu_nome, registro.alu_rg, registro.alu_observacoes, registro.alu_datanasc, registro.alu_celular);
             const pontoEmbarque = new PontoEmbarque(registro.pde_codigo, registro.pde_rua, registro.pde_numero, registro.pde_bairro, registro.pde_cep);
             const inscricao = new Inscricao(registro.insc_ano, aluno, pontoEmbarque, escola, registro.rot_codigo, registro.insc_cep, registro.insc_rua, registro.insc_numero, registro.insc_bairro, registro.insc_periodo, registro.insc_etapa, registro.insc_anoletivo, registro.insc_turma, registro.insc_dataAlocacao);
             listaInscricoes.push(inscricao);
