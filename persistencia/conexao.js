@@ -20,6 +20,7 @@ export default class poolConexao{
   }
 
   static getInstance(){
+    
     if(poolConexao._instance==null)
       new poolConexao();
     return poolConexao._instance;

@@ -83,6 +83,36 @@ export default class MonitorCtrl{
         }
     }
 
+    async gravar(requisicao,resposta){
+        const dados = requisicao.body
+        try{
+            const monitorModelo = new Monitor(dados.codigo,dados.nome,dados.cpf,dados.celular)
+            const client = await poolConexao.getInstance().connect()
+            await client.query('BEGIN')
+            try{
+                await monitorModelo.gravar(client)
+                resposta.status(200).json({
+                    status:true,
+                    mensagem:"Monitor gravado com sucesso!!!"
+                })
+                await client.query('COMMIT')
+            }catch(erro){
+                await client.query('ROLLBACK')
+                resposta.status(500).json({
+                    status:false,
+                    mensagem:"Erro ao gravar monitor: "+erro
+                })
+            }
+
+            await client.release()
+        }catch(erro){
+            resposta.status(500).json({
+                status:false,
+                mensagem:"Erro ao gravar monitor: "+erro
+            })
+        }
+    }
+
 
 
 

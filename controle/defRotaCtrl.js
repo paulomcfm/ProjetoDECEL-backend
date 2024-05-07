@@ -59,7 +59,6 @@ export default class defRotaCtrl {
 
                 await client.query('COMMIT')
             } catch (erro) {
-                console.log(erro)
                 await client.query('ROLLBACK');
                 resposta.status(500).json({
                     "status": false,
