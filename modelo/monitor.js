@@ -62,7 +62,7 @@ export default class Monitor{
         try{
             await new MonitorDAO().gravar(client,this)
         }catch(erro){
-            
+            throw erro
         }
     }
 
@@ -70,7 +70,7 @@ export default class Monitor{
         try{
             await new MonitorDAO().atualizar(client,this)
         }catch(erro){
-            
+            throw erro
         }
     }
 
