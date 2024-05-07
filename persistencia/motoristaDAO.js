@@ -2,11 +2,6 @@ import poolConexao from "./conexao.js";
 
 export default class motoristaDAO{
     #conexao
-    
-
-    constructor(){
-        this.#conexao = poolConexao;
-    }
 
     async gravar(motorista){
         const sql = 'insert into motoristas(moto_nome,moto_cnh,moto_celular) values ($1,$2,$3)'
@@ -20,31 +15,35 @@ export default class motoristaDAO{
         await this.#conexao.query(sql,values)
     }
 
-    async consultar(filtro){
-        let lista = []
-        let linhas
-        if(filtro === "" || filtro === undefined){
-            const sql = 'select * from motoristas'
-            await this.#conexao.query(sql).then((res)=>{
-                linhas = res.rows
-            })
-        }else{
-            const sql = `select * from motoristas where moto_nome ilike $1`;
-            const values = [filtro + '%'];
-            await this.#conexao.query(sql,values).then((res)=>{
-                linhas = res.rows
-            })
-        }
-        for(let i=0;i<linhas.length;i++){
-            const motorista ={
-                'id':linhas[i].moto_id,
-                'nome':linhas[i].moto_nome,
-                'cnh':linhas[i].moto_cnh,
-                'celular':linhas[i].moto_celular
+    async consultar(client,filtro){
+        try{
+            let sql
+            let values = []
+            let lista = []
+            let linhas
+            if(filtro === "" || filtro === undefined){
+                sql = 'select * from motoristas'
+            }else{
+                sql = `select * from motoristas where moto_nome ilike $1`;
+                values = [filtro + '%'];
             }
-            lista.push(motorista)
+            
+            await client.query(sql,values).then((res)=>{
+                linhas = res.rows
+            })
+            for(let i=0;i<linhas.length;i++){
+                const motorista ={
+                    'id':linhas[i].moto_id,
+                    'nome':linhas[i].moto_nome,
+                    'cnh':linhas[i].moto_cnh,
+                    'celular':linhas[i].moto_celular
+                }
+                lista.push(motorista)
+            }
+            return lista
+        }catch(erro){
+            throw erro
         }
-        return lista
     }
 
     async atualizar(motorista){

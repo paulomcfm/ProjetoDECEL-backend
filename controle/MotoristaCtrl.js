@@ -1,4 +1,5 @@
 import Motorista from '../modelo/motorista.js'
+import poolConexao from '../persistencia/conexao.js';
 
 export default class MotoristaCtrl{
     
@@ -52,21 +53,37 @@ export default class MotoristaCtrl{
     }
 
     async consultar(requisicao,resposta){
-        let termo = requisicao.params.termo
-        if(termo === undefined)
-            termo = ""
-        const motorista = new Motorista()
-        motorista.buscar(termo).then((lista)=>{
-            resposta.status(200).json({
-                'status':true,
-                'listaMotoristas':lista
-            })
-        }).catch((error)=>{
+        try{
+            let termo = requisicao.params.termo
+            if(termo === undefined)
+                termo = ""
+            const client = await poolConexao.getInstance().connect()
+            const motorista = new Motorista()
+
+            try{
+                await client.query('BEGIN')
+                const lista = await motorista.buscar(client,termo)
+                resposta.status(200).json({
+                    'status':true,
+                    'listaMotoristas':lista
+                })
+                
+                await client.query('COMMIT')
+            }catch(erro){
+                client.query('ROLLBACK')
+                resposta.status(500).json({
+                    'status':false,
+                    'mensagem':'Erro ao buscar motorista(s)'
+                })
+            }
+
+            await client.release()
+        }catch(erro){
             resposta.status(500).json({
                 'status':false,
                 'mensagem':'Erro ao buscar motorista(s)'
             })
-        })
+        }
     }
 
 

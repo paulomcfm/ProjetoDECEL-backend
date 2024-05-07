@@ -72,9 +72,13 @@ export default class Motorista{
     }
 
     // o filtro pode ou nao conter valores, na classe motoristaDAO tem um if para analisar
-    async buscar(filtro){
-        const motoristaDao = new motoristaDAO()
-        return await motoristaDao.consultar(filtro)
+    async buscar(client,filtro){
+        try{
+            const motoristaDao = new motoristaDAO()
+            return await motoristaDao.consultar(client,filtro)
+        }catch(erro){
+            throw erro
+        }
     }
 
 
