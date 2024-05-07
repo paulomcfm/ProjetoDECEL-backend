@@ -2,6 +2,8 @@ import Inscricao from "../modelo/inscricao.js";
 import PontoEmbarque from "../modelo/pontoEmbarque.js";
 import Escola from "../modelo/escola.js";
 import Aluno from "../modelo/aluno.js";
+import defRota from "../modelo/defRota.js";
+import Veiculo from "../modelo/veiculo.js";
 
 export default class InscricaoDAO {
     async gravar(client, inscricao) {
@@ -49,10 +51,12 @@ export default class InscricaoDAO {
             e.esc_nome,e.esc_tipo, e.esc_email, e.esc_telefone,
             a.alu_nome, a.alu_rg,a.alu_observacoes,a.alu_dataNasc,a.alu_celular,
 			r.rot_nome, r.rot_km, r.rot_periodo, r.rot_tempoinicio, r.rot_tempofinal,
-            i.pde_codigo, i.esc_codigo, i.alu_codigo, i.rot_codigo
+            i.pde_codigo, i.esc_codigo, i.alu_codigo, i.rot_codigo, 
+            v.vei_codigo, v.vei_renavam, v.vei_placa, v.vei_modelo, v.vei_capacidade, v.vei_tipo
             FROM inscricoes i
             INNER JOIN  pontosdeembarque pd ON i.pde_codigo = pd.pde_codigo
 			LEFT JOIN  rotas r ON i.rot_codigo = r.rot_codigo
+            LEFT JOIN veiculos v ON r.vei_codigo = v.vei_codigo
             INNER JOIN  escolas e ON i.esc_codigo = e.esc_codigo
             INNER JOIN  alunos a ON i.alu_codigo = a.alu_codigo
             WHERE LOWER(UNACCENT(a.alu_nome)) LIKE LOWER(UNACCENT('$1'));
@@ -64,7 +68,12 @@ export default class InscricaoDAO {
                 const escola = new Escola(registro.esc_codigo, registro.esc_nome, registro.esc_tipo, registro.esc_email, registro.esc_telefone);
                 const aluno = new Aluno(registro.alu_codigo, registro.alu_nome, registro.alu_rg, registro.alu_observacoes, registro.alu_datanasc, registro.alu_celular);
                 const pontoEmbarque = new PontoEmbarque(registro.pde_codigo, registro.pde_rua, registro.pde_numero, registro.pde_bairro, registro.pde_cep);
-                const inscricao = new Inscricao(registro.insc_ano, aluno, pontoEmbarque, escola, registro.rot_codigo, registro.insc_cep, registro.insc_rua, registro.insc_numero, registro.insc_bairro, registro.insc_periodo, registro.insc_etapa, registro.insc_anoletivo, registro.insc_turma, registro.insc_dataalocacao);
+                let rota = null;
+                if (registro.rot_codigo) {
+                    let veiculo = new Veiculo(registro.vei_codigo, registro.vei_renavam, registro.vei_placa, registro.vei_modelo, registro.vei_capacidade, registro.vei_tipo);
+                    rota = new defRota(registro.rot_codigo, registro.rot_nome, registro.rot_km, registro.rot_periodo, registro.rot_tempoinicio, registro.rot_tempofinal, veiculo);
+                }
+                const inscricao = new Inscricao(registro.insc_ano, aluno, pontoEmbarque, escola, rota, registro.insc_cep, registro.insc_rua, registro.insc_numero, registro.insc_bairro, registro.insc_periodo, registro.insc_etapa, registro.insc_anoletivo, registro.insc_turma, registro.insc_dataAlocacao);
                 listaInscricoes.push(inscricao);
             }
         }
@@ -74,10 +83,12 @@ export default class InscricaoDAO {
             e.esc_nome,e.esc_tipo, e.esc_email, e.esc_telefone,
             a.alu_nome, a.alu_rg,a.alu_observacoes,a.alu_dataNasc,a.alu_celular,
 			r.rot_nome, r.rot_km, r.rot_periodo, r.rot_tempoinicio, r.rot_tempofinal,
-            i.pde_codigo, i.esc_codigo, i.alu_codigo, i.rot_codigo
+            i.pde_codigo, i.esc_codigo, i.alu_codigo, i.rot_codigo,
+            v.vei_codigo, v.vei_renavam, v.vei_placa, v.vei_modelo, v.vei_capacidade, v.vei_tipo
             FROM inscricoes i
             INNER JOIN  pontosdeembarque pd ON i.pde_codigo = pd.pde_codigo
 			LEFT JOIN  rotas r ON i.rot_codigo = r.rot_codigo
+            LEFT JOIN veiculos v ON r.vei_codigo = v.vei_codigo
             INNER JOIN  escolas e ON i.esc_codigo = e.esc_codigo
             INNER JOIN  alunos a ON i.alu_codigo = a.alu_codigo
             ORDER BY i.insc_ano DESC, a.alu_nome;
@@ -87,7 +98,12 @@ export default class InscricaoDAO {
                 const escola = new Escola(registro.esc_codigo, registro.esc_nome, registro.esc_tipo, registro.esc_email, registro.esc_telefone);
                 const aluno = new Aluno(registro.alu_codigo, registro.alu_nome, registro.alu_rg, registro.alu_observacoes, registro.alu_datanasc, registro.alu_celular);
                 const pontoEmbarque = new PontoEmbarque(registro.pde_codigo, registro.pde_rua, registro.pde_numero, registro.pde_bairro, registro.pde_cep);
-                const inscricao = new Inscricao(registro.insc_ano, aluno, pontoEmbarque, escola, registro.rot_codigo, registro.insc_cep, registro.insc_rua, registro.insc_numero, registro.insc_bairro, registro.insc_periodo, registro.insc_etapa, registro.insc_anoletivo, registro.insc_turma, registro.insc_dataalocacao);
+                let rota = null;
+                if (registro.rot_codigo) {
+                    let veiculo = new Veiculo(registro.vei_codigo, registro.vei_renavam, registro.vei_placa, registro.vei_modelo, registro.vei_capacidade, registro.vei_tipo);
+                    rota = new defRota(registro.rot_codigo, registro.rot_nome, registro.rot_km, registro.rot_periodo, registro.rot_tempoinicio, registro.rot_tempofinal, veiculo);
+                }
+                const inscricao = new Inscricao(registro.insc_ano, aluno, pontoEmbarque, escola, rota, registro.insc_cep, registro.insc_rua, registro.insc_numero, registro.insc_bairro, registro.insc_periodo, registro.insc_etapa, registro.insc_anoletivo, registro.insc_turma, registro.insc_dataAlocacao);
                 listaInscricoes.push(inscricao);
             }
         }
