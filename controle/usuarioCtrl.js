@@ -27,7 +27,7 @@ export default class UsuarioCtrl {
             const celular = dados.celular;
             if (nome && senha && cpf && email && celular) {
                 const usuario = new Usuario(nome, senha, cpf, email, celular);
-                const client = await poolConexao.connect();
+                const client = await poolConexao.getInstance().connect();
                 try {
                     await client.query('BEGIN');
                     usuario.gravar(client).then(() => {
@@ -82,7 +82,7 @@ export default class UsuarioCtrl {
         }
         try {
             const usuario = new Usuario(nome);
-            const client = await poolConexao.connect();
+            const client = await poolConexao.getInstance().connect();
             await client.query('BEGIN');
             const usuarioConsultado = await usuario.consultar(nome);
             if (usuarioConsultado && usuarioConsultado[0].cpf === cpf && usuarioConsultado[0].senha === senha) {
@@ -118,8 +118,9 @@ export default class UsuarioCtrl {
             const email = dados.email;
             const celular = dados.celular;
             const usuario = new Usuario(nome, senha, cpf, email, celular);
+            console.log(usuario.nome);
             if (nome && senha && cpf && email && celular) {
-                const client = await poolConexao.connect();
+                const client = await poolConexao.getInstance().connect();
                 try {
                     await client.query('BEGIN');
                     usuario.atualizar(client).then(() => {
@@ -129,6 +130,8 @@ export default class UsuarioCtrl {
                             "mensagem": 'Usuario alterado com sucesso!'
                         });
                         client.query('COMMIT');
+                        console.log(client);
+                        console.log(usuario.nome);
                     }).catch(async (erro) => {
                         await client.query('ROLLBACK');
                         if (erro.code === '23505') {
@@ -136,11 +139,15 @@ export default class UsuarioCtrl {
                                 "status": false,
                                 "mensagem": 'CPF já cadastrado.'
                             });
+                            console.log(client);
+                            console.log(usuario.nome);
                         } else {
                             resposta.status(500).json({
                                 "status": false,
                                 "mensagem": 'Erro ao alterar o usuario: ' + erro.message
                             });
+                            console.log(client);
+                            console.log(usuario.nome);
                         }
                     });
                 } catch (e) {
@@ -169,16 +176,16 @@ export default class UsuarioCtrl {
         resposta.type('application/json');
         if (requisicao.method === 'DELETE' && requisicao.is('application/json')) {
             const dados = requisicao.body;
-            const nome = dados.nome;
-            if (nome) {
-                const client = await poolConexao.connect();
+            const cpf = dados.cpf;
+            if (cpf) {
+                const client = await poolConexao.getInstance().connect();
                 try {
                     await client.query('BEGIN');
-                    const usuario = new Usuario(nome);
+                    const usuario = new Usuario('','',cpf);
                     usuario.excluir(client).then(() => {
                         resposta.status(200).json({
                             "status": true,
-                            "nomeUsuario": usuario.nome,
+                            "cpfUsuario": usuario.cpf,
                             "mensagem": 'Usuario excluído com sucesso!'
                         });
                         client.query('COMMIT');
@@ -199,7 +206,7 @@ export default class UsuarioCtrl {
             else {
                 resposta.status(400).json({
                     "status": false,
-                    "mensagem": 'Por favor, informe o nome da usuario!'
+                    "mensagem": 'Por favor, informe o cpf do usuario!'
                 });
             }
         }
@@ -218,7 +225,7 @@ export default class UsuarioCtrl {
             termo = '';
         }
         if (requisicao.method === 'GET') {
-            const client = await poolConexao.connect();
+            const client = await poolConexao.getInstance().connect();
             const usuarios = new Usuario();
             usuarios.consultar(termo, client).then((listaUsuarios) => {
                 console.log(listaUsuarios);

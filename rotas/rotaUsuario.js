@@ -1,4 +1,4 @@
-import {Router} from 'express';
+import { Router } from 'express';
 import UsuarioCtrl from '../controle/usuarioCtrl.js';
 
 const userCtrl = UsuarioCtrl.getInstance();
