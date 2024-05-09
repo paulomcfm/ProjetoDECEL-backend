@@ -114,7 +114,7 @@ export default class InscricaoDAO {
         let sql = '';
         let parametros = [];
         const listaInscricoes = [];
-        sql = `SELECT i.insc_ano, i.insc_anoletivo, i.insc_etapa, i.insc_turma, i.insc_periodo, i.insc_rua, i.insc_numero, i.insc_bairro, i.insc_cep, i.insc_dataAlocacao,
+        sql = `SELECT i.insc_ano, i.insc_anoletivo, i.insc_etapa, i.insc_turma, i.insc_periodo, i.insc_rua, i.insc_numero, i.insc_bairro, i.insc_cep, i.insc_dataAlocacao, i.rot_codigo,
             pd.pde_rua, pd.pde_numero, pd.pde_bairro, pd.pde_cep,
             e.esc_nome, e.esc_tipo, e.esc_email, e.esc_telefone,
             a.alu_nome, a.alu_rg, a.alu_observacoes, a.alu_dataNasc, a.alu_celular
