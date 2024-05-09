@@ -138,9 +138,9 @@ CREATE TABLE Rotas_tem_Motoristas (
 
 -- Inserts para a tabela Usuarios
 INSERT INTO Usuarios (user_nome, user_senha, user_cpf, user_email, user_celular)
-VALUES ('usuario1', 'senha123', '123.456.789-00', 'usuario1@email.com', '(123) 456-7890'),
-       ('usuario2', 'senha456', '987.654.321-00', 'usuario2@email.com', '(987) 654-3210'),
-       ('usuario3', 'senha789', '111.222.333-44', 'usuario3@email.com', '(111) 222-3333');
+VALUES ('usuario1', 'senha123', '123.456.789-00', 'usuario1@email.com', '(12) 93456-7890'),
+       ('usuario2', 'senha456', '987.654.321-00', 'usuario2@email.com', '(98) 97654-3210'),
+       ('usuario3', 'senha789', '111.222.333-44', 'usuario3@email.com', '(11) 91222-3333');
 
 -- Inserts para a tabela Veiculos
 INSERT INTO Veiculos (vei_renavam, vei_placa, vei_modelo, vei_capacidade, vei_tipo)
@@ -151,15 +151,15 @@ VALUES ('12345678901', 'ABC123', 'Ônibus', 5, 'C'),
 
 -- Inserts para a tabela Responsaveis
 INSERT INTO Responsaveis (resp_nome, resp_rg, resp_cpf, resp_email, resp_telefone, resp_celular)
-VALUES ('Responsavel 1', '1234567-8', '123.456.789-00', 'responsavel1@email.com', '(123) 456-7890', '(123) 456-7890'),
-       ('Responsavel 2', '9876543-2', '987.654.321-00', 'responsavel2@email.com', '(987) 654-3210', '(987) 654-3210'),
-       ('Responsavel 3', '1112223-4', '111.222.333-44', 'responsavel3@email.com', '(111) 222-3333', '(111) 222-3333');
+VALUES ('Responsavel 1', '1234567-8', '123.456.789-00', 'responsavel1@email.com', '(21) 2345-6789', '(22) 93456-7890'),
+       ('Responsavel 2', '9876543-2', '987.654.321-00', 'responsavel2@email.com', '(33) 4567-8901', '(44) 95678-9012'),
+       ('Responsavel 3', '1112223-4', '111.222.333-44', 'responsavel3@email.com', '(55) 6789-0123', '(66) 97890-1234');
 
 -- Inserts para a tabela Alunos
 INSERT INTO Alunos (alu_nome, alu_rg, alu_observacoes, alu_datanasc, alu_celular)
-VALUES ('Aluno 1', '1234567-8', 'Observacoes sobre Aluno 1', '2005-01-01', '(123) 456-7890'),
-       ('Aluno 2', '9876543-2', 'Observacoes sobre Aluno 2', '2006-02-02', '(987) 654-3210'),
-       ('Aluno 3', '1112223-4', 'Observacoes sobre Aluno 3', '2007-03-03', '(111) 222-3333');
+VALUES ('Aluno 1', '1234567-8', 'Observacoes sobre Aluno 1', '2005-01-01', '(77) 98901-2345'),
+       ('Aluno 2', '9876543-2', 'Observacoes sobre Aluno 2', '2006-02-02', '(88) 99012-3456'),
+       ('Aluno 3', '1112223-4', 'Observacoes sobre Aluno 3', '2007-03-03', '(99) 90123-4567');
 
 -- Inserts para a tabela Parentescos
 INSERT INTO Parentescos (alu_codigo, resp_codigo, par_parentesco)
