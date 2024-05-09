@@ -73,7 +73,7 @@ export default class InscricaoDAO {
                     let veiculo = new Veiculo(registro.vei_codigo, registro.vei_renavam, registro.vei_placa, registro.vei_modelo, registro.vei_capacidade, registro.vei_tipo);
                     rota = new defRota(registro.rot_codigo, registro.rot_nome, registro.rot_km, registro.rot_periodo, registro.rot_tempoinicio, registro.rot_tempofinal, veiculo);
                 }
-                const inscricao = new Inscricao(registro.insc_ano, aluno, pontoEmbarque, escola, rota, registro.insc_cep, registro.insc_rua, registro.insc_numero, registro.insc_bairro, registro.insc_periodo, registro.insc_etapa, registro.insc_anoletivo, registro.insc_turma, registro.insc_dataAlocacao);
+                const inscricao = new Inscricao(registro.insc_ano, aluno, pontoEmbarque, escola, rota, registro.insc_cep, registro.insc_rua, registro.insc_numero, registro.insc_bairro, registro.insc_periodo, registro.insc_etapa, registro.insc_anoletivo, registro.insc_turma, registro.insc_dataalocacao);
                 listaInscricoes.push(inscricao);
             }
         }
@@ -103,7 +103,7 @@ export default class InscricaoDAO {
                     let veiculo = new Veiculo(registro.vei_codigo, registro.vei_renavam, registro.vei_placa, registro.vei_modelo, registro.vei_capacidade, registro.vei_tipo);
                     rota = new defRota(registro.rot_codigo, registro.rot_nome, registro.rot_km, registro.rot_periodo, registro.rot_tempoinicio, registro.rot_tempofinal, veiculo);
                 }
-                const inscricao = new Inscricao(registro.insc_ano, aluno, pontoEmbarque, escola, rota, registro.insc_cep, registro.insc_rua, registro.insc_numero, registro.insc_bairro, registro.insc_periodo, registro.insc_etapa, registro.insc_anoletivo, registro.insc_turma, registro.insc_dataAlocacao);
+                const inscricao = new Inscricao(registro.insc_ano, aluno, pontoEmbarque, escola, rota, registro.insc_cep, registro.insc_rua, registro.insc_numero, registro.insc_bairro, registro.insc_periodo, registro.insc_etapa, registro.insc_anoletivo, registro.insc_turma, registro.insc_dataalocacao);
                 listaInscricoes.push(inscricao);
             }
         }
