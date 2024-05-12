@@ -8,8 +8,10 @@ export default class Aluno {
     #dataNasc;
     #celular;
     #responsaveis = [];
+    #status;
+    #motivoInativo;
 
-    constructor(codigo = 0, nome = '', rg = '', observacoes = '', dataNasc = '', celular = '', responsaveis = []) {
+    constructor(codigo = 0, nome = '', rg = '', observacoes = '', dataNasc = '', celular = '', responsaveis = [], status = '', motivoInativo = '') {
         this.#codigo = codigo;
         this.#nome = nome;
         this.#rg = rg;
@@ -17,6 +19,8 @@ export default class Aluno {
         this.#dataNasc = dataNasc;
         this.#celular = celular;
         this.#responsaveis = responsaveis;
+        this.#status = status;
+        this.#motivoInativo = motivoInativo;
     }
 
     get codigo() {
@@ -75,13 +79,29 @@ export default class Aluno {
         this.#responsaveis = novoResponsavel;
     }
 
+    get status() {
+        return this.#status;
+    }
+
+    set status(novoStatus) {
+        this.#status = novoStatus;
+    }
+
+    get motivoInativo() {
+        return this.#motivoInativo;
+    }
+
+    set motivoInativo(novoMotivoInativo) {
+        this.#motivoInativo = novoMotivoInativo;
+    }
+
     validarDataNascimento(data) {
         const targetDate = new Date(data);
         const currentDate = new Date();
         const past100Years = new Date(currentDate.getFullYear() - 100, currentDate.getMonth(), currentDate.getDate());
       
         return targetDate <= currentDate && targetDate >= past100Years;
-      }
+    }
 
     toJSON() {
         return {
@@ -91,7 +111,9 @@ export default class Aluno {
             observacoes: this.#observacoes,
             dataNasc: this.#dataNasc,
             celular: this.#celular,
-            responsaveis: this.#responsaveis
+            responsaveis: this.#responsaveis,
+            status: this.#status,
+            motivoInativo: this.#motivoInativo
         }
     }
 

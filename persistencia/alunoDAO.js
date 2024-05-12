@@ -3,8 +3,8 @@ import Aluno from "../modelo/aluno.js";
 export default class AlunoDAO {
     async gravar(aluno, client) {
         if (aluno instanceof Aluno) {
-            const sql = "INSERT INTO alunos(alu_nome, alu_rg, alu_observacoes, alu_dataNasc, alu_celular) VALUES($1,$2,$3,$4,$5) RETURNING alu_codigo;";
-            const parametros = [aluno.nome, aluno.rg, aluno.observacoes, aluno.dataNasc, aluno.celular];
+            const sql = "INSERT INTO alunos(alu_nome, alu_rg, alu_observacoes, alu_dataNasc, alu_celular, alu_status, alu_motivoInativo) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING alu_codigo;";
+            const parametros = [aluno.nome, aluno.rg, aluno.observacoes, aluno.dataNasc, aluno.celular, aluno.status, aluno.motivoInativo];
 
             const retorno = await client.query(sql, parametros);
             aluno.codigo = retorno.rows[0].alu_codigo;
@@ -13,8 +13,8 @@ export default class AlunoDAO {
 
     async atualizar(aluno, client) {
         if (aluno instanceof Aluno) {
-            const sql = "UPDATE alunos SET alu_nome = $1, alu_rg = $2, alu_observacoes = $3, alu_dataNasc = $4, alu_celular = $5 WHERE alu_codigo = $6";
-            const parametros = [aluno.nome, aluno.rg, aluno.observacoes, aluno.dataNasc, aluno.celular, aluno.codigo];
+            const sql = "UPDATE alunos SET alu_nome = $1, alu_rg = $2, alu_observacoes = $3, alu_dataNasc = $4, alu_celular = $5, alu_status = $6, alu_motivoInativo = $7 WHERE alu_codigo = $8";
+            const parametros = [aluno.nome, aluno.rg, aluno.observacoes, aluno.dataNasc, aluno.celular, aluno.status, aluno.motivoInativo, aluno.codigo];
 
             await client.query(sql, parametros);
 
@@ -70,7 +70,9 @@ export default class AlunoDAO {
                     observacoes: registro.alu_observacoes,
                     dataNasc: registro.alu_datanasc,
                     celular: registro.alu_celular,
-                    responsaveis: []
+                    responsaveis: [],
+                    status: registro.alu_status,
+                    motivoInativo: registro.alu_motivoinativo
                 };
             }
             const responsavel = {

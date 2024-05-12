@@ -32,7 +32,9 @@ CREATE TABLE Alunos (
     alu_rg VARCHAR(20) NOT NULL UNIQUE,
     alu_observacoes VARCHAR(255),
     alu_datanasc DATE NOT NULL,
-    alu_celular VARCHAR(16)
+    alu_celular VARCHAR(16),
+    alu_status CHAR DEFAULT 'A',
+    alu_motivoInativo VARCHAR(255)
 );
 
 CREATE TABLE Parentescos (

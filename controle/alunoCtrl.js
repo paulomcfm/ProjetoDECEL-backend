@@ -25,7 +25,9 @@ export default class AlunoCtrl {
             const dataNasc = dados.dataNasc;
             const celular = dados.celular;
             const responsaveis = dados.responsaveis;
-            const aluno = new Aluno(0, nome, rg, observacoes, dataNasc, celular, responsaveis);
+            const status = dados.status;
+            const motivoInativo = dados.motivoInativo;
+            const aluno = new Aluno(0, nome, rg, observacoes, dataNasc, celular, responsaveis, status, motivoInativo);
             if (nome && rg && aluno.validarDataNascimento(dataNasc)) {
                 const client = await poolConexao.getInstance().connect();
                 try {
@@ -89,14 +91,16 @@ export default class AlunoCtrl {
             const dataNasc = dados.dataNasc;
             const celular = dados.celular;
             const responsaveis = dados.responsaveis;
-            const aluno = new Aluno(codigo, nome, rg, observacoes, dataNasc, celular, responsaveis);
+            const status = dados.status;
+            const motivoInativo = dados.motivoInativo;
+            const aluno = new Aluno(codigo, nome, rg, observacoes, dataNasc, celular, responsaveis, status, motivoInativo);
             if (codigo >= 0 && nome && rg && aluno.validarDataNascimento(dataNasc)) {
                 const client = await poolConexao.getInstance().connect();
                 try {
                     await client.query('BEGIN');
                     const parentescos = new Parentesco();
-                    const res = await parentescos.consultarAluno(aluno.codigo, client);
-                    const responsaveisFaltantes = res.filter(responsavel => {
+                    const parentescosDoAluno = await parentescos.consultarAluno(aluno.codigo, client);
+                    const responsaveisFaltantes = parentescosDoAluno.filter(responsavel => {
                         return !aluno.responsaveis.some(alunoResponsavel => alunoResponsavel.codigo === responsavel.codigoResponsavel);
                     });
                     for (const responsavel of responsaveisFaltantes) { // remover parentescos que existiam mas não existem mais
@@ -105,14 +109,14 @@ export default class AlunoCtrl {
                         await par.excluir(client);
                     }
                     const responsaveisNovos = aluno.responsaveis.filter(responsavel => {
-                        return !res.some(parentesco => parentesco.codigoResponsavel === responsavel.codigo);
+                        return !parentescosDoAluno.some(parentesco => parentesco.codigoResponsavel === responsavel.codigo);
                     });
                     for (const responsavel of responsaveisNovos) { // incluir novos parentescos
                         const resp = new Responsavel(responsavel.codigo);
                         const par = new Parentesco(aluno.codigo, resp.codigo, responsavel.parentesco);
                         await par.gravar(client);
                     }
-                    const parentescosAtuais = res.filter(responsavel => {
+                    const parentescosAtuais = parentescosDoAluno.filter(responsavel => {
                         return aluno.responsaveis.some(alunoResponsavel => alunoResponsavel.codigo === responsavel.codigoResponsavel);
                     });
                     for (const responsavel of parentescosAtuais) { // atualizar parentescos que já existiam
