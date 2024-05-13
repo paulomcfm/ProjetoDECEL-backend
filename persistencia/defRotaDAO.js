@@ -9,8 +9,8 @@ export default class defRotaDAO{
 
     async gravar(client,rotaModelo){
         try{
-            const sql = 'INSERT INTO Rotas (rot_nome, rot_km, rot_periodo, rot_tempoInicio, rot_tempoFinal, vei_codigo, mon_codigo) values ($1,$2,$3,$4,$5,$6,$7) RETURNING rot_codigo'
-            const values = [rotaModelo.nome,rotaModelo.km,rotaModelo.periodo,rotaModelo.ida,rotaModelo.volta,rotaModelo.veiculo,rotaModelo.monitor]
+            const sql = 'INSERT INTO Rotas (rot_nome, rot_km, rot_periodo, rot_tempoInicio, rot_tempoFinal, vei_codigo, mon_codigo,status) values ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING rot_codigo'
+            const values = [rotaModelo.nome,rotaModelo.km,rotaModelo.periodo,rotaModelo.ida,rotaModelo.volta,rotaModelo.veiculo,rotaModelo.monitor,true]
             const retorno = await client.query(sql,values)
             rotaModelo.codigo = retorno.rows[0].rot_codigo
         }catch(erro){
@@ -18,27 +18,6 @@ export default class defRotaDAO{
         }
     }
 
-    async gravarPontos(client,rotaModelo){
-        let sql = ''
-        let values = []
-        let ordem=0
-        for(const ponto of rotaModelo.pontos){
-            ordem++;
-            sql = 'INSERT INTO rotas_tem_pontosdeembarque(rot_codigo,pde_codigo,ordem) values ($1,$2,$3)'
-            values = [rotaModelo.codigo,ponto,''+ordem]
-            await client.query(sql,values)
-        }
-    }
-
-    async gravarMotoristas(client,rotaModelo){
-        let sql = ''
-        let values = []
-        for(const motorista of rotaModelo.motoristas){
-            sql = 'INSERT INTO rotas_tem_motoristas(rot_codigo,moto_id) values ($1,$2)'
-            values = [rotaModelo.codigo,motorista]
-            await client.query(sql,values)
-        }
-    }
 
     async consultar(client,termo){
         try{
@@ -46,9 +25,9 @@ export default class defRotaDAO{
             let sql;
             let values
             if(termo === ''){
-                sql = 'SELECT * FROM rotas'
+                sql = 'SELECT * FROM rotas WHERE status = true'
             }else{
-                sql = 'SELECT * FROM rotas WHERE rot_nome ilike $1'
+                sql = 'SELECT * FROM rotas WHERE rot_nome ilike $1 and status = true'
                 values = ['%'+termo+'%']
             }
             
@@ -61,7 +40,7 @@ export default class defRotaDAO{
                 sql = 'SELECT * FROM monitores WHERE mon_codigo = $1'
                 values = [registro.mon_codigo]
                 const { rows: monitor, fields: camposM } = await client.query(sql,values)
-                const rota = new defRota(registro.rot_codigo,registro.rot_nome,registro.rot_km,registro.rot_periodo,registro.rot_tempoinicio,registro.rot_tempofinal,veiculo,monitor,[],[])
+                const rota = new defRota(registro.rot_codigo,registro.rot_nome,registro.rot_km,registro.rot_periodo,registro.rot_tempoinicio,registro.rot_tempofinal,veiculo,monitor,[],[],null,registro.status)
                 lista.push(rota)
 
             }
@@ -72,37 +51,15 @@ export default class defRotaDAO{
         }
     }
 
-    async consultarPontos(client,rotaModelo){
-        let lista = []
-        let sql = "SELECT * FROM rotas_tem_pontosdeembarque INNER JOIN pontosdeembarque ON pontosdeembarque.pde_codigo = rotas_tem_pontosdeembarque.pde_codigo where rot_codigo = $1 order by ordem asc "
-        let values = [rotaModelo.codigo]
-        const { rows: registros, fields: campos } = await client.query(sql,values)
-        for(const registro of registros){
-            const ponto = new pontoEmbarque(registro.pde_codigo,registro.pde_rua,registro.pde_numero,registro.pde_bairro,registro.pde_cep)
-            lista.push(ponto)
-        }
-        rotaModelo.pontos = lista
-    }
-
-    async consultarMotoristas(client,rotaModelo){
-        let lista = []
-        let sql = "SELECT * FROM ((SELECT * FROM rotas_tem_motoristas WHERE rot_codigo = $1) as rota INNER JOIN motoristas on motoristas.moto_id = rota.moto_id)"
-        let values = [rotaModelo.codigo]
-        const { rows: registros, fields: campos } = await client.query(sql,values)
-        for(const registro of registros){
-            const moto = new motorista(registro.moto_id,registro.moto_nome,registro.moto_cnh,registro.moto_celular)
-            lista.push(moto.toJson())
-        }
-        rotaModelo.motoristas = lista
-    }
-
 
     async consultarQtdInscricoes(client,rotaModelo){
         let sql = "select count(rot_codigo) as qtd from inscricoes where rot_codigo = $1 Group by rot_codigo;"
         let values = [rotaModelo.codigo]
         const { rows: registros, fields: campos } = await client.query(sql,values)
-        return registros
+        return registros.length>0? registros[0].qtd:0
     }
+
+
 
 
     async consultarInscricoes(client,rotaModelo){
@@ -132,26 +89,6 @@ export default class defRotaDAO{
             let sql = "UPDATE rotas SET rot_nome=$2,rot_km=$3,rot_periodo=$4,rot_tempoInicio=$5,rot_tempoFinal=$6,vei_codigo=$7,mon_codigo=$8 WHERE rot_codigo = $1"
             let values = [rotaModelo.codigo,rotaModelo.nome,rotaModelo.km,rotaModelo.periodo,rotaModelo.ida,rotaModelo.volta,rotaModelo.veiculo,rotaModelo.monitor]
             await client.query(sql,values)
-            sql = "DELETE FROM rotas_tem_motoristas WHERE rot_codigo = $1"
-            values = [rotaModelo.codigo]
-            
-            await client.query(sql,values)
-            for(let i=0;i<rotaModelo.motoristas.length;i++){
-                sql = "INSERT INTO rotas_tem_motoristas(rot_codigo,moto_id) values ($1,$2)"
-                values = [rotaModelo.codigo,rotaModelo.motoristas[i]]
-                await client.query(sql,values)
-            }
-
-            sql = "DELETE FROM rotas_tem_pontosdeembarque WHERE rot_codigo = $1"
-            values = [rotaModelo.codigo]
-            await client.query(sql,values)
-            let ordem = 0
-            for(let i=0;i<rotaModelo.pontos.length;i++){
-                ordem++;
-                sql = "INSERT INTO rotas_tem_pontosdeembarque(rot_codigo,pde_codigo,ordem) values ($1,$2,$3)"
-                values = [rotaModelo.codigo,rotaModelo.pontos[i],ordem]
-                await client.query(sql,values)
-            }
         }catch(erro){
             console.error("Ocorreu um erro durante a atualização:", erro);
             await client.query('ROLLBACK');
@@ -166,6 +103,16 @@ export default class defRotaDAO{
             await client.query(sql,values)
         }catch(erro){
             await client.query('ROLLBACK')
+            throw erro
+        }
+    }
+
+    async desativar(client,rotaCodigo){
+        try{
+            let sql = 'UPDATE rotas SET status=false WHERE rot_codigo = $1'
+            let values = [rotaCodigo]
+            await client.query(sql,values)
+        }catch(erro){
             throw erro
         }
     }

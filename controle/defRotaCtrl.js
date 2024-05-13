@@ -163,29 +163,92 @@ export default class defRotaCtrl {
         }
     }
 
-    async atualizar(requisao, resposta) {
-        const dados = requisao.body
-        const rota = new defRota(dados.codigo, dados.nome, dados.km, dados.periodo, dados.ida, dados.volta, dados.veiculo, dados.monitor, JSON.parse(dados.pontos), JSON.parse(dados.motoristas), [])
+    async atualizar(requisicao, resposta) {
+        const dados = JSON.parse(requisicao.body.rota)
+        const aceito = requisicao.body.aceito
 
+        const rota = new defRota(dados.codigo, dados.nome, dados.km, dados.periodo, dados.ida, dados.volta, dados.veiculo, dados.monitor, JSON.parse(dados.pontos), JSON.parse(dados.motoristas), [])
+        
+        
+        
         try {
-            const client = await poolConexao.connect()
-            await client.query('BEGIN')
-            await rota.atualizar(client).then(() => {
+            const client = await poolConexao.getInstance().connect()
+            try{
+                await client.query('BEGIN')
+
+                const qtd = await rota.consultarQtdInscricoes(client)
+                console.log(aceito)
+                if(aceito !=1 && qtd>0){
+                    resposta.status(500).json({
+                        status: false,
+                        mensagem: 'Rota possui inscrições vinculadas a ela'
+                    })
+                }
+                else{
+                    if(aceito == 1){
+                        await rota.desativar(client)
+
+                        await rota.gravar(client)
+ 
+                        // lista sera usada para guardar os objetos de ponto de embarque
+                        let lista = []
+                        for (const ponto of rota.pontos) {
+                            lista.push(new PontoEmbarque(ponto))
+                        }
+                        const rotaP = new Rotas_Pontos(rota, lista)
+                        await rotaP.gravar(client)
+                        // lista sera usada para guardar os objetos de motoristas
+                        lista = []
+                        for (const motorista of rota.motoristas) {
+                            lista.push(new Motorista(motorista))
+                        }
+                        const rotaM = new Rotas_Motoristas(rota, lista)
+                        await rotaM.gravar(client)
+
+                        
+                        resposta.status(200).json({
+                            status: true,
+                            mensagem: "Rota duplicada com sucesso!!!"
+                        })
+                    }
+                    else{
+                        await rota.atualizar(client)
+                        await new Rotas_Pontos().deletar(client, rota.codigo)
+                        await new Rotas_Motoristas().deletar(client, rota.codigo)
+                        // lista sera usada para guardar os objetos de ponto de embarque
+                        let lista = []
+                        for (const ponto of rota.pontos) {
+                            lista.push(new PontoEmbarque(ponto))
+                        }
+                        const rotaP = new Rotas_Pontos(rota, lista)
+                        await rotaP.gravar(client)
+                        // lista sera usada para guardar os objetos de motoristas
+                        lista = []
+                        for (const motorista of rota.motoristas) {
+                            lista.push(new Motorista(motorista))
+                        }
+                        const rotaM = new Rotas_Motoristas(rota, lista)
+                        await rotaM.gravar(client)
+
+                        resposta.status(200).json({
+                            status: true,
+                            mensagem: "Rota atualizada com sucesso!!!"
+                        })
+                    }
+                }
                 client.query('COMMIT')
-                resposta.status(200).json({
-                    status: true,
-                    mensagem: "Rota atualizada com sucesso!!!"
-                })
-            }).catch(async (erro) => {
+            }catch(erro){
                 await client.query('ROLLBACK');
                 resposta.status(500).json({
                     status: false,
                     mensagem: 'Erro ao atualizar a rota: ' + erro,
                 })
-            }).finally(() => {
-                client.release()
-            })
+            }
+            
+            client.release()
+            
         } catch (erro) {
+            console.log(erro)
             resposta.status(500).json({
                 status: false,
                 mensagem: 'Erro ao atualizar a rota: ' + erro,
