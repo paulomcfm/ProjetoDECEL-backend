@@ -2,8 +2,8 @@ import {Router} from 'express';
 import UsuarioCtrl from '../controle/usuarioCtrl.js';
 
 const userCtrl = UsuarioCtrl.getInstance();
-const rotaAutenticar = new Router();
+const rotaEnviarEmail = new Router();
 
-rotaAutenticar.get('/', userCtrl.autenticar);
+rotaEnviarEmail.post('/', userCtrl.enviarEmail);
 
-export default rotaAutenticar;
+export default rotaEnviarEmail;

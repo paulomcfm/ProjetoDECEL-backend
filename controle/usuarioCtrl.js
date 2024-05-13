@@ -1,5 +1,11 @@
 import Usuario from "../modelo/usuario.js";
 import poolConexao from "../persistencia/conexao.js";
+import enviarCodigo from "../servicos/servicoEmail.js"
+
+function gerarCodigo() {
+    const codigo = Math.floor(10000 + Math.random() * 90000);
+    return codigo.toString();
+}
 
 export default class UsuarioCtrl {
     static _instance = null;
@@ -65,8 +71,7 @@ export default class UsuarioCtrl {
     }
 
     async autenticar(requisicao, resposta) {
-        resposta.type('application/json');
-    
+        resposta.type('application/json');  
         if (requisicao.method !== 'GET' || !requisicao.is('application/json')) {
             return resposta.status(400).json({
                 "status": false,
@@ -102,6 +107,52 @@ export default class UsuarioCtrl {
             resposta.status(500).json({
                 "status": false,
                 "mensagem": 'Erro ao autenticar o usuario: ' + erro.message
+            });
+        } finally {
+            client.release();
+        }
+    }
+
+    async enviarEmail(requisicao, resposta) {
+        resposta.type('application/json');
+        let codigo;
+        if (requisicao.method !== 'POST' || !requisicao.is('application/json')) {
+            return resposta.status(400).json({
+                "status": false,
+                "mensagem": 'Por favor, utilize o método POST e envie os dados no formato JSON para enviar o e-mail!'
+            });
+        }
+        const { provedor, email } = requisicao.body;
+        if (!provedor || !email) {
+            return resposta.status(401).json({
+                "status": false,
+                "mensagem": 'Erro não foi possível obter o provedor e o e-mail do usuário'
+            });
+        }
+        try {
+            const usuario = new Usuario('','','',email);
+            const client = await poolConexao.getInstance().connect();
+            await client.query('BEGIN');
+            codigo = gerarCodigo();
+            const enviar = enviarCodigo(email, codigo);
+            const usuarioConsultado = await usuario.consultar(email);
+            if (usuarioConsultado && enviar) {
+                resposta.status(201).json({
+                    "status": true,
+                    "mensagem": 'E-mail enviado para o usuário com sucesso!'
+                });
+            } else {
+                resposta.status(401).json({
+                    "status": false,
+                    "mensagem": 'E-mail inválido!'
+                });
+            }
+            await client.query('COMMIT');
+        } catch (erro) {
+            await client.query('ROLLBACK');
+            resposta.status(500).json({
+                "status": false,
+                "mensagem": 'Erro ao enviar e-mail do usuario: ' + erro.message
             });
         } finally {
             client.release();
