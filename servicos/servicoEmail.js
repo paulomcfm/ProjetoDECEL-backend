@@ -10,8 +10,7 @@ const transporter = nodemailer.createTransport({
 
 
 // Função para enviar e-mail com o código
-export default function enviarCodigo(destinatario, codigo) {
-    console.log(nodemailer);
+export default async function enviarCodigo(destinatario, codigo) {
     try {
         // Opções do e-mail
         const mailOptions = {
@@ -20,9 +19,8 @@ export default function enviarCodigo(destinatario, codigo) {
             subject: 'Código de Verificação',
             text: `Seu código de verificação é: ${codigo}`
         };
-
-        // Envia o e-mail
-        const info = transporter.sendMail(mailOptions);
+        // Envia o e-mail e aguarda a resposta (utilizando async/await)
+        const info = await transporter.sendMail(mailOptions);
         console.log('E-mail enviado: ', info.response);
         return true; // Indica que o e-mail foi enviado com sucesso
     } catch (error) {
