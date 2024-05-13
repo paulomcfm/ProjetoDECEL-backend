@@ -87,6 +87,7 @@ CREATE TABLE Rotas (
   rot_tempoFinal VARCHAR(45) NOT NULL,
   vei_codigo INT NOT NULL,
   mon_codigo INT NOT NULL,
+  status BOOLEAN,
   CONSTRAINT fk_rotas_veiculos FOREIGN KEY (vei_codigo) REFERENCES Veiculos(vei_codigo),
   CONSTRAINT fk_rotas_monitores FOREIGN KEY (mon_codigo) REFERENCES Monitores(mon_codigo)
 );
@@ -198,10 +199,10 @@ VALUES ('Valdemar', '123.456.789-00', '(123) 456-7890'),
        ('Maria', '111.222.333-55', '(111) 222-4444');
 
 -- Inserts para a tabela Rotas
-INSERT INTO Rotas (rot_nome, rot_km, rot_periodo, rot_tempoInicio, rot_tempoFinal, vei_codigo, mon_codigo)
-VALUES ('Rota 1', 10, 'M', '08:00', '10:00', 1, 1),
-       ('Rota 2', 15, 'T', '13:00', '15:00', 2, 2),
-       ('Rota 3', 20, 'N', '18:00', '20:00', 3, 3);
+INSERT INTO Rotas (rot_nome, rot_km, rot_periodo, rot_tempoInicio, rot_tempoFinal, vei_codigo, mon_codigo,status)
+VALUES ('Rota 1', 10, 'M', '08:00', '10:00', 1, 1,true),
+       ('Rota 2', 15, 'T', '13:00', '15:00', 2, 2,true),
+       ('Rota 3', 20, 'N', '18:00', '20:00', 3, 3,true);
 
 -- Inserts para a tabela Inscricoes
 INSERT INTO Inscricoes (insc_ano, insc_anoLetivo, insc_turma, insc_etapa, insc_periodo, insc_dataAlocacao, insc_rua, insc_cep, insc_numero, insc_bairro, alu_codigo, esc_codigo, pde_codigo, rot_codigo)
