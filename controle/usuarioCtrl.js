@@ -129,9 +129,9 @@ export default class UsuarioCtrl {
                 "mensagem": 'Erro não foi possível obter o provedor e o e-mail do usuário'
             });
         }
+        const usuario = new Usuario('','','',email);
+        const client = await poolConexao.getInstance().connect();
         try {
-            const usuario = new Usuario('','','',email);
-            const client = await poolConexao.getInstance().connect();
             await client.query('BEGIN');
             codigo = gerarCodigo();
             const enviar = enviarCodigo(email, codigo);
