@@ -18,7 +18,7 @@ export default class InscricaoCtrl {
         resposta.type('application/json');
         if (requisicao.method === 'POST' && requisicao.is('application/json')) {
             const dados = requisicao.body;
-            const ano = dados.ano;
+            const ano = new Date().getFullYear();
             const aluno = dados.aluno;
             const pontoEmbarque = dados.pontoEmbarque;
             const escola = dados.escola;
@@ -42,18 +42,10 @@ export default class InscricaoCtrl {
                         });
                         await client.query('COMMIT');
                     }).catch(async (erro) => {
-                        if (erro.code === '23503') {
-                            resposta.status(400).json({
-                                "status": false,
-                                "mensagem": 'Inscrição não pode ser excluída pois está sendo usada.'
-                            });
-                        }
-                        else {
-                            resposta.status(500).json({
-                                "status": false,
-                                "mensagem": 'Erro ao excluir inscrição  : ' + erro.message
-                            });
-                        }
+                        resposta.status(500).json({
+                            "status": false,
+                            "mensagem": 'Erro ao inscrever aluno: ' + erro.message
+                        });
                         await client.query('ROLLBACK');
                     });
                 } catch (e) {
