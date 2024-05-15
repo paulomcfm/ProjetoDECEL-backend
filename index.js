@@ -32,7 +32,7 @@ app.use('/motorista', rotaMotorista);
 app.use('/veiculo', rotaVeiculo);
 app.use('/definir-rota', rotaDefRota);
 app.use('/usuario', rotaUsuario);
-app.use('/autenticar', rotaAutenticar);
+app.use('/usuario/autenticar', rotaAutenticar);
 app.use('/definir-rota',rotaDefRota);
 app.use('/alocar-alunos',rotaAlocarAlunos);
 app.use('/inscricoes-rota',rota_Inscricoes_tem_Rotas);

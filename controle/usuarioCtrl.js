@@ -72,10 +72,10 @@ export default class UsuarioCtrl {
 
     async autenticar(requisicao, resposta) {
         resposta.type('application/json');  
-        if (requisicao.method !== 'GET' || !requisicao.is('application/json')) {
+        if (requisicao.method !== 'POST' || !requisicao.is('application/json')) {
             return resposta.status(400).json({
                 "status": false,
-                "mensagem": 'Por favor, utilize o método GET e envie os dados no formato JSON para autenticar o usuário!'
+                "mensagem": 'Por favor, utilize o método POST e envie os dados no formato JSON para autenticar o usuário!'
             });
         }
         const { nome, cpf, senha } = requisicao.body;
