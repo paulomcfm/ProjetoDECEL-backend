@@ -48,15 +48,15 @@ CREATE TABLE Parentescos (
 
 CREATE TABLE pontosdeembarque (
   pde_codigo SERIAL PRIMARY KEY,
-  pde_rua VARCHAR(45) NOT NULL,
-  pde_bairro VARCHAR(45) NOT NULL,
+  pde_rua VARCHAR(255) NOT NULL,
+  pde_bairro VARCHAR(255) NOT NULL,
   pde_numero VARCHAR(45) NOT NULL,
   pde_cep VARCHAR(45) NOT NULL
 );
 
 CREATE TABLE Escolas (
   esc_codigo SERIAL PRIMARY KEY,
-  esc_nome VARCHAR(45) NOT NULL,
+  esc_nome VARCHAR(255) NOT NULL,
   esc_tipo CHAR NOT NULL,
   esc_email VARCHAR(45) NOT NULL,
   esc_telefone VARCHAR(45) NOT NULL,
@@ -68,19 +68,19 @@ CREATE TABLE Motoristas (
   moto_id SERIAL PRIMARY KEY,
   moto_cnh VARCHAR(45) NOT NULL UNIQUE,
   moto_celular VARCHAR(16) NOT NULL,
-  moto_nome VARCHAR(45) NOT NULL
+  moto_nome VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE Monitores (
   mon_codigo SERIAL PRIMARY KEY,
-  mon_nome VARCHAR(45) NOT NULL,
+  mon_nome VARCHAR(255) NOT NULL,
   mon_cpf VARCHAR(14) NOT NULL UNIQUE,
   mon_celular VARCHAR(16) NOT NULL
 );
 
 CREATE TABLE Rotas (
   rot_codigo SERIAL PRIMARY KEY,
-  rot_nome VARCHAR(45) NOT NULL,
+  rot_nome VARCHAR(255) NOT NULL,
   rot_km INT NOT NULL,
   rot_periodo CHAR NOT NULL,
   rot_tempoInicio VARCHAR(45) NOT NULL,
@@ -99,10 +99,10 @@ CREATE TABLE Inscricoes (
   insc_etapa CHAR NOT NULL,
   insc_periodo CHAR NOT NULL,
   insc_dataAlocacao DATE,
-  insc_rua varchar(45),
+  insc_rua varchar(255),
   insc_cep varchar(45),
   insc_numero varchar(45),
-  insc_bairro varchar(45),
+  insc_bairro varchar(255),
   alu_codigo INT NOT NULL,
   esc_codigo INT NOT NULL,
   pde_codigo INT NOT NULL,
@@ -154,15 +154,24 @@ VALUES ('12345678901', 'ABC123', 'Ônibus', 5, 'C'),
 
 -- Inserts para a tabela Responsaveis
 INSERT INTO Responsaveis (resp_nome, resp_rg, resp_cpf, resp_email, resp_telefone, resp_celular)
-VALUES ('Responsavel 1', '1234567-8', '123.456.789-00', 'responsavel1@email.com', '(21) 2345-6789', '(22) 93456-7890'),
-       ('Responsavel 2', '9876543-2', '987.654.321-00', 'responsavel2@email.com', '(33) 4567-8901', '(44) 95678-9012'),
-       ('Responsavel 3', '1112223-4', '111.222.333-44', 'responsavel3@email.com', '(55) 6789-0123', '(66) 97890-1234');
+VALUES ('Laura Gomes Santos', '1234567-8', '123.456.789-00', 'responsavel1@email.com', '(21) 2345-6789', '(22) 93456-7890'),
+       ('Vitor Martins Costa', '9876543-2', '987.654.321-00', 'responsavel2@email.com', '(33) 4567-8901', '(44) 95678-9012'),
+       ('Breno Lima Cunha', '1112223-4', '111.222.333-44', 'responsavel3@email.com', '(55) 6789-0123', '(66) 97890-1234'),
+       ('Brenda Ribeiro Sousa', '1112223-5', '111.222.333-55', 'email@email', '(55) 6789-0123', '(66) 97890-1234');
 
 -- Inserts para a tabela Alunos
 INSERT INTO Alunos (alu_nome, alu_rg, alu_observacoes, alu_datanasc, alu_celular)
-VALUES ('Aluno 1', '1234567-8', 'Observacoes sobre Aluno 1', '2005-01-01', '(77) 98901-2345'),
-       ('Aluno 2', '9876543-2', 'Observacoes sobre Aluno 2', '2006-02-02', '(88) 99012-3456'),
-       ('Aluno 3', '1112223-4', 'Observacoes sobre Aluno 3', '2007-03-03', '(99) 90123-4567');
+VALUES ('Anna Silva Sousa', '1234567-8', 'Observacoes sobre Aluno 1', '2005-01-01', '(77) 98901-2345'),
+       ('Estevan Almeida Rodrigues', '9876543-2', 'Observacoes sobre Aluno 2', '2006-02-02', '(88) 99012-3456'),
+       ('Daniel Barros Barbosa', '1112223-4', 'Observacoes sobre Aluno 3', '2007-03-03', '(99) 90123-4567'),
+       ('Caio Costa Dias', '1112223-5', 'Observacoes sobre Aluno 4', '2008-04-04', '(00) 01234-5678'),
+        ('Martim Lima Martins', '1112223-6', 'Observacoes sobre Aluno 5', '2009-05-05', '(11) 12345-6789'),
+        ('Luís Correia Cavalcanti', '1112223-7', 'Observacoes sobre Aluno 6', '2010-06-06', '(22) 23456-7890'),
+        ('Thiago Ribeiro Azevedo', '1112223-8', 'Observacoes sobre Aluno 7', '2011-07-07', '(33) 34567-8901'),
+        ('Rafaela Costa Dias', '1112223-9', 'Observacoes sobre Aluno 8', '2012-08-08', '(44) 45678-9012'),
+        ('Lucas Silva Cunha', '1112223-0', 'Observacoes sobre Aluno 9', '2013-09-09', '(55) 56789-0123'),
+        ('Breno Dias Pinto', '1112223-1', 'Observacoes sobre Aluno 10', '2014-10-10', '(66) 67890-1234');
+
 
 -- Inserts para a tabela Parentescos
 INSERT INTO Parentescos (alu_codigo, resp_codigo, par_parentesco)
@@ -175,41 +184,44 @@ INSERT INTO PontosdeEmbarque (pde_rua, pde_bairro, pde_numero, pde_cep)
 VALUES ('R. Guarucaia','Jardim Bela Vista','649', '19160-000'),
        ('R. Alfredo Marcondes','Álvares Machado','113', '19160-000'),
        ('José alexandre','Jardim Antonio Pichione', '72', '19160-000'),
-       ('R. Geraldo Cândido Martins','Álvares Machado','220','19160-000'),
-       ('R. Almeida Cardoso','Álvares Machado','135','19160-000'),
-       ('R. Iansã','Álvares Machado','22','19160-000');
+       ('R. Geraldo Cândido Martins','Centro','220','19160-000'),
+       ('R. Almeida Cardoso','Limoeiro','135','19160-000'),
+       ('R. Iansã','Parque dos Pinheiros','22','19160-000');
 
 -- Inserts para a tabela Escolas
 INSERT INTO Escolas (esc_nome, esc_tipo, esc_email, esc_telefone, pde_codigo)
-VALUES ('Escola 1', 'P', 'escola1@email.com', '(123) 456-7890', 1),
-       ('Escola 2', 'E', 'escola2@email.com', '(987) 654-3210', 2),
-       ('Escola 3', 'P', 'escola3@email.com', '(111) 222-3333', 3);
+VALUES ('EMEIF Álvares Machado', 'A', 'escola1@email.com', '(123) 456-7890', 1),
+       ('E.E. Angelica De Oliveira', 'I', 'escola2@email.com', '(987) 654-3210', 2),
+       ('EMEIF Governador Mário Covas', 'F', 'escola3@email.com', '(111) 222-3333', 3);
 
 -- Inserts para a tabela Motoristas
 INSERT INTO Motoristas (moto_cnh, moto_celular, moto_nome)
-VALUES ('12345678901', '(123) 456-7890', 'Motorista 1'),
-       ('98765432109', '(987) 654-3210', 'Motorista 2'),
-       ('11122233344', '(111) 222-3333', 'Motorista 3');
+VALUES ('12345678901', '(123) 456-7890', 'Thaís Rodrigues Oliveira'),
+       ('98765432109', '(987) 654-3210', 'Júlia Rocha Barbosa'),
+       ('11122233344', '(111) 222-3333', 'Tomás Goncalves Alves');
 
 -- Inserts para a tabela Monitores
 INSERT INTO Monitores (mon_nome, mon_cpf, mon_celular)
-VALUES ('Valdemar', '123.456.789-00', '(123) 456-7890'),
-       ('Antonio', '987.654.321-00', '(987) 654-3210'),
-       ('Joao', '111.222.333-44', '(111) 222-3333'),
-       ('Maria', '111.222.333-55', '(111) 222-4444');
+VALUES ('Clara Cunha Ribeiro', '123.456.789-00', '(123) 456-7890'),
+       ('Giovana Almeida Dias', '987.654.321-00', '(987) 654-3210'),
+       ('Melissa Azevedo Carvalho', '111.222.333-44', '(111) 222-3333'),
+       ('Aline Cunha Rodrigues', '111.222.333-55', '(111) 222-4444');
 
 -- Inserts para a tabela Rotas
 INSERT INTO Rotas (rot_nome, rot_km, rot_periodo, rot_tempoInicio, rot_tempoFinal, vei_codigo, mon_codigo,status)
-VALUES ('Rota 1', 10, 'M', '08:00', '10:00', 1, 1,true),
-       ('Rota 2', 15, 'T', '13:00', '15:00', 2, 2,true),
-       ('Rota 3', 20, 'N', '18:00', '20:00', 3, 3,true);
+VALUES ('Chácara Matsuda/Bairro Balneário/Residencial União', 10, 'M', '08:00', '10:00', 1, 1,true),
+       ('1º de Maio/São Geraldo/Parque dos Pinheiros', 15, 'T', '13:00', '15:00', 2, 2,true),
+       ('Limoeiro/Cobral/Cond. Gramado', 20, 'N', '18:00', '20:00', 3, 3,true);
 
 -- Inserts para a tabela Inscricoes
 INSERT INTO Inscricoes (insc_ano, insc_anoLetivo, insc_turma, insc_etapa, insc_periodo, insc_dataAlocacao, insc_rua, insc_cep, insc_numero, insc_bairro, alu_codigo, esc_codigo, pde_codigo, rot_codigo)
 VALUES
-  (2024, '24', 'A', '1', '1', '2024-04-23', 'Rua A', '12345-678', '123', 'Bairro A', 1, 1, 1, 1),
-  (2024, '24', 'B', '2', '1', '2024-04-23', 'Rua B', '23456-789', '234', 'Bairro B', 2, 2, 2, 2),
-  (2024, '24', 'C', '3', '1', '2024-04-23', 'Rua C', '34567-890', '345', 'Bairro C', 3, 3, 3, 3);
+  (2024, '1I', 'A', 'I', 'I', '2024-04-23', 'Rua Rui Barbosa', '12345-678', '123', 'Campo Alto', 1, 1, 6, 1),
+  (2024, '2', 'B', 'F', 'M', '2024-04-23', 'Rua Manuel Fagundes de Lima', '23456-789', '234', 'Felicidade Avista', 2, 2, 4, 2),
+  (2024, '1I', 'A', 'I', 'I', null, 'Rua Rui Barbosa', '12345-678', '123', 'Campo Alto', 4, 3, 2, null),
+  (2024, '2', 'B', 'F', 'M', null, 'Rua Manuel Fagundes de Lima', '23456-789', '234', 'Felicidade Avista', 5, 2, 5, null),
+  (2024, '3', 'C', 'F', 'V', null, 'Rua São José', '34567-890', '345', 'Riacho Lua Doce', 6, 1, 6, null),
+  (2024, '4', 'C', 'F', 'M', '2024-04-23', 'Rua São José', '34567-890', '345', 'Riacho Lua Doce', 3, 3, 4, 3);
 
 -- Inserts para a tabela Manutencoes
 INSERT INTO Manutencoes (manu_tipo, manu_data, vei_codigo)
@@ -219,9 +231,14 @@ VALUES ('P', '2024-04-22', 1),
 
 -- Inserts para a tabela Rotas_tem_PontosdeEmbarque
 INSERT INTO Rotas_tem_PontosdeEmbarque (rot_codigo,pde_codigo,ordem)
-VALUES (1,1,1),
-       (2,2,1),
-       (3,3,1);
+VALUES (1,1,3),
+       (1,4,1),
+       (1,5,2),
+       (2,2,3),
+       (2,5,1),
+       (2,6,2),
+       (3,2,1),
+       (3,3,2);
 
 -- Inserts para a tabela Rotas_tem_Motoristas
 INSERT INTO Rotas_tem_Motoristas (moto_id, rot_codigo)
