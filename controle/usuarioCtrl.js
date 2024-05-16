@@ -71,7 +71,7 @@ export default class UsuarioCtrl {
     }
 
     async autenticar(requisicao, resposta) {
-        resposta.type('application/json');  
+        resposta.type('application/json');
         if (requisicao.method !== 'POST' || !requisicao.is('application/json')) {
             return resposta.status(400).json({
                 "status": false,
@@ -82,36 +82,43 @@ export default class UsuarioCtrl {
         if (!nome || !cpf || !senha) {
             return resposta.status(400).json({
                 "status": false,
-                "mensagem": 'Por favor, informe o nome de usuário e o CPF!'
+                "mensagem": 'Por favor, informe o nome de usuário, CPF e senha!'
             });
         }
+        let client;
         try {
-            const usuario = new Usuario(nome);
-            const client = await poolConexao.getInstance().connect();
+            client = await poolConexao.getInstance().connect();
             await client.query('BEGIN');
-            const usuarioConsultado = await usuario.consultar(nome);
-            if (usuarioConsultado && usuarioConsultado[0].cpf === cpf && usuarioConsultado[0].senha === senha) {
+            const usuario = new Usuario(nome, senha, cpf); // Passando nome, senha e CPF
+            const usuarioConsultado = await usuario.consultar(cpf, client); // Passando o client
+            if (usuarioConsultado && usuarioConsultado.length > 0 && usuarioConsultado[0].senha === senha) {
                 resposta.status(200).json({
                     "status": true,
-                    "mensagem": 'Usuario autenticado com sucesso!'
+                    "mensagem": 'Usuário autenticado com sucesso!'
                 });
             } else {
                 resposta.status(401).json({
                     "status": false,
-                    "mensagem": 'Nome de usuario ou CPF ou senha inválidos!'
+                    "mensagem": 'Nome de usuário, CPF ou senha inválidos!'
                 });
             }
             await client.query('COMMIT');
         } catch (erro) {
-            await client.query('ROLLBACK');
+            if (client) {
+                await client.query('ROLLBACK');
+                client.release();
+            }
             resposta.status(500).json({
                 "status": false,
-                "mensagem": 'Erro ao autenticar o usuario: ' + erro.message
+                "mensagem": 'Erro ao autenticar o usuário: ' + erro.message
             });
         } finally {
-            client.release();
+            if (client) {
+                client.release();
+            }
         }
     }
+    
 
     async enviarEmail(requisicao, resposta) {
         resposta.type('application/json');
