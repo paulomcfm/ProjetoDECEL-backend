@@ -91,7 +91,7 @@ export default class UsuarioCtrl {
             await client.query('BEGIN');
             const usuario = new Usuario(nome, senha, cpf); // Passando nome, senha e CPF
             const usuarioConsultado = await usuario.consultar(cpf, client); // Passando o client
-            if (usuarioConsultado && usuarioConsultado.length > 0 && usuarioConsultado[0].senha === senha) {
+            if (usuarioConsultado && usuarioConsultado[0].nome === nome && usuarioConsultado[0].senha === senha) {
                 resposta.status(200).json({
                     "status": true,
                     "mensagem": 'Usuário autenticado com sucesso!'
