@@ -80,8 +80,13 @@ export default class Usuario {
         await userDAO.atualizar(this, client);
     }
 
-    async consultar(parametro, client) {
+    async consultarCPF(parametro, client){
         const userDAO = new UsuarioDAO();
-        return await userDAO.consultar(parametro, client);
+        return await userDAO.consultarCPF(parametro, client);
+    }
+
+    async consultar(client) {
+        const userDAO = new UsuarioDAO();
+        return await userDAO.consultar(client);
     }
 }

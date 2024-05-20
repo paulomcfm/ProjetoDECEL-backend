@@ -89,11 +89,15 @@ export default class UsuarioCtrl {
         try {
             client = await poolConexao.getInstance().connect();
             await client.query('BEGIN');
-            const usuario = new Usuario(nome, senha, cpf); // Passando nome, senha e CPF
-            const usuarioConsultado = await usuario.consultar(cpf, client); // Passando o client
-            if (usuarioConsultado && usuarioConsultado[0].nome === nome && usuarioConsultado[0].senha === senha) {
+            const usuario = new Usuario(nome,senha,cpf);
+            console.log(usuario.nome,usuario.senha,usuario.cpf," campos");
+            const usuarioConsultado = await usuario.consultarCPF(usuario.cpf, client);
+            console.log('Resultado da consulta:', usuarioConsultado);
+    
+            if (usuarioConsultado && usuarioConsultado.nome === nome && usuarioConsultado.senha === senha) {
                 resposta.status(200).json({
                     "status": true,
+                    "usuario": usuarioConsultado,
                     "mensagem": 'Usuário autenticado com sucesso!'
                 });
             } else {
@@ -102,11 +106,11 @@ export default class UsuarioCtrl {
                     "mensagem": 'Nome de usuário, CPF ou senha inválidos!'
                 });
             }
+    
             await client.query('COMMIT');
         } catch (erro) {
             if (client) {
                 await client.query('ROLLBACK');
-                client.release();
             }
             resposta.status(500).json({
                 "status": false,
@@ -118,6 +122,7 @@ export default class UsuarioCtrl {
             }
         }
     }
+    
     
 
     async enviarEmail(requisicao, resposta) {
@@ -277,7 +282,6 @@ export default class UsuarioCtrl {
     }
 
     async consultar(requisicao, resposta) {
-        resposta.type('application/json');
         let termo = requisicao.params.termo;
         if (!termo) {
             termo = '';
@@ -285,7 +289,7 @@ export default class UsuarioCtrl {
         if (requisicao.method === 'GET') {
             const client = await poolConexao.getInstance().connect();
             const usuarios = new Usuario();
-            usuarios.consultar(termo, client).then((listaUsuarios) => {
+            usuarios.consultar(client).then((listaUsuarios) => {
                 console.log(listaUsuarios);
                 resposta.json({
                     "status": true,
