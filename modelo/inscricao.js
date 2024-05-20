@@ -203,4 +203,9 @@ export default class Inscricao {
         const inscDAO = new InscricaoDAO();
         return await inscDAO.consultarPorRota(client, parametro);
     }
+
+    async hasInscricaoAluno(client, codigoAluno, curYear) {
+        const inscDAO = new InscricaoDAO();
+        return await inscDAO.hasInscricaoAluno(client, codigoAluno, curYear);
+    }
 }

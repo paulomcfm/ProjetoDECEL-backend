@@ -208,4 +208,17 @@ export default class InscricaoDAO {
         }
         return listaInscricoes;
     }
+
+    async hasInscricaoAluno(client, codigoAluno, curYear) {
+        let sql = '';
+        let parametros = [];
+        let retorno = false;
+        sql = `SELECT 1 FROM inscricoes WHERE alu_codigo = $1 AND insc_ano = $2;`;
+        parametros = [codigoAluno, curYear];
+        const { rows: registros, fields: campos } = await client.query(sql, parametros);
+        if (registros.length > 0) {
+            retorno = true;
+        }
+        return retorno;
+    }
 }
