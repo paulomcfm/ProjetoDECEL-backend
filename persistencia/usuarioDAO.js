@@ -50,4 +50,37 @@ export default class UsuarioDAO {
             return null;
         }
     }
+
+    async consultarEmail(email, client) {
+        const sql = "SELECT * FROM Usuarios WHERE user_email = $1";
+        const parametros = [email];
+        const { rows: registros } = await client.query(sql, parametros);
+        
+        if (registros.length > 0) {
+            const registro = registros[0];
+            return new Usuario(registro.user_nome, registro.user_senha, registro.user_cpf, registro.user_email, registro.user_celular);
+        } else {
+            return null;
+        }
+    }
+
+    async salvarCodigoRedefinicao(email, codigo, client) {
+        const sql = "INSERT INTO PasswordResetCodes (email, codigo_redefinicao, data_codigo) VALUES ($1, $2, CURRENT_TIMESTAMP)";
+        const parametros = [email, codigo];
+        await client.query(sql, parametros);
+    }
+    
+
+    async verificarCodigoRedefinicao(email, codigo, client) {
+        const sql = "SELECT * FROM PasswordResetCodes WHERE email = $1 AND codigo_redefinicao = $2 AND NOW() - data_codigo < INTERVAL '1 hour'";
+        const parametros = [email, codigo];
+        const { rows: registros } = await client.query(sql, parametros);
+        return registros.length > 0;
+    }    
+
+    async redefinirSenha(email, novaSenha, client) {
+        const sql = "UPDATE Usuarios SET user_senha = $1 WHERE user_email = $2";
+        const parametros = [novaSenha, email];
+        await client.query(sql, parametros);
+    }
 }

@@ -1,11 +1,15 @@
 import nodemailer from "nodemailer";
+import dotenv from "dotenv";
+
+// Carregar variáveis de ambiente do arquivo .env
+dotenv.config();
 
 // Configurações do seu provedor de e-mail (substitua com suas próprias credenciais)
 const transporter = nodemailer.createTransport({
     service: process.env.EMAIL_PROVIDER,
     auth: {
         user: process.env.EMAIL_USER,
-        // Adicione a senha aqui se necessário
+        pass: process.env.EMAIL_PASSWORD  // Adicionando a senha do e-mail
     }
 });
 

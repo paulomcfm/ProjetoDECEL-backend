@@ -1,11 +1,10 @@
 import Usuario from "../modelo/usuario.js";
 import poolConexao from "../persistencia/conexao.js";
-import enviarCodigo from "../servicos/servicoEmail.js"
+import enviarCodigo from "../servicos/servicoEmail.js";
+import crypto from "crypto";
+import dotenv from "dotenv";
 
-function gerarCodigo() {
-    const codigo = Math.floor(10000 + Math.random() * 90000);
-    return codigo.toString();
-}
+dotenv.config(); // Carregar variáveis de ambiente
 
 export default class UsuarioCtrl {
     static _instance = null;
@@ -85,15 +84,12 @@ export default class UsuarioCtrl {
                 "mensagem": 'Por favor, informe o nome de usuário, CPF e senha!'
             });
         }
-        let client;
+        const client = await poolConexao.getInstance().connect();
         try {
-            client = await poolConexao.getInstance().connect();
+            //client = await poolConexao.getInstance().connect();
             await client.query('BEGIN');
             const usuario = new Usuario(nome,senha,cpf);
-            console.log(usuario.nome,usuario.senha,usuario.cpf," campos");
             const usuarioConsultado = await usuario.consultarCPF(usuario.cpf, client);
-            console.log('Resultado da consulta:', usuarioConsultado);
-    
             if (usuarioConsultado && usuarioConsultado.nome === nome && usuarioConsultado.senha === senha) {
                 resposta.status(200).json({
                     "status": true,
@@ -123,54 +119,82 @@ export default class UsuarioCtrl {
         }
     }
     
-    
-
-    async enviarEmail(requisicao, resposta) {
+    async solicitarCodigoRedefinicao(requisicao, resposta) {
         resposta.type('application/json');
-        let codigo;
         if (requisicao.method !== 'POST' || !requisicao.is('application/json')) {
             return resposta.status(400).json({
                 "status": false,
-                "mensagem": 'Por favor, utilize o método POST e envie os dados no formato JSON para enviar o e-mail!'
+                "mensagem": 'Por favor, utilize o método POST e envie os dados no formato JSON para solicitar o código!'
             });
         }
-        const { provedor, email } = requisicao.body;
-        if (!provedor || !email) {
-            return resposta.status(401).json({
-                "status": false,
-                "mensagem": 'Erro não foi possível obter o provedor e o e-mail do usuário'
-            });
+        const { email } = requisicao.body;
+        if (!email) {
+            return resposta.status(400).json({ status: false, mensagem: 'Por favor, forneça um endereço de e-mail!' });
         }
-        const usuario = new Usuario('','','',email);
-        const client = await poolConexao.getInstance().connect();
+    
+        let client;
         try {
-            await client.query('BEGIN');
-            codigo = gerarCodigo();
-            const enviar = enviarCodigo(email, codigo);
-            const usuarioConsultado = await usuario.consultar(email);
-            if (usuarioConsultado && enviar) {
-                resposta.status(201).json({
-                    "status": true,
-                    "mensagem": 'E-mail enviado para o usuário com sucesso!'
-                });
+            client = await poolConexao.getInstance().connect();
+            const usuario = new Usuario();
+            const usuarioConsultado = await usuario.consultarEmail(email, client);
+    
+            if (usuarioConsultado) {
+                const codigo = crypto.randomBytes(3).toString('hex'); // Gera um código aleatório de 6 caracteres
+                await usuario.salvarCodigoRedefinicao(email, codigo, client);
+    
+                const emailEnviado = await enviarCodigo(email, codigo);
+                if (emailEnviado) {
+                    resposta.status(200).json({ status: true, mensagem: 'Código de redefinição enviado para seu e-mail!' });
+                } else {
+                    resposta.status(500).json({ status: false, mensagem: 'Erro ao enviar o código de redefinição. Tente novamente mais tarde.' });
+                }
             } else {
-                resposta.status(401).json({
-                    "status": false,
-                    "mensagem": 'E-mail inválido!'
-                });
+                resposta.status(404).json({ status: false, mensagem: 'E-mail não encontrado!' });
             }
-            await client.query('COMMIT');
         } catch (erro) {
-            await client.query('ROLLBACK');
-            resposta.status(500).json({
-                "status": false,
-                "mensagem": 'Erro ao enviar e-mail do usuario: ' + erro.message
-            });
+            resposta.status(500).json({ status: false, mensagem: 'Erro ao solicitar a redefinição: ' + erro.message });
         } finally {
-            client.release();
+            if (client) {
+                client.release();
+            }
         }
     }
     
+    
+    async redefinirSenha(requisicao, resposta) {
+        resposta.type('application/json');
+        if (requisicao.method !== 'POST' || !requisicao.is('application/json')) {
+            return resposta.status(400).json({
+                "status": false,
+                "mensagem": 'Por favor, utilize o método POST e envie os dados no formato JSON para redefinir a senha!'
+            });
+        }
+        const { email, codigo, novaSenha } = requisicao.body;
+        if (!email || !codigo || !novaSenha) {
+            return resposta.status(400).json({ status: false, mensagem: 'Por favor, forneça todos os dados necessários!' });
+        }
+    
+        let client;
+        try {
+            client = await poolConexao.getInstance().connect();
+            const usuario = new Usuario();
+            const codigoValido = await usuario.verificarCodigoRedefinicao(email, codigo, client);
+    
+            if (codigoValido) {
+                await usuario.redefinirSenha(email, novaSenha, client);
+                resposta.status(200).json({ status: true, mensagem: 'Senha redefinida com sucesso!' });
+            } else {
+                resposta.status(400).json({ status: false, mensagem: 'Código de redefinição inválido ou expirado!' });
+            }
+        } catch (erro) {
+            resposta.status(500).json({ status: false, mensagem: 'Erro ao redefinir a senha: ' + erro.message });
+        } finally {
+            if (client) {
+                client.release();
+            }
+        }
+    }
+
     async atualizar(requisicao, resposta) {
         resposta.type('application/json');
         if ((requisicao.method === 'PUT' || requisicao.method === 'PATCH') && requisicao.is('application/json')) {

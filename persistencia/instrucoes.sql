@@ -7,6 +7,14 @@ CREATE TABLE Usuarios (
     CONSTRAINT pk_usuarios PRIMARY KEY (user_cpf)
 );
 
+CREATE TABLE PasswordResetCodes (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
+    codigo_redefinicao VARCHAR(6) NOT NULL,
+    data_codigo TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (email) REFERENCES Usuarios(user_email)
+);
+
 CREATE TABLE Veiculos (
   vei_codigo SERIAL PRIMARY KEY,
   vei_renavam VARCHAR(11) NOT NULL UNIQUE,

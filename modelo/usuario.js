@@ -89,4 +89,24 @@ export default class Usuario {
         const userDAO = new UsuarioDAO();
         return await userDAO.consultar(client);
     }
+
+    async consultarEmail(email, client) {
+        const userDAO = new UsuarioDAO();
+        return await userDAO.consultarEmail(email, client);
+    }
+
+    async salvarCodigoRedefinicao(cpf, codigo, client) {
+        const userDAO = new UsuarioDAO();
+        await userDAO.salvarCodigoRedefinicao(cpf, codigo, client);
+    }
+
+    async verificarCodigoRedefinicao(email, codigo, client) {
+        const userDAO = new UsuarioDAO();
+        return await userDAO.verificarCodigoRedefinicao(email, codigo, client);
+    }
+
+    async redefinirSenha(email, novaSenha, client) {
+        const userDAO = new UsuarioDAO();
+        await userDAO.redefinirSenha(email, novaSenha, client);
+    }
 }
