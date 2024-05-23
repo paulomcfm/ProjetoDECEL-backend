@@ -4,12 +4,14 @@ import dotenv from "dotenv";
 // Carregar variáveis de ambiente do arquivo .env
 dotenv.config();
 
-// Configurações do seu provedor de e-mail (substitua com suas próprias credenciais)
+// Configurações do seu provedor de e-mail usando variáveis de ambiente
 const transporter = nodemailer.createTransport({
-    service: process.env.EMAIL_PROVIDER,
+    host: process.env.EMAIL_PROVIDER,
+    port: parseInt(process.env.EMAIL_PORT, 10),
+    secure: false, // true for 465, false for other ports
     auth: {
         user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD  // Adicionando a senha do e-mail
+        pass: process.env.EMAIL_PASSWORD
     }
 });
 
@@ -18,13 +20,13 @@ export default async function enviarCodigo(destinatario, codigo) {
     try {
         // Opções do e-mail
         const mailOptions = {
-            from: process.env.EMAIL_USER, // Usar o mesmo e-mail que está autenticado
+            from: process.env.EMAIL_USER,
             to: destinatario,
             subject: 'Código de Verificação',
             text: `Seu código de verificação é: ${codigo}`
         };
 
-        // Envia o e-mail e aguarda a resposta (utilizando async/await)
+        // Envia o e-mail e aguarda a resposta
         const info = await transporter.sendMail(mailOptions);
         
         // Verifica se a resposta foi bem-sucedida

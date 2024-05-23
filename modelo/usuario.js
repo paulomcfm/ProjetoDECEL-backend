@@ -109,4 +109,9 @@ export default class Usuario {
         const userDAO = new UsuarioDAO();
         await userDAO.redefinirSenha(email, novaSenha, client);
     }
+
+    async removerCodigoRedefinicao(email, client) {
+        const userDAO = new UsuarioDAO();
+        await userDAO.removerCodigoRedefinicao(email, client);
+    }
 }

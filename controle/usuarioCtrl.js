@@ -158,7 +158,7 @@ export default class UsuarioCtrl {
                 client.release();
             }
         }
-    }
+    }    
     
     
     async redefinirSenha(requisicao, resposta) {
@@ -182,6 +182,7 @@ export default class UsuarioCtrl {
     
             if (codigoValido) {
                 await usuario.redefinirSenha(email, novaSenha, client);
+                await usuario.removerCodigoRedefinicao(email, client);
                 resposta.status(200).json({ status: true, mensagem: 'Senha redefinida com sucesso!' });
             } else {
                 resposta.status(400).json({ status: false, mensagem: 'Código de redefinição inválido ou expirado!' });
@@ -193,7 +194,7 @@ export default class UsuarioCtrl {
                 client.release();
             }
         }
-    }
+    }    
 
     async atualizar(requisicao, resposta) {
         resposta.type('application/json');

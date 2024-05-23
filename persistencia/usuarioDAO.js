@@ -65,19 +65,25 @@ export default class UsuarioDAO {
     }
 
     async salvarCodigoRedefinicao(email, codigo, client) {
-        const sql = "INSERT INTO PasswordResetCodes (email, codigo_redefinicao, data_codigo) VALUES ($1, $2, CURRENT_TIMESTAMP)";
+        const sql = "INSERT INTO RedefinicoesSenha (user_email, codigo, data_criacao) VALUES ($1, $2, CURRENT_TIMESTAMP)";
         const parametros = [email, codigo];
         await client.query(sql, parametros);
     }
     
 
     async verificarCodigoRedefinicao(email, codigo, client) {
-        const sql = "SELECT * FROM PasswordResetCodes WHERE email = $1 AND codigo_redefinicao = $2 AND NOW() - data_codigo < INTERVAL '1 hour'";
+        const sql = "SELECT * FROM RedefinicoesSenha WHERE user_email = $1 AND codigo = $2 AND CURRENT_TIMESTAMP - data_criacao < INTERVAL '30 minutes'";
         const parametros = [email, codigo];
         const { rows: registros } = await client.query(sql, parametros);
         return registros.length > 0;
-    }    
+    }  
 
+    async removerCodigoRedefinicao(email, client) {
+        const sql = "DELETE FROM RedefinicoesSenha WHERE user_email = $1";
+        const parametros = [email];
+        await client.query(sql, parametros);
+    }
+    
     async redefinirSenha(email, novaSenha, client) {
         const sql = "UPDATE Usuarios SET user_senha = $1 WHERE user_email = $2";
         const parametros = [novaSenha, email];
