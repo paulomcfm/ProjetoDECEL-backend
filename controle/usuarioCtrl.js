@@ -86,9 +86,9 @@ export default class UsuarioCtrl {
         }
         const client = await poolConexao.getInstance().connect();
         try {
-            //client = await poolConexao.getInstance().connect();
             await client.query('BEGIN');
             const usuario = new Usuario(nome,senha,cpf);
+            console.log(nome, senha, cpf, "camposaaa");
             const usuarioConsultado = await usuario.consultarCPF(usuario.cpf, client);
             if (usuarioConsultado && usuarioConsultado.nome === nome && usuarioConsultado.senha === senha) {
                 resposta.status(200).json({
