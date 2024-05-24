@@ -1,8 +1,8 @@
-import Usuario from "../modelo/usuario.js";
-import poolConexao from "../persistencia/conexao.js";
 import enviarCodigo from "../servicos/servicoEmail.js";
 import crypto from "crypto";
 import dotenv from "dotenv";
+import Usuario from "../modelo/usuario.js";
+import poolConexao from "../persistencia/conexao.js";
 
 dotenv.config(); // Carregar variáveis de ambiente
 
