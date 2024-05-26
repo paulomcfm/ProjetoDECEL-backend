@@ -78,6 +78,7 @@ export default class UsuarioCtrl {
             });
         }
         const { nome, cpf, senha } = requisicao.body;
+        console.log(requisicao.body);
         if (!nome || !cpf || !senha) {
             return resposta.status(400).json({
                 "status": false,
