@@ -18,7 +18,7 @@ export default class InscricaoCtrl {
         resposta.type('application/json');
         if (requisicao.method === 'POST' && requisicao.is('application/json')) {
             const dados = requisicao.body;
-            const ano = dados.ano;
+            const ano = new Date().getFullYear();
             const aluno = dados.aluno;
             const pontoEmbarque = dados.pontoEmbarque;
             const escola = dados.escola;
@@ -42,18 +42,10 @@ export default class InscricaoCtrl {
                         });
                         await client.query('COMMIT');
                     }).catch(async (erro) => {
-                        if (erro.code === '23503') {
-                            resposta.status(400).json({
-                                "status": false,
-                                "mensagem": 'Inscrição não pode ser excluída pois está sendo usada.'
-                            });
-                        }
-                        else {
-                            resposta.status(500).json({
-                                "status": false,
-                                "mensagem": 'Erro ao excluir inscrição  : ' + erro.message
-                            });
-                        }
+                        resposta.status(500).json({
+                            "status": false,
+                            "mensagem": 'Erro ao inscrever aluno: ' + erro.message
+                        });
                         await client.query('ROLLBACK');
                     });
                 } catch (e) {
@@ -219,6 +211,36 @@ export default class InscricaoCtrl {
             const client = await poolConexao.getInstance().connect();
             const inscricoes = new Inscricao();
             inscricoes.consultarFora(client, termo).then((listaInscricoes) => {
+                resposta.json({
+                    "status": true,
+                    "listaInscricoes": listaInscricoes
+                });
+            }).catch((erro) => {
+                resposta.status(500).json({
+                    "status": false,
+                    "mensagem": 'Erro ao consultar as inscrições: ' + erro.message
+                });
+            });
+            client.release();
+        }
+        else {
+            resposta.status(400).json({
+                "status": false,
+                "mensagem": 'Por favor, utilize o método GET para consultar as inscrições!'
+            });
+        }
+    }
+
+    async consultarDesatualizadas(requisicao, resposta) {
+        resposta.type('application/json');
+        let termo = requisicao.params.termo;
+        if (!termo) {
+            termo = '';
+        }
+        if (requisicao.method === 'GET') {
+            const client = await poolConexao.getInstance().connect();
+            const inscricoes = new Inscricao();
+            inscricoes.consultarDesatualizadas(client, termo).then((listaInscricoes) => {
                 resposta.json({
                     "status": true,
                     "listaInscricoes": listaInscricoes

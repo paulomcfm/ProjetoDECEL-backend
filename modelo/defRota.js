@@ -12,9 +12,10 @@ export default class defRota{
     #pontos
     #motoristas 
     #inscricoes
+    #status
 
 
-    constructor(codigo, nome, km, periodo, tempoInicio, volta, veiculoCodigo, monitorCodigo,pontos,motoristas,inscricoes) {
+    constructor(codigo, nome, km, periodo, tempoInicio, volta, veiculoCodigo, monitorCodigo,pontos,motoristas,inscricoes,status) {
         this.#codigo = codigo;
         this.#nome = nome;
         this.#km = km;
@@ -26,6 +27,7 @@ export default class defRota{
         this.#pontos = pontos
         this.#motoristas = motoristas
         this.#inscricoes = inscricoes
+        this.#status = status
     }
 
     get codigo() {
@@ -115,6 +117,14 @@ export default class defRota{
     set inscricoes(inscricoesCodigo) {
         this.#inscricoes = inscricoesCodigo;
     }
+    
+    get status() {
+        return this.#status;
+    }
+
+    set status(novoStatus) {
+        this.#status = novoStatus;
+    }
 
     toJSON() {
         return {
@@ -128,7 +138,8 @@ export default class defRota{
             monitor: this.#monitor,
             motoristas:this.#motoristas,
             pontos:this.#pontos,
-            inscricoes:this.#inscricoes
+            inscricoes:this.#inscricoes,
+            status:this.#status
         };
     }
     
@@ -153,8 +164,12 @@ export default class defRota{
     }
 
     async atualizar(client){
-        const dao = new defRotaDAO()
-        await dao.atualizar(client,this)
+        try{
+            const dao = new defRotaDAO()
+            await dao.atualizar(client,this)
+        }catch(erro){
+            throw erro
+        }
     }
 
     async consultar(client,termo){
@@ -170,6 +185,16 @@ export default class defRota{
     async consultarQtdInscricoes(client){
         const dao = new defRotaDAO()
         return await dao.consultarQtdInscricoes(client,this)
+    }
+
+    async desativar(client){
+        try{
+            const dao = new defRotaDAO()
+            return await dao.desativar(client,this.#codigo)
+        }catch(erro){
+            console.log(erro)
+            throw erro
+        }
     }
 
 
