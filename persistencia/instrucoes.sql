@@ -2,7 +2,7 @@ CREATE TABLE Usuarios (
     user_nome VARCHAR(100) NOT NULL UNIQUE,
     user_senha VARCHAR(255) NOT NULL,
     user_cpf VARCHAR(14) NOT NULL,
-    user_email VARCHAR(255) NOT NULL,
+    user_email VARCHAR(255) NOT NULL UNIQUE,
     user_celular VARCHAR(20) NOT NULL,
     CONSTRAINT pk_usuarios PRIMARY KEY (user_cpf)
 );
