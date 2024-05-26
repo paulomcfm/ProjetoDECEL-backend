@@ -80,8 +80,38 @@ export default class Usuario {
         await userDAO.atualizar(this, client);
     }
 
-    async consultar(parametro, client) {
+    async consultarCPF(parametro, client){
         const userDAO = new UsuarioDAO();
-        return await userDAO.consultar(parametro, client);
+        return await userDAO.consultarCPF(parametro, client);
+    }
+
+    async consultar(client) {
+        const userDAO = new UsuarioDAO();
+        return await userDAO.consultar(client);
+    }
+
+    async consultarEmail(email, client) {
+        const userDAO = new UsuarioDAO();
+        return await userDAO.consultarEmail(email, client);
+    }
+
+    async salvarCodigoRedefinicao(cpf, codigo, client) {
+        const userDAO = new UsuarioDAO();
+        await userDAO.salvarCodigoRedefinicao(cpf, codigo, client);
+    }
+
+    async verificarCodigoRedefinicao(email, codigo, client) {
+        const userDAO = new UsuarioDAO();
+        return await userDAO.verificarCodigoRedefinicao(email, codigo, client);
+    }
+
+    async redefinirSenha(email, novaSenha, client) {
+        const userDAO = new UsuarioDAO();
+        await userDAO.redefinirSenha(email, novaSenha, client);
+    }
+
+    async removerCodigoRedefinicao(email, client) {
+        const userDAO = new UsuarioDAO();
+        await userDAO.removerCodigoRedefinicao(email, client);
     }
 }

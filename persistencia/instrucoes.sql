@@ -2,9 +2,17 @@ CREATE TABLE Usuarios (
     user_nome VARCHAR(100) NOT NULL UNIQUE,
     user_senha VARCHAR(255) NOT NULL,
     user_cpf VARCHAR(14) NOT NULL,
-    user_email VARCHAR(255) NOT NULL,
+    user_email VARCHAR(255) NOT NULL UNIQUE,
     user_celular VARCHAR(20) NOT NULL,
     CONSTRAINT pk_usuarios PRIMARY KEY (user_cpf)
+);
+
+CREATE TABLE RedefinicoesSenha (
+    id SERIAL PRIMARY KEY,
+    user_email VARCHAR(255) NOT NULL,
+    codigo VARCHAR(6) NOT NULL,
+    data_criacao TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_email) REFERENCES Usuarios(user_email) ON DELETE CASCADE
 );
 
 CREATE TABLE Veiculos (
@@ -142,7 +150,7 @@ CREATE TABLE Rotas_tem_Motoristas (
 
 -- Inserts para a tabela Usuarios
 INSERT INTO Usuarios (user_nome, user_senha, user_cpf, user_email, user_celular)
-VALUES ('usuario1', 'senha123', '123.456.789-00', 'usuario1@email.com', '(12) 93456-7890'),
+VALUES ('admin', 'senha123', '123.456.789-00', 'usuario1@email.com', '(12) 93456-7890'),
        ('usuario2', 'senha456', '987.654.321-00', 'usuario2@email.com', '(98) 97654-3210'),
        ('usuario3', 'senha789', '111.222.333-44', 'usuario3@email.com', '(11) 91222-3333');
 

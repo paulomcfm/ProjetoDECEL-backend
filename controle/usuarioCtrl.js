@@ -1,5 +1,10 @@
+import enviarCodigo from "../servicos/servicoEmail.js";
+import crypto from "crypto";
+import dotenv from "dotenv";
 import Usuario from "../modelo/usuario.js";
 import poolConexao from "../persistencia/conexao.js";
+
+dotenv.config(); // Carregar variáveis de ambiente
 
 export default class UsuarioCtrl {
     static _instance = null;
@@ -66,48 +71,132 @@ export default class UsuarioCtrl {
 
     async autenticar(requisicao, resposta) {
         resposta.type('application/json');
-    
-        if (requisicao.method !== 'GET' || !requisicao.is('application/json')) {
+        if (requisicao.method !== 'POST' || !requisicao.is('application/json')) {
             return resposta.status(400).json({
                 "status": false,
-                "mensagem": 'Por favor, utilize o método GET e envie os dados no formato JSON para autenticar o usuário!'
+                "mensagem": 'Por favor, utilize o método POST e envie os dados no formato JSON para autenticar o usuário!'
             });
         }
         const { nome, cpf, senha } = requisicao.body;
+        console.log(requisicao.body);
         if (!nome || !cpf || !senha) {
             return resposta.status(400).json({
                 "status": false,
-                "mensagem": 'Por favor, informe o nome de usuário e o CPF!'
+                "mensagem": 'Por favor, informe o nome de usuário, CPF e senha!'
             });
         }
+        const client = await poolConexao.getInstance().connect();
         try {
-            const usuario = new Usuario(nome);
-            const client = await poolConexao.getInstance().connect();
             await client.query('BEGIN');
-            const usuarioConsultado = await usuario.consultar(nome);
-            if (usuarioConsultado && usuarioConsultado[0].cpf === cpf && usuarioConsultado[0].senha === senha) {
+            const usuario = new Usuario(nome,senha,cpf);
+            console.log(nome, senha, cpf, "camposaaa");
+            const usuarioConsultado = await usuario.consultarCPF(usuario.cpf, client);
+            if (usuarioConsultado && usuarioConsultado.nome === nome && usuarioConsultado.senha === senha) {
                 resposta.status(200).json({
                     "status": true,
-                    "mensagem": 'Usuario autenticado com sucesso!'
+                    "usuario": usuarioConsultado,
+                    "mensagem": 'Usuário autenticado com sucesso!'
                 });
             } else {
                 resposta.status(401).json({
                     "status": false,
-                    "mensagem": 'Nome de usuario ou CPF ou senha inválidos!'
+                    "mensagem": 'Nome de usuário, CPF ou senha inválidos!'
                 });
             }
+    
             await client.query('COMMIT');
         } catch (erro) {
-            await client.query('ROLLBACK');
+            if (client) {
+                await client.query('ROLLBACK');
+            }
             resposta.status(500).json({
                 "status": false,
-                "mensagem": 'Erro ao autenticar o usuario: ' + erro.message
+                "mensagem": 'Erro ao autenticar o usuário: ' + erro.message
             });
         } finally {
-            client.release();
+            if (client) {
+                client.release();
+            }
         }
     }
     
+    async solicitarCodigoRedefinicao(requisicao, resposta) {
+        resposta.type('application/json');
+        if (requisicao.method !== 'POST' || !requisicao.is('application/json')) {
+            return resposta.status(400).json({
+                "status": false,
+                "mensagem": 'Por favor, utilize o método POST e envie os dados no formato JSON para solicitar o código!'
+            });
+        }
+        const { email } = requisicao.body;
+        if (!email) {
+            return resposta.status(400).json({ status: false, mensagem: 'Por favor, forneça um endereço de e-mail!' });
+        }
+    
+        let client;
+        try {
+            client = await poolConexao.getInstance().connect();
+            const usuario = new Usuario();
+            const usuarioConsultado = await usuario.consultarEmail(email, client);
+    
+            if (usuarioConsultado) {
+                const codigo = crypto.randomBytes(3).toString('hex'); // Gera um código aleatório de 6 caracteres
+                await usuario.salvarCodigoRedefinicao(email, codigo, client);
+    
+                const emailEnviado = await enviarCodigo(email, codigo);
+                if (emailEnviado) {
+                    resposta.status(200).json({ status: true, mensagem: 'Código de redefinição enviado para seu e-mail!' });
+                } else {
+                    resposta.status(500).json({ status: false, mensagem: 'Erro ao enviar o código de redefinição. Tente novamente mais tarde.' });
+                }
+            } else {
+                resposta.status(404).json({ status: false, mensagem: 'E-mail não encontrado!' });
+            }
+        } catch (erro) {
+            resposta.status(500).json({ status: false, mensagem: 'Erro ao solicitar a redefinição: ' + erro.message });
+        } finally {
+            if (client) {
+                client.release();
+            }
+        }
+    }    
+    
+    
+    async redefinirSenha(requisicao, resposta) {
+        resposta.type('application/json');
+        if (requisicao.method !== 'POST' || !requisicao.is('application/json')) {
+            return resposta.status(400).json({
+                "status": false,
+                "mensagem": 'Por favor, utilize o método POST e envie os dados no formato JSON para redefinir a senha!'
+            });
+        }
+        const { email, codigo, novaSenha } = requisicao.body;
+        if (!email || !codigo || !novaSenha) {
+            return resposta.status(400).json({ status: false, mensagem: 'Por favor, forneça todos os dados necessários!' });
+        }
+    
+        let client;
+        try {
+            client = await poolConexao.getInstance().connect();
+            const usuario = new Usuario();
+            const codigoValido = await usuario.verificarCodigoRedefinicao(email, codigo, client);
+    
+            if (codigoValido) {
+                await usuario.redefinirSenha(email, novaSenha, client);
+                await usuario.removerCodigoRedefinicao(email, client);
+                resposta.status(200).json({ status: true, mensagem: 'Senha redefinida com sucesso!' });
+            } else {
+                resposta.status(400).json({ status: false, mensagem: 'Código de redefinição inválido ou expirado!' });
+            }
+        } catch (erro) {
+            resposta.status(500).json({ status: false, mensagem: 'Erro ao redefinir a senha: ' + erro.message });
+        } finally {
+            if (client) {
+                client.release();
+            }
+        }
+    }    
+
     async atualizar(requisicao, resposta) {
         resposta.type('application/json');
         if ((requisicao.method === 'PUT' || requisicao.method === 'PATCH') && requisicao.is('application/json')) {
@@ -219,7 +308,6 @@ export default class UsuarioCtrl {
     }
 
     async consultar(requisicao, resposta) {
-        resposta.type('application/json');
         let termo = requisicao.params.termo;
         if (!termo) {
             termo = '';
@@ -227,7 +315,7 @@ export default class UsuarioCtrl {
         if (requisicao.method === 'GET') {
             const client = await poolConexao.getInstance().connect();
             const usuarios = new Usuario();
-            usuarios.consultar(termo, client).then((listaUsuarios) => {
+            usuarios.consultar(client).then((listaUsuarios) => {
                 console.log(listaUsuarios);
                 resposta.json({
                     "status": true,
