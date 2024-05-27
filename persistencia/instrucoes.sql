@@ -4,6 +4,7 @@ CREATE TABLE Usuarios (
     user_cpf VARCHAR(14) NOT NULL,
     user_email VARCHAR(255) NOT NULL UNIQUE,
     user_celular VARCHAR(20) NOT NULL,
+    user_nivel VARCHAR(13) NOT NULL,
     CONSTRAINT pk_usuarios PRIMARY KEY (user_cpf)
 );
 
@@ -149,10 +150,10 @@ CREATE TABLE Rotas_tem_Motoristas (
 );
 
 -- Inserts para a tabela Usuarios
-INSERT INTO Usuarios (user_nome, user_senha, user_cpf, user_email, user_celular)
-VALUES ('admin', 'senha123', '123.456.789-00', 'usuario1@email.com', '(12) 93456-7890'),
-       ('usuario2', 'senha456', '987.654.321-00', 'usuario2@email.com', '(98) 97654-3210'),
-       ('usuario3', 'senha789', '111.222.333-44', 'usuario3@email.com', '(11) 91222-3333');
+INSERT INTO Usuarios (user_nome, user_senha, user_cpf, user_email, user_celular, user_nivel)
+VALUES ('admin', 'senha123', '123.456.789-00', 'usuario1@email.com', '(12) 93456-7890', 'admnistrador'),
+       ('usuario2', 'senha456', '987.654.321-00', 'usuario2@email.com', '(98) 97654-3210', 'normal'),
+       ('usuario3', 'senha789', '111.222.333-44', 'usuario3@email.com', '(11) 91222-3333', 'normal');
 
 -- Inserts para a tabela Veiculos
 INSERT INTO Veiculos (vei_renavam, vei_placa, vei_modelo, vei_capacidade, vei_tipo)
