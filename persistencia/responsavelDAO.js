@@ -30,22 +30,63 @@ export default class ResponsavelDAO {
         let sql = '';
         let parametros = [];
         if (!isNaN(parseInt(parametroConsulta))) {
-            sql = 'SELECT * FROM responsaveis WHERE resp_codigo = $1 order by resp_nome';
+            sql = `SELECT alunos.*, responsaveis.*
+                FROM responsaveis
+                LEFT JOIN parentescos ON responsaveis.resp_codigo = parentescos.resp_codigo
+                LEFT JOIN alunos ON parentescos.alu_codigo = alunos.alu_codigo
+                WHERE responsaveis.resp_codigo = $1
+                ORDER BY responsaveis.resp_nome, alunos.alu_nome;`;
             parametros = [parametroConsulta];
-        }
-        else {
+        } else {
             if (!parametroConsulta) {
                 parametroConsulta = '';
             }
-            sql = "SELECT * FROM responsaveis WHERE resp_nome like $1";
+            sql = `SELECT alunos.*, responsaveis.*
+            FROM responsaveis
+            LEFT JOIN parentescos ON responsaveis.resp_codigo = parentescos.resp_codigo
+            LEFT JOIN alunos ON parentescos.alu_codigo = alunos.alu_codigo
+            WHERE responsaveis.resp_codigo = $1
+            ORDER BY responsaveis.resp_nome, alunos.alu_nome;`;
             parametros = ['%' + parametroConsulta + '%'];
         }
+    
         const { rows: registros, fields: campos } = await client.query(sql, parametros);
         let listaResponsaveis = [];
+        let responsavelAtual = null;
         for (const registro of registros) {
-            const responsavel = new Responsavel(registro.resp_codigo, registro.resp_nome, registro.resp_rg, registro.resp_cpf, registro.resp_email, registro.resp_telefone, registro.resp_celular);
-            listaResponsaveis.push(responsavel);
+            if (!responsavelAtual || responsavelAtual.codigo !== registro.resp_codigo) {
+                if (responsavelAtual) {
+                    listaResponsaveis.push(responsavelAtual);
+                }
+                responsavelAtual = {
+                    codigo: registro.resp_codigo,
+                    nome: registro.resp_nome,
+                    rg: registro.resp_rg,
+                    cpf: registro.resp_cpf,
+                    email: registro.resp_email,
+                    telefone: registro.resp_telefone,
+                    celular: registro.resp_celular,
+                    alunos: []
+                };
+            }
+            const aluno = {
+                codigo: registro.alu_codigo,
+                nome: registro.alu_nome,
+                rg: registro.alu_rg,
+                observacoes: registro.alu_observacoes,
+                dataNasc: registro.alu_datanasc,
+                celular: registro.alu_celular,
+                status: registro.alu_status,
+                motivoInativo: registro.alu_motivoinativo
+            };
+            if (registro.resp_codigo !== null) {
+                responsavelAtual.alunos.push(aluno);
+            }
+        }
+        if (responsavelAtual) {
+            listaResponsaveis.push(responsavelAtual);
         }
         return listaResponsaveis;
     }
+    
 }
