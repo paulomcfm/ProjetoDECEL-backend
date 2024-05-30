@@ -53,7 +53,8 @@ export default class ParentescoCtrl {
         }
         if (requisicao.method === 'GET') {
             const parentescos = new Parentesco();
-            parentescos.consultarResponsavel(termo).then((listaParentescos) => {
+            const client = await poolConexao.getInstance().connect();
+            parentescos.consultarResponsavel(termo,client).then((listaParentescos) => {
                 resposta.json({
                     "status": true,
                     "listaParentescos": listaParentescos

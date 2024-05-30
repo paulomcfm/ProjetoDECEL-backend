@@ -5,7 +5,7 @@ export default class ParentescoDAO {
         if (parentesco instanceof Parentesco) {
             const sql = "INSERT INTO parentescos(alu_codigo, resp_codigo, par_parentesco) VALUES($1,$2,$3)";
             const parametros = [parentesco.codigoAluno, parentesco.codigoResponsavel, parentesco.parentesco];
-            
+            console.log(sql,parametros)
             await client.query(sql, parametros);
             
         }
@@ -25,7 +25,7 @@ export default class ParentescoDAO {
         if (parentesco instanceof Parentesco) {
             const sql = "DELETE FROM parentescos WHERE alu_codigo = $1 AND resp_codigo = $2";
             const parametros = [parentesco.codigoAluno, parentesco.codigoResponsavel];
-            
+            console.log(sql,parametros)
             await client.query(sql, parametros);
             
         }
@@ -75,7 +75,6 @@ export default class ParentescoDAO {
             sql = 'SELECT * FROM parentescos WHERE resp_codigo = $1';
             parametros = [parametroConsulta];
         }
-        
         const { rows: registros, fields: campos } = await client.query(sql, parametros);
         let listaParentescos = [];
         for (const registro of registros) {

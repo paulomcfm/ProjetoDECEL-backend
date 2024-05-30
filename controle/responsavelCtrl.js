@@ -89,40 +89,31 @@ export default class ResponsavelCtrl {
             const telefone = dados.telefone;
             const celular = dados.celular;
             const alunos = dados.alunos;
-            const responsavel = new Responsavel(0, nome, rg, cpf, email, telefone, celular, alunos); 
+            const responsavel = new Responsavel(codigo, nome, rg, cpf, email, telefone, celular, alunos); 
             if (codigo>=0 && nome && rg && cpf && email && telefone && celular) {
                 const client = await poolConexao.getInstance().connect();
                 try{
                     await client.query('BEGIN');
                     const parentescos = new Parentesco();
                     const parentescoDoResponsavel = await parentescos.consultarResponsavel(responsavel.codigo, client);
-                    const alunosFaltantes = parentescoDoResponsavel.filter(aluno => {
-                        return !responsavel.alunos.some(responsavelAluno => responsavelAluno.codigo === aluno.codigoAluno);
-                    });
-                    for(const aluno of alunosFaltantes){
-                        const alu = new Aluno(aluno.codigoAluno);
-                        const par = new Parentesco(alu.codigo, responsavel.codigo,aluno.parentesco);
-                        await par.gravar(client);
-                    }
-                    const alunosNovos = responsavel.alunos.filter(aluno =>{
-                        return !parentescoDoResponsavel.some(parentesco => parentesco.codigoAluno === aluno.codigo);
-                    }
-                    );
-                    for(const aluno of alunosNovos){
-                        const alu = new Aluno(aluno.codigoAluno);
-                        const par = new Parentesco(alu.codigo, responsavel.codigo,aluno.parentesco);
-                        await par.gravar(client);
-                    }
-                    const parentescosAtuais = parentescoDoResponsavel.filter(aluno => {
-                        return responsavel.alunos.some(responsavelAluno => responsavelAluno.codigo === aluno.codigoAluno);
-                    });
-                    for(const aluno of parentescosAtuais){
-                        const alunoAtualizado = responsavel.alunos.find(responsavelAluno => responsavelAluno.codigo === aluno.codigoAluno);
-                        if(aluno.parentesco !== alunoAtualizado.parentesco){
+                    
+                    for(const aluno of parentescoDoResponsavel){
+                        let tem = false
+                        for(const aluno1 of alunos){
+                            if(parentescoDoResponsavel.some(aluno => aluno.codigoAluno === aluno1.codigoAluno))
+                                tem = true;
+                        }
+                        if(tem){
+                            console.log(aluno.codigoAluno)
                             const alu = new Aluno(aluno.codigoAluno);
                             const par = new Parentesco(alu.codigo, responsavel.codigo,aluno.parentesco);
-                            await par.gravar(client);
+                            await par.excluir(client);
                         }
+                    }
+                    for(const aluno of alunos){
+                        const alu = new Aluno(aluno.codigoAluno);
+                        const par = new Parentesco(alu.codigo, responsavel.codigo,aluno.parentesco);
+                        await par.gravar(client);
                     }
                     await responsavel.atualizar(client);
                     resposta.status(200).json({
@@ -132,6 +123,7 @@ export default class ResponsavelCtrl {
                     });
                     await client.query('COMMIT');
                 } catch(e){
+                    console.log(e)
                     await client.query('ROLLBACK');
                     if (e.code === '23505') {
                         resposta.status(400).json({
@@ -207,9 +199,6 @@ export default class ResponsavelCtrl {
     async consultar(requisicao, resposta) {
         resposta.type('application/json');
         let termo = requisicao.params.termo;
-        console.log(requisicao);
-        console.log(requisicao.params);
-        console.log(requisicao.params.termo);
         if (!termo) {
             termo = '';
         }
