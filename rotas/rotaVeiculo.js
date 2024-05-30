@@ -1,14 +1,14 @@
 import { Router } from 'express';
 import VeiculoCtrl from '../controle/veiculoCtrl.js';
 
-// const aluCtrl = new VeiculoCtrl();
+const veiCtrl = VeiculoCtrl.getInstance();
 const rotaVeiculo = new Router();
 
-rotaVeiculo.get('/', VeiculoCtrl.consultar)
-    .get('/:termo', VeiculoCtrl.consultar)
-    .post('/', VeiculoCtrl.gravar)
-    .patch('/', VeiculoCtrl.atualizar)
-    .put('/', VeiculoCtrl.atualizar)
-    .delete('/', VeiculoCtrl.excluir);
+rotaVeiculo.get('/', veiCtrl.consultar)
+    .get('/:termo', veiCtrl.consultar)
+    .post('/', veiCtrl.gravar)
+    .patch('/', veiCtrl.atualizar)
+    .put('/', veiCtrl.atualizar)
+    .delete('/', veiCtrl.excluir);
 
 export default rotaVeiculo;
