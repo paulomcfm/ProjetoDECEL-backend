@@ -125,11 +125,18 @@ CREATE TABLE Inscricoes (
 
 CREATE TABLE Manutencoes (
   manu_codigo SERIAL PRIMARY KEY,
-  manu_tipo CHAR NOT NULL,
+  manu_tipo VARCHAR(11) NOT NULL,
   manu_data DATE NOT NULL,
   manu_observacoes varchar(255),
-  vei_codigo INT,
-  CONSTRAINT fk_manutencoes_veiculos FOREIGN KEY (vei_codigo) REFERENCES Veiculos(vei_codigo)
+  vei_placa VARCHAR(7) NOT NULL,
+  CONSTRAINT fk_manutencoes_veiculos FOREIGN KEY (vei_placa) REFERENCES Veiculos(vei_placa)
+);
+
+CREATE TABLE PeriodoManutencao (
+    pm_id SERIAL PRIMARY KEY,
+    vei_placa VARCHAR(7) NOT NULL,
+    pm_data_criacao TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (vei_placa) REFERENCES Usuarios(vei_placa) ON DELETE CASCADE
 );
 
 CREATE TABLE Rotas_tem_PontosdeEmbarque (
