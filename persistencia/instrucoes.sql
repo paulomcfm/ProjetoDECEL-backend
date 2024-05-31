@@ -19,7 +19,7 @@ CREATE TABLE RedefinicoesSenha (
 CREATE TABLE Veiculos (
   vei_codigo SERIAL PRIMARY KEY,
   vei_renavam VARCHAR(11) NOT NULL UNIQUE,
-  vei_placa VARCHAR(7) NOT NULL,
+  vei_placa VARCHAR(7) NOT NULL UNIQUE,
   vei_modelo VARCHAR(45) NOT NULL,
   vei_capacidade INT NOT NULL,
   vei_tipo CHAR NOT NULL
@@ -136,7 +136,7 @@ CREATE TABLE PeriodoManutencao (
     pm_id SERIAL PRIMARY KEY,
     vei_placa VARCHAR(7) NOT NULL,
     pm_data_criacao TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (vei_placa) REFERENCES Usuarios(vei_placa) ON DELETE CASCADE
+    FOREIGN KEY (vei_placa) REFERENCES Veiculos(vei_placa) ON DELETE CASCADE
 );
 
 CREATE TABLE Rotas_tem_PontosdeEmbarque (
