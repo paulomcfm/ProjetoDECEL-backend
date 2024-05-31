@@ -241,10 +241,10 @@ VALUES
   (2024, '4', 'C', 'F', 'M', '2024-04-23', 'Rua São José', '34567-890', '345', 'Riacho Lua Doce', 3, 3, 4, 3);
 
 -- Inserts para a tabela Manutencoes
-INSERT INTO Manutencoes (manu_tipo, manu_data, vei_codigo)
-VALUES ('P', '2024-04-22', 1),
-       ('C', '2024-04-22', 2),
-       ('P', '2024-04-22', 3);
+INSERT INTO Manutencoes (manu_tipo, manu_data, vei_placa)
+VALUES ('preventiva', '2024-04-22', 'GHI789'),
+       ('corretiva', '2024-04-22', 'DEF456'),
+       ('preventiva', '2024-04-22', 'XYZ789');
 
 -- Inserts para a tabela Rotas_tem_PontosdeEmbarque
 INSERT INTO Rotas_tem_PontosdeEmbarque (rot_codigo,pde_codigo,ordem)
