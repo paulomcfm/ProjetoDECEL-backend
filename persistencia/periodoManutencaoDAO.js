@@ -1,4 +1,4 @@
-import Manutencao from "../modelo/manutencao";
+import Manutencao from "../modelo/manutencao.js";
 
 export default class PeriodoManutencaoDAO {
     async gravar(placa, client) {

@@ -194,4 +194,45 @@ export default class ManutencaoCtrl {
             });
         }
     }
+
+    async gravarPreventiva(requisicao, resposta) {
+        resposta.type('application/json');
+        if (requisicao.method === 'POST' && requisicao.is('application/json')) {
+            const dados = requisicao.body;
+            const { tipo, data, observacoes, placa } = dados;
+            if (tipo && data && placa) {
+                const manutencao = new Manutencao(null, tipo, data, observacoes, placa);
+                const client = await poolConexao.getInstance().connect();
+                const manutencaoDAO = new ManutencaoDAO();
+                try {
+                    await client.query('BEGIN');
+                    await manutencaoDAO.gravar(manutencao, client);
+                    await client.query('COMMIT');
+                    resposta.status(200).json({
+                        "status": true,
+                        "manutencao": manutencao,
+                        "mensagem": 'Manutenção preventiva incluída com sucesso!'
+                    });
+                } catch (erro) {
+                    await client.query('ROLLBACK');
+                    resposta.status(500).json({
+                        "status": false,
+                        "mensagem": 'Erro ao registrar a manutenção preventiva: ' + erro.message
+                    });
+                } finally {
+                    client.release();
+                }
+            } else {
+                resposta.status(400).json({
+                    "status": false,
+                    "mensagem": 'Por favor, preencha todos os campos obrigatórios!'
+                });
+            }
+        } else {
+            resposta.status(400).json({
+                "status": false,
+                "mensagem": 'Por favor, utilize o método POST e envie os dados no formato JSON para cadastrar uma manutenção preventiva!'
+            });
+        }
+    }
 }

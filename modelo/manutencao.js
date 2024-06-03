@@ -1,4 +1,4 @@
-import ManutencaoDAO from "../persistencia/manutencaoDAO";
+import ManutencaoDAO from "../persistencia/manutencaoDAO.js";
 
 export default class Manutencao{
     #codigo;
