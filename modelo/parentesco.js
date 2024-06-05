@@ -1,30 +1,30 @@
 import ParentescoDAO from "../persistencia/parentescoDAO.js";
 
 export default class Parentesco {
-    #codigoAluno;
-    #codigoResponsavel;
+    #aluno;
+    #responsavel;
     #parentesco;
 
-    constructor(codigoAluno = 0, codigoResponsavel= 0, parentesco= '') {
-        this.#codigoAluno=codigoAluno;
-        this.#codigoResponsavel=codigoResponsavel;
+    constructor(aluno = '', responsavel= '', parentesco= '') {
+        this.#aluno=aluno;
+        this.#responsavel=responsavel;
         this.#parentesco=parentesco;
     }
 
-    get codigoAluno() {
-        return this.#codigoAluno;
+    get aluno() {
+        return this.#aluno;
     }
 
-    set codigoAluno(novoCodigoAluno) {
-        this.#codigoAluno = novoCodigoAluno;
+    set aluno(novoAluno) {
+        this.#aluno = novoAluno;
     }
 
-    get codigoResponsavel() {
-        return this.#codigoResponsavel;
+    get responsavel() {
+        return this.#responsavel;
     }
 
-    set codigoResponsavel(novoCodigoResponsavel) {
-        this.#codigoResponsavel = novoCodigoResponsavel;
+    set responsavel(novoResponsavel) {
+        this.#responsavel = novoResponsavel;
     }
 
     get parentesco() {
@@ -41,8 +41,8 @@ export default class Parentesco {
     
     toJSON() {
         return {
-            codigoAluno: this.#codigoAluno,
-            codigoResponsavel: this.#codigoResponsavel,
+            aluno: this.#aluno,
+            responsavel: this.#responsavel,
             parentesco: this.#parentesco
         }
     }
