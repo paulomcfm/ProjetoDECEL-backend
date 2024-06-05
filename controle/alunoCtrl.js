@@ -26,8 +26,8 @@ export default class AlunoCtrl {
             const dataNasc = dados.dataNasc;
             const celular = dados.celular;
             const responsaveis = dados.responsaveis;
-            const status = dados.status;
-            const motivoInativo = dados.motivoInativo;
+            const status = 'A';
+            const motivoInativo = '';
             const aluno = new Aluno(0, nome, rg, observacoes, dataNasc, celular, responsaveis, status, motivoInativo);
             if (nome && rg && aluno.validarDataNascimento(dataNasc)) {
                 const client = await poolConexao.getInstance().connect();
@@ -35,8 +35,8 @@ export default class AlunoCtrl {
                     await client.query('BEGIN');
                     await aluno.gravar(client);
                     for (const responsavel of aluno.responsaveis) {
-                        const resp = new Responsavel(responsavel.codigo);
-                        const parentesco = new Parentesco(aluno.codigo, resp.codigo, responsavel.parentesco);
+                        const resp = new Responsavel(responsavel.codigo, responsavel.nome, responsavel.rg, responsavel.cpf, responsavel.email, responsavel.telefone, responsavel.celular);
+                        const parentesco = new Parentesco(aluno, resp, responsavel.parentesco);
                         await parentesco.gravar(client);
                     }
                     await client.query('COMMIT');
@@ -102,35 +102,35 @@ export default class AlunoCtrl {
                     const parentescos = new Parentesco();
                     const insc = new Inscricao();
                     let hasInscricao = false;
-                    if (aluno.status === 'I') { 
+                    if (aluno.status === 'A') { 
                         hasInscricao = await insc.hasInscricaoAluno(client, codigo, new Date().getFullYear()); 
                     }
                     if (!hasInscricao) {
                         const parentescosDoAluno = await parentescos.consultarAluno(aluno.codigo, client);
                         const responsaveisFaltantes = parentescosDoAluno.filter(responsavel => {
-                            return !aluno.responsaveis.some(alunoResponsavel => alunoResponsavel.codigo === responsavel.codigoResponsavel);
+                            return !aluno.responsaveis.some(alunoResponsavel => alunoResponsavel.codigo === responsavel.responsavel.codigo);
                         });
-                        for (const responsavel of responsaveisFaltantes) { // remover parentescos que existiam mas não existem mais
-                            const resp = new Responsavel(responsavel.codigoResponsavel);
-                            const par = new Parentesco(aluno.codigo, resp.codigo, responsavel.parentesco);
+                        for (const parentesco of responsaveisFaltantes) { // remover parentescos que existiam mas não existem mais
+                            const resp = new Responsavel(parentesco.responsavel.codigo, parentesco.responsavel.nome, parentesco.responsavel.rg, parentesco.responsavel.cpf, parentesco.responsavel.email, parentesco.responsavel.telefone, parentesco.responsavel.celular);
+                            const par = new Parentesco(aluno, resp, parentesco.parentesco);
                             await par.excluir(client);
                         }
                         const responsaveisNovos = aluno.responsaveis.filter(responsavel => {
-                            return !parentescosDoAluno.some(parentesco => parentesco.codigoResponsavel === responsavel.codigo);
+                            return !parentescosDoAluno.some(parentesco => parentesco.responsavel.codigo === responsavel.codigo);
                         });
                         for (const responsavel of responsaveisNovos) { // incluir novos parentescos
-                            const resp = new Responsavel(responsavel.codigo);
-                            const par = new Parentesco(aluno.codigo, resp.codigo, responsavel.parentesco);
+                            const resp = new Responsavel(responsavel.codigo, responsavel.nome, responsavel.rg, responsavel.cpf, responsavel.email, responsavel.telefone, responsavel.celular);
+                            const par = new Parentesco(aluno, resp, responsavel.parentesco);
                             await par.gravar(client);
                         }
                         const parentescosAtuais = parentescosDoAluno.filter(responsavel => {
-                            return aluno.responsaveis.some(alunoResponsavel => alunoResponsavel.codigo === responsavel.codigoResponsavel);
+                            return aluno.responsaveis.some(alunoResponsavel => alunoResponsavel.codigo === responsavel.responsavel.codigo);
                         });
-                        for (const responsavel of parentescosAtuais) { // atualizar parentescos que já existiam
-                            const responsavelAtualizado = aluno.responsaveis.find(alunoResponsavel => alunoResponsavel.codigo === responsavel.codigoResponsavel);
-                            if (responsavel.parentesco !== responsavelAtualizado.parentesco) {
-                                const resp = new Responsavel(responsavel.codigoResponsavel);
-                                const par = new Parentesco(aluno.codigo, resp.codigo, responsavelAtualizado.parentesco);
+                        for (const parentesco of parentescosAtuais) { // atualizar parentescos que já existiam
+                            const responsavelAtualizado = aluno.responsaveis.find(alunoResponsavel => alunoResponsavel.codigo === parentesco.responsavel.codigo);
+                            if (parentesco.parentesco !== responsavelAtualizado.parentesco) {
+                                const resp = new Responsavel(parentesco.responsavel.codigo, parentesco.responsavel.nome, parentesco.responsavel.rg, parentesco.responsavel.cpf, parentesco.responsavel.email, parentesco.responsavel.telefone, parentesco.responsavel.celular);
+                                const par = new Parentesco(aluno, resp, responsavelAtualizado.parentesco);
                                 await par.atualizar(client);
                             }
                         }
