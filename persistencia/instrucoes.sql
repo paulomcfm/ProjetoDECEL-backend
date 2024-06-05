@@ -16,15 +16,6 @@ CREATE TABLE RedefinicoesSenha (
     FOREIGN KEY (user_email) REFERENCES Usuarios(user_email) ON DELETE CASCADE
 );
 
-CREATE TABLE Veiculos (
-  vei_codigo SERIAL PRIMARY KEY,
-  vei_renavam VARCHAR(11) NOT NULL UNIQUE,
-  vei_placa VARCHAR(7) NOT NULL UNIQUE,
-  vei_modelo VARCHAR(45) NOT NULL,
-  vei_capacidade INT NOT NULL,
-  vei_tipo CHAR NOT NULL
-);
-
 CREATE TABLE Responsaveis (
     resp_codigo SERIAL PRIMARY KEY,
     resp_nome VARCHAR(255) NOT NULL,
@@ -87,6 +78,31 @@ CREATE TABLE Monitores (
   mon_celular VARCHAR(16) NOT NULL
 );
 
+CREATE TABLE Veiculos (
+  vei_codigo SERIAL PRIMARY KEY,
+  vei_renavam VARCHAR(11) NOT NULL UNIQUE,
+  vei_placa VARCHAR(7) NOT NULL UNIQUE,
+  vei_modelo VARCHAR(45) NOT NULL,
+  vei_capacidade INT NOT NULL,
+  vei_tipo CHAR NOT NULL
+);
+
+CREATE TABLE Manutencoes (
+  manu_codigo SERIAL PRIMARY KEY,
+  manu_tipo VARCHAR(11) NOT NULL,
+  manu_data DATE NOT NULL,
+  manu_observacoes varchar(255),
+  vei_placa VARCHAR(7) NOT NULL,
+  CONSTRAINT fk_manutencoes_veiculos FOREIGN KEY (vei_placa) REFERENCES Veiculos(vei_placa)
+);
+
+CREATE TABLE PeriodoManutencao (
+    pm_id SERIAL PRIMARY KEY,
+    vei_placa VARCHAR(7) NOT NULL,
+    pm_data_criacao TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (vei_placa) REFERENCES Veiculos(vei_placa) ON DELETE CASCADE
+);
+
 CREATE TABLE Rotas (
   rot_codigo SERIAL PRIMARY KEY,
   rot_nome VARCHAR(255) NOT NULL,
@@ -123,22 +139,6 @@ CREATE TABLE Inscricoes (
   CONSTRAINT fk_inscricoes_rotas FOREIGN KEY (rot_codigo) REFERENCES Rotas(rot_codigo)
 );
 
-CREATE TABLE Manutencoes (
-  manu_codigo SERIAL PRIMARY KEY,
-  manu_tipo VARCHAR(11) NOT NULL,
-  manu_data DATE NOT NULL,
-  manu_observacoes varchar(255),
-  vei_placa VARCHAR(7) NOT NULL,
-  CONSTRAINT fk_manutencoes_veiculos FOREIGN KEY (vei_placa) REFERENCES Veiculos(vei_placa)
-);
-
-CREATE TABLE PeriodoManutencao (
-    pm_id SERIAL PRIMARY KEY,
-    vei_placa VARCHAR(7) NOT NULL,
-    pm_data_criacao TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (vei_placa) REFERENCES Veiculos(vei_placa) ON DELETE CASCADE
-);
-
 CREATE TABLE Rotas_tem_PontosdeEmbarque (
   rot_codigo INT NOT NULL,
   pde_codigo INT NOT NULL,
@@ -158,7 +158,7 @@ CREATE TABLE Rotas_tem_Motoristas (
 
 -- Inserts para a tabela Usuarios
 INSERT INTO Usuarios (user_nome, user_senha, user_cpf, user_email, user_celular, user_nivel)
-VALUES ('admin', 'senha123', '123.456.789-00', 'usuario1@email.com', '(12) 93456-7890', 'admnistrador'),
+VALUES ('admin', 'senha123', '123.456.789-00', 'usuario1@email.com', '(12) 93456-7890', 'administrador'),
        ('usuario2', 'senha456', '987.654.321-00', 'usuario2@email.com', '(98) 97654-3210', 'normal'),
        ('usuario3', 'senha789', '111.222.333-44', 'usuario3@email.com', '(11) 91222-3333', 'normal');
 
