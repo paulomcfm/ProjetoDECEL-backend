@@ -19,25 +19,32 @@ export default class ManutencaoCtrl {
         resposta.type('application/json');
         if (requisicao.method === 'POST' && requisicao.is('application/json')) {
             const dados = requisicao.body;
-            const { tipo, data, observacoes, id } = dados;
+            const tipo = dados.tipo;
+            const data = dados.data;
+            const observacoes = dados.observacoes;
+            const id = dados.id;
             if (tipo && data && id) {
                 const manutencao = new Manutencao(tipo, data, observacoes, id);
                 const client = await poolConexao.getInstance().connect();
                 try {
                     await client.query('BEGIN');
-                    await manutencao.gravar(client);
-                    await client.query('COMMIT');
-                    resposta.status(200).json({
-                        "status": true,
-                        "manutencao": manutencao,
-                        "mensagem": 'Manutenção incluída com sucesso!'
+                    await manutencao.gravar(client).then(() => {
+                        resposta.status(200).json({
+                            "status": true,
+                            "manutencao": manutencao,
+                            "mensagem": 'Manutenção incluída com sucesso!'
+                        });
+                        client.query('COMMIT');
+                    }).catch(async (erro) => {
+                        await client.query('ROLLBACK');
+                        resposta.status(500).json({
+                            "status": false,
+                            "mensagem": 'Erro ao registrar a manutencao: ' + erro.message
+                        });
                     });
                 } catch (erro) {
                     await client.query('ROLLBACK');
-                    resposta.status(500).json({
-                        "status": false,
-                        "mensagem": 'Erro ao registrar a manutenção: ' + erro
-                    });
+                    throw erro;
                 } finally {
                     client.release();
                 }
@@ -59,25 +66,33 @@ export default class ManutencaoCtrl {
         resposta.type('application/json');
         if ((requisicao.method === 'PUT' || requisicao.method === 'PATCH') && requisicao.is('application/json')) {
             const dados = requisicao.body;
-            const { codigo, tipo, data, observacoes, placa } = dados;
-            if (codigo && tipo && data && placa) {
-                const manutencao = new Manutencao(codigo, tipo, data, observacoes, placa);
+            const codigo = dados.codigo;
+            const tipo = dados.tipo;
+            const data = dados.data;
+            const observacoes = dados.observacoes;
+            const id = dados.id;
+            if (codigo && tipo && data && id) {
+                const manutencao = new Manutencao(tipo, data, observacoes, id, codigo);
                 const client = await poolConexao.getInstance().connect();
-                const manutencaoDAO = new ManutencaoDAO();
                 try {
                     await client.query('BEGIN');
-                    await manutencaoDAO.atualizar(manutencao, client);
-                    await client.query('COMMIT');
-                    resposta.status(200).json({
-                        "status": true,
-                        "mensagem": 'Manutenção atualizada com sucesso!'
+                    await manutencao.atualizar(client).then(() => {
+                        resposta.status(200).json({
+                            "status": true,
+                            "manutencao": manutencao,
+                            "mensagem": 'Manutenção alterada com sucesso!'
+                        });
+                        client.query('COMMIT');
+                    }).catch(async (erro) => {
+                        await client.query('ROLLBACK');
+                        resposta.status(500).json({
+                            "status": false,
+                            "mensagem": 'Erro ao alterar a manutencao: ' + erro.message
+                        });
                     });
                 } catch (erro) {
                     await client.query('ROLLBACK');
-                    resposta.status(500).json({
-                        "status": false,
-                        "mensagem": 'Erro ao atualizar a manutenção: ' + erro.message
-                    });
+                    throw erro;
                 } finally {
                     client.release();
                 }
@@ -98,25 +113,30 @@ export default class ManutencaoCtrl {
     async excluir(requisicao, resposta) {
         resposta.type('application/json');
         if (requisicao.method === 'DELETE' && requisicao.is('application/json')) {
-            const { codigo } = requisicao.body;
+            const dados = requisicao.body;
+            const codigo = dados.codigo;
             if (codigo) {
                 const client = await poolConexao.getInstance().connect();
-                const manutencaoDAO = new ManutencaoDAO();
                 try {
                     await client.query('BEGIN');
-                    const manutencao = new Manutencao(codigo);
-                    await manutencaoDAO.excluir(manutencao, client);
-                    await client.query('COMMIT');
-                    resposta.status(200).json({
-                        "status": true,
-                        "mensagem": 'Manutenção excluída com sucesso!'
+                    const manutencao = new Manutencao('','','','',codigo);
+                    await manutencao.excluir(client).then(() => {
+                        resposta.status(200).json({
+                            "status": true,
+                            "Codigo": manutencao.codigo,
+                            "mensagem": 'Manutenção excluída com sucesso!'
+                        });
+                        client.query('COMMIT');
+                    }).catch(async (erro) => {
+                        await client.query('ROLLBACK');
+                        resposta.status(500).json({
+                            "status": false,
+                            "mensagem": 'Erro ao excluir a manutencao: ' + erro.message
+                        });
                     });
                 } catch (erro) {
                     await client.query('ROLLBACK');
-                    resposta.status(500).json({
-                        "status": false,
-                        "mensagem": 'Erro ao excluir a manutenção: ' + erro.message
-                    });
+                    throw erro;
                 } finally {
                     client.release();
                 }
@@ -194,44 +214,4 @@ export default class ManutencaoCtrl {
         }
     }
 
-    async gravarPreventiva(requisicao, resposta) {
-        resposta.type('application/json');
-        if (requisicao.method === 'POST' && requisicao.is('application/json')) {
-            const dados = requisicao.body;
-            const { tipo, data, observacoes, placa } = dados;
-            if (tipo && data && placa) {
-                const manutencao = new Manutencao(null, tipo, data, observacoes, placa);
-                const client = await poolConexao.getInstance().connect();
-                const manutencaoDAO = new ManutencaoDAO();
-                try {
-                    await client.query('BEGIN');
-                    await manutencaoDAO.gravar(manutencao, client);
-                    await client.query('COMMIT');
-                    resposta.status(200).json({
-                        "status": true,
-                        "manutencao": manutencao,
-                        "mensagem": 'Manutenção preventiva incluída com sucesso!'
-                    });
-                } catch (erro) {
-                    await client.query('ROLLBACK');
-                    resposta.status(500).json({
-                        "status": false,
-                        "mensagem": 'Erro ao registrar a manutenção preventiva: ' + erro.message
-                    });
-                } finally {
-                    client.release();
-                }
-            } else {
-                resposta.status(400).json({
-                    "status": false,
-                    "mensagem": 'Por favor, preencha todos os campos obrigatórios!'
-                });
-            }
-        } else {
-            resposta.status(400).json({
-                "status": false,
-                "mensagem": 'Por favor, utilize o método POST e envie os dados no formato JSON para cadastrar uma manutenção preventiva!'
-            });
-        }
-    }
 }

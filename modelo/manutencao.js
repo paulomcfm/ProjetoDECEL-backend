@@ -61,7 +61,7 @@ export default class Manutencao{
             tipo: this.#tipo,
             data: this.#data,
             observacoes: this.#observacoes,
-            id: this.#id
+            id_veiculo: this.#id
         }
     }
 
