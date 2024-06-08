@@ -92,15 +92,15 @@ CREATE TABLE Manutencoes (
   manu_tipo VARCHAR(11) NOT NULL,
   manu_data DATE NOT NULL,
   manu_observacoes varchar(255),
-  vei_placa VARCHAR(7) NOT NULL,
-  CONSTRAINT fk_manutencoes_veiculos FOREIGN KEY (vei_placa) REFERENCES Veiculos(vei_placa)
+  vei_codigo INT NOT NULL,
+  CONSTRAINT fk_manutencoes_veiculos FOREIGN KEY (vei_codigo) REFERENCES Veiculos(vei_codigo)
 );
 
 CREATE TABLE PeriodoManutencao (
     pm_id SERIAL PRIMARY KEY,
-    vei_placa VARCHAR(7) NOT NULL,
+    vei_codigo INT NOT NULL,
     pm_data_criacao TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (vei_placa) REFERENCES Veiculos(vei_placa) ON DELETE CASCADE
+    FOREIGN KEY (vei_codigo) REFERENCES Veiculos(vei_codigo) ON DELETE CASCADE
 );
 
 CREATE TABLE Rotas (
@@ -241,10 +241,10 @@ VALUES
   (2024, '4', 'C', 'F', 'M', '2024-04-23', 'Rua São José', '34567-890', '345', 'Riacho Lua Doce', 3, 3, 4, 3);
 
 -- Inserts para a tabela Manutencoes
-INSERT INTO Manutencoes (manu_tipo, manu_data, vei_placa)
-VALUES ('preventiva', '2024-04-22', 'GHI789'),
-       ('corretiva', '2024-04-22', 'DEF456'),
-       ('preventiva', '2024-04-22', 'XYZ789');
+INSERT INTO Manutencoes (manu_tipo, manu_data, vei_codigo)
+VALUES ('preventiva', '2024-04-22', 1),
+       ('corretiva', '2024-04-22', 2),
+       ('preventiva', '2024-04-22', 3);
 
 -- Inserts para a tabela Rotas_tem_PontosdeEmbarque
 INSERT INTO Rotas_tem_PontosdeEmbarque (rot_codigo,pde_codigo,ordem)

@@ -19,14 +19,13 @@ export default class ManutencaoCtrl {
         resposta.type('application/json');
         if (requisicao.method === 'POST' && requisicao.is('application/json')) {
             const dados = requisicao.body;
-            const { tipo, data, observacoes, placa } = dados;
-            if (tipo && data && placa) {
-                const manutencao = new Manutencao(null, tipo, data, observacoes, placa);
+            const { tipo, data, observacoes, id } = dados;
+            if (tipo && data && id) {
+                const manutencao = new Manutencao(tipo, data, observacoes, id);
                 const client = await poolConexao.getInstance().connect();
-                const manutencaoDAO = new ManutencaoDAO();
                 try {
                     await client.query('BEGIN');
-                    await manutencaoDAO.gravar(manutencao, client);
+                    await manutencao.gravar(client);
                     await client.query('COMMIT');
                     resposta.status(200).json({
                         "status": true,
@@ -37,7 +36,7 @@ export default class ManutencaoCtrl {
                     await client.query('ROLLBACK');
                     resposta.status(500).json({
                         "status": false,
-                        "mensagem": 'Erro ao registrar a manutenção: ' + erro.message
+                        "mensagem": 'Erro ao registrar a manutenção: ' + erro
                     });
                 } finally {
                     client.release();
@@ -138,9 +137,9 @@ export default class ManutencaoCtrl {
     async consultar(requisicao, resposta) {
         if (requisicao.method === 'GET') {
             const client = await poolConexao.getInstance().connect();
-            const manutencaoDAO = new ManutencaoDAO();
+            const manutencao = new Manutencao();
             try {
-                const listaManutencoes = await manutencaoDAO.consultar(client);
+                const listaManutencoes = await manutencao.consultar(client);
                 resposta.json({
                     "status": true,
                     "listaManutencoes": listaManutencoes

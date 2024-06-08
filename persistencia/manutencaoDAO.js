@@ -18,8 +18,9 @@ export default class ManutencaoDAO {
                 }
             }
 
-            const sql = "INSERT INTO Manutencoes (manu_tipo, manu_data, manu_observacoes, vei_placa) VALUES ($1, $2, $3, $4) RETURNING manu_codigo";
-            const parametros = [manutencao.tipo, manutencao.data, manutencao.observacoes, manutencao.placa];
+            const sql = "INSERT INTO Manutencoes (manu_tipo, manu_data, manu_observacoes, vei_codigo) VALUES ($1, $2, $3, $4) RETURNING manu_codigo";
+            const parametros = [manutencao.tipo, manutencao.data, manutencao.observacoes, manutencao.id];
+            console.log(sql, parametros);
             const { rows } = await client.query(sql, parametros);
             if (rows.length > 0) {
                 manutencao.codigo = rows[0].manu_codigo;
@@ -51,9 +52,10 @@ export default class ManutencaoDAO {
     async consultar(client) {
         const sql = "SELECT * FROM Manutencoes";
         const { rows: registros } = await client.query(sql);
+        console.log(registros);
         const listaManutencoes = [];
         for (const registro of registros) {
-            const manutencao = new Manutencao(registro.manu_codigo, registro.manu_tipo, registro.manu_data, registro.manu_observacoes, registro.vei_placa);
+            const manutencao = new Manutencao(registro.manu_tipo, registro.manu_data, registro.manu_observacoes, registro.vei_placa, registro.manu_codigo);
             listaManutencoes.push(manutencao);
         }
         return listaManutencoes;

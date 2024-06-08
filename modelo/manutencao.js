@@ -5,14 +5,15 @@ export default class Manutencao{
     #tipo;
     #data;
     #observacoes;
-    #placa;
+    #id;
 
-    constructor(codigo=0, tipo='', data='', observacoes='', placa=''){
+    // Cuidado aqui, mudamos o parâmetro código de lugar
+    constructor(tipo='', data='', observacoes='', id=1, codigo=0){
         this.#codigo=codigo;
         this.#tipo=tipo;
         this.#data=data;
         this.#observacoes=observacoes;
-        this.#placa=placa;
+        this.#id=id;
     }
 
     get codigo() {
@@ -46,12 +47,12 @@ export default class Manutencao{
     set observacoes(novaObservacoes) {
         this.#observacoes = novaObservacoes;
     }
-    get placa() {
-        return this.#placa;
+    get id() {
+        return this.#id;
     }
 
-    set placa(novaPlaca) {
-        this.#placa = novaPlaca;
+    set id(novoId) {
+        this.#id = novoId;
     }
 
     toJSON(){
@@ -60,7 +61,7 @@ export default class Manutencao{
             tipo: this.#tipo,
             data: this.#data,
             observacoes: this.#observacoes,
-            placa: this.#placa
+            id: this.#id
         }
     }
 
