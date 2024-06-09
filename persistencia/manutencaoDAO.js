@@ -19,7 +19,7 @@ export default class ManutencaoDAO {
             }
 
             const sql = "INSERT INTO Manutencoes (manu_tipo, manu_data, manu_observacoes, vei_codigo) VALUES ($1, $2, $3, $4) RETURNING manu_codigo";
-            const parametros = [manutencao.tipo, manutencao.data, manutencao.observacoes, manutencao.id];
+            const parametros = [manutencao.tipo, manutencao.data, manutencao.observacoes, manutencao.veiculoCodigo];
             console.log(sql, parametros);
             const { rows } = await client.query(sql, parametros);
             if (rows.length > 0) {
@@ -35,7 +35,6 @@ export default class ManutencaoDAO {
 
     async atualizar(manutencao, client) {
         if (manutencao instanceof Manutencao) {
-            // 1. Obter o tipo da manutenção antiga
             const sqlConsulta = "SELECT manu_tipo FROM Manutencoes WHERE manu_codigo = $1";
             const resultadoConsulta = await client.query(sqlConsulta, [manutencao.codigo]);
             const manutencaoAntiga = resultadoConsulta.rows[0];
@@ -44,15 +43,13 @@ export default class ManutencaoDAO {
                 throw new Error('Manutenção não encontrada!');
             }
 
-            // 2. Atualizar a manutenção
             const sqlAtualiza = "UPDATE Manutencoes SET manu_tipo = $1, manu_data = $2, manu_observacoes = $3, vei_codigo = $4 WHERE manu_codigo = $5";
-            const parametros = [manutencao.tipo, manutencao.data, manutencao.observacoes, manutencao.id, manutencao.codigo];
+            const parametros = [manutencao.tipo, manutencao.data, manutencao.observacoes, manutencao.veiculoCodigo, manutencao.codigo];
             await client.query(sqlAtualiza, parametros);
 
-            // 3. Verificar se é necessário excluir da tabela PeriodoManutencao
             if (manutencaoAntiga.manu_tipo === 'Preventiva' && manutencao.tipo === 'Corretiva') {
                 const sqlExclui = "DELETE FROM PeriodoManutencao WHERE vei_codigo = $1";
-                await client.query(sqlExclui, [manutencao.id]);
+                await client.query(sqlExclui, [manutencao.veiculoCodigo]);
             }
         }
     }
@@ -68,7 +65,6 @@ export default class ManutencaoDAO {
     async consultar(client) {
         const sql = "SELECT * FROM Manutencoes";
         const { rows: registros } = await client.query(sql);
-        console.log(registros);
         const listaManutencoes = [];
         for (const registro of registros) {
             const manutencao = new Manutencao(registro.manu_tipo, registro.manu_data, registro.manu_observacoes, registro.vei_codigo, registro.manu_codigo);

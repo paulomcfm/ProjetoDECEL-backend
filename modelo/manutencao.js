@@ -1,19 +1,18 @@
 import ManutencaoDAO from "../persistencia/manutencaoDAO.js";
 
-export default class Manutencao{
-    #codigo;
+export default class Manutencao {
+    #codigo; // Código da manutenção
     #tipo;
     #data;
     #observacoes;
-    #id;
+    #veiculoCodigo; // Código do veículo relacionado à manutenção
 
-    // Cuidado aqui, mudamos o parâmetro código de lugar
-    constructor(tipo='', data='', observacoes='', id=1, codigo=0){
-        this.#codigo=codigo;
-        this.#tipo=tipo;
-        this.#data=data;
-        this.#observacoes=observacoes;
-        this.#id=id;
+    constructor(tipo='', data='', observacoes='', veiculoCodigo= 1, codigo= 0) {
+        this.#codigo = codigo;
+        this.#tipo = tipo;
+        this.#data = data;
+        this.#observacoes = observacoes;
+        this.#veiculoCodigo = veiculoCodigo;
     }
 
     get codigo() {
@@ -44,25 +43,26 @@ export default class Manutencao{
         return this.#observacoes;
     }
 
-    set observacoes(novaObservacoes) {
-        this.#observacoes = novaObservacoes;
-    }
-    get id() {
-        return this.#id;
+    set observacoes(novasObservacoes) {
+        this.#observacoes = novasObservacoes;
     }
 
-    set id(novoId) {
-        this.#id = novoId;
+    get veiculoCodigo() {
+        return this.#veiculoCodigo;
     }
 
-    toJSON(){
-        return{
+    set veiculoCodigo(novoVeiculoCodigo) {
+        this.#veiculoCodigo = novoVeiculoCodigo;
+    }
+
+    toJSON() {
+        return {
             codigo: this.#codigo,
             tipo: this.#tipo,
             data: this.#data,
             observacoes: this.#observacoes,
-            id_veiculo: this.#id
-        }
+            veiculoCodigo: this.#veiculoCodigo
+        };
     }
 
     async gravar(client) {

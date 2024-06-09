@@ -22,9 +22,9 @@ export default class ManutencaoCtrl {
             const tipo = dados.tipo;
             const data = dados.data;
             const observacoes = dados.observacoes;
-            const id = dados.id;
-            if (tipo && data && id) {
-                const manutencao = new Manutencao(tipo, data, observacoes, id);
+            const veiculoCodigo = dados.veiculoCodigo;
+            if (tipo && data && veiculoCodigo) {
+                const manutencao = new Manutencao(tipo, data, observacoes, veiculoCodigo);
                 const client = await poolConexao.getInstance().connect();
                 try {
                     await client.query('BEGIN');
@@ -70,9 +70,9 @@ export default class ManutencaoCtrl {
             const tipo = dados.tipo;
             const data = dados.data;
             const observacoes = dados.observacoes;
-            const id = dados.id;
-            if (codigo && tipo && data && id) {
-                const manutencao = new Manutencao(tipo, data, observacoes, id, codigo);
+            const veiculoCodigo = dados.veiculoCodigo;
+            if (codigo && tipo && data && veiculoCodigo) {
+                const manutencao = new Manutencao(tipo, data, observacoes, veiculoCodigo, codigo);
                 const client = await poolConexao.getInstance().connect();
                 try {
                     await client.query('BEGIN');
@@ -213,5 +213,4 @@ export default class ManutencaoCtrl {
             });
         }
     }
-
 }
