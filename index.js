@@ -15,6 +15,7 @@ import rotaAlocarAlunos from './rotas/rotaAlocarAlunos.js';
 import rota_Inscricoes_tem_Rotas from './rotas/rota_Inscricoes_tem_Rotas.js';
 import rotaMonitor from './rotas/rotaMonitor.js';
 import rotaEnviarEmail from './rotas/rotaEnviarEmail.js';
+import rotaManutencao from './rotas/rotaManutencao.js';
 
 const app = express();
 const porta = '8080'
@@ -38,6 +39,7 @@ app.use('/alocar-alunos',rotaAlocarAlunos);
 app.use('/inscricoes-rota',rota_Inscricoes_tem_Rotas);
 app.use('/monitor',rotaMonitor);
 app.use('/enviar-email',rotaEnviarEmail);
+app.use('/manutencoes', rotaManutencao);
 
 
 app.listen(porta, () => { console.log("servidor iniciado " + porta) });

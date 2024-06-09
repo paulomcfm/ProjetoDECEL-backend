@@ -1,4 +1,6 @@
 import Responsavel from "../modelo/responsavel.js";
+import Aluno from "../modelo/aluno.js";
+import Parentesco from "../modelo/parentesco.js";
 import poolConexao from "../persistencia/conexao.js";
 
 export default class ResponsavelCtrl {
@@ -15,7 +17,7 @@ export default class ResponsavelCtrl {
             new ResponsavelCtrl();
         return ResponsavelCtrl._instance;
     }
-    gravar(requisicao, resposta) {
+    async gravar(requisicao, resposta) {
         resposta.type('application/json');
         if (requisicao.method === 'POST' && requisicao.is('application/json')) {
             const dados = requisicao.body;
@@ -25,20 +27,40 @@ export default class ResponsavelCtrl {
             const email = dados.email;
             const telefone = dados.telefone;
             const celular = dados.celular;
+            const alunos = dados.alunos;
+            const responsavel = new Responsavel(0, nome, rg, cpf, email, telefone, celular, alunos); 
             if (nome && rg && cpf && email && telefone && celular) {
-                const responsavel = new Responsavel(0, nome, rg, cpf, email, telefone, celular);
-                responsavel.gravar().then(() => {
+                const client = await poolConexao.getInstance().connect();
+                try{
+                    await client.query('BEGIN');
+                    await responsavel.gravar(client);
+                    for(const aluno of responsavel.alunos){
+                        const alu = new Aluno(aluno.codigo);
+                        const parentesco = new Parentesco(alu.codigo, responsavel.codigo, aluno.parentesco)
+                        await parentesco.gravar(client);
+                    }
+                    await client.query('COMMIT');
                     resposta.status(200).json({
                         "status": true,
                         "codigoGerado": responsavel.codigo,
-                        "mensagem": 'Responsavel incluida com sucesso!'
+                        "mensagem": 'Responsável incluido com sucesso!'
                     });
-                }).catch((erro) => {
-                    resposta.status(500).json({
-                        "status": false,
-                        "mensagem": 'Erro ao registrar a responsavel: ' + erro.message
-                    });
-                });
+                }catch(e){
+                    await client.query('ROLLBACK');
+                    if (e.code === '23505') {
+                        resposta.status(400).json({
+                            "status": false,
+                            "mensagem": 'RG já cadastrado.'
+                        });
+                    } else {
+                        resposta.status(500).json({
+                            "status": false,
+                            "mensagem": 'Erro ao atualizar o responsavel: ' + e.message
+                        });
+                    }
+                } finally {
+                    await client.release();
+                }
             }
             else {
                 resposta.status(400).json({
@@ -55,7 +77,7 @@ export default class ResponsavelCtrl {
         }
     }
 
-    atualizar(requisicao, resposta) {
+    async atualizar(requisicao, resposta) {
         resposta.type('application/json');
         if ((requisicao.method === 'PUT' || requisicao.method === 'PATCH') && requisicao.is('application/json')) {
             const dados = requisicao.body;
@@ -66,20 +88,57 @@ export default class ResponsavelCtrl {
             const email = dados.email;
             const telefone = dados.telefone;
             const celular = dados.celular;
+            const alunos = dados.alunos;
+            const responsavel = new Responsavel(codigo, nome, rg, cpf, email, telefone, celular, alunos); 
             if (codigo>=0 && nome && rg && cpf && email && telefone && celular) {
-                const responsavel = new Responsavel(codigo, nome, rg, cpf, email, telefone, celular);
-                responsavel.atualizar().then(() => {
+                const client = await poolConexao.getInstance().connect();
+                try{
+                    await client.query('BEGIN');
+                    const parentescos = new Parentesco();
+                    const parentescoDoResponsavel = await parentescos.consultarResponsavel(responsavel.codigo, client);
+                    
+                    for(const aluno of parentescoDoResponsavel){
+                        let tem = false
+                        for(const aluno1 of alunos){
+                            if(parentescoDoResponsavel.some(aluno => aluno.codigoAluno === aluno1.codigoAluno))
+                                tem = true;
+                        }
+                        if(tem){
+                            console.log(aluno.codigoAluno)
+                            const alu = new Aluno(aluno.codigoAluno);
+                            const par = new Parentesco(alu.codigo, responsavel.codigo,aluno.parentesco);
+                            await par.excluir(client);
+                        }
+                    }
+                    for(const aluno of alunos){
+                        const alu = new Aluno(aluno.codigoAluno);
+                        const par = new Parentesco(alu.codigo, responsavel.codigo,aluno.parentesco);
+                        await par.gravar(client);
+                    }
+                    await responsavel.atualizar(client);
                     resposta.status(200).json({
                         "status": true,
                         "codigoGerado": responsavel.codigo,
-                        "mensagem": 'Responsavel alterada com sucesso!'
+                        "mensagem": 'Responsavel alterado com sucesso!'
                     });
-                }).catch((erro) => {
-                    resposta.status(500).json({
-                        "status": false,
-                        "mensagem": 'Erro ao alterar a responsavel: ' + erro.message
-                    });
-                });
+                    await client.query('COMMIT');
+                } catch(e){
+                    console.log(e)
+                    await client.query('ROLLBACK');
+                    if (e.code === '23505') {
+                        resposta.status(400).json({
+                            "status": false,
+                            "mensagem": 'RG já cadastrado.'
+                        });
+                    } else {
+                        resposta.status(500).json({
+                            "status": false,
+                            "mensagem": 'Erro ao atualizar o responsavel: ' + e.message
+                        });
+                    }
+                } finally {
+                    client.release();
+                }
             }
             else {
                 resposta.status(400).json({
@@ -96,25 +155,31 @@ export default class ResponsavelCtrl {
         }
     }
 
-    excluir(requisicao, resposta) {
+    async excluir(requisicao, resposta) {
         resposta.type('application/json');
         if (requisicao.method === 'DELETE' && requisicao.is('application/json')) {
             const dados = requisicao.body;
             const codigo = dados.codigo;
             if (codigo>=0) {
-                const responsavel = new Responsavel(codigo);
-                responsavel.excluir().then(() => {
+                const client = await poolConexao.getInstance().connect();
+                try{
+                    await client.query('BEGIN');
+                    const responsavel = new Responsavel(codigo);
+                    await responsavel.excluir(client);
                     resposta.status(200).json({
                         "status": true,
                         "codigoGerado": responsavel.codigo,
-                        "mensagem": 'Responsavel excluída com sucesso!'
+                        "mensagem": 'Responsável excluído com sucesso!'
                     });
-                }).catch((erro) => {
-                    resposta.status(500).json({
-                        "status": false,
-                        "mensagem": 'Erro ao excluir a responsavel: ' + erro.message
-                    });
-                });
+                    await client.query('COMMIT');
+                }catch(e){
+                    await client.query('ROLLBACK');
+                        resposta.status(500).json({
+                            "status": false,
+                            "mensagem": 'Erro ao excluir o responsavel: ' + e.message
+                        });
+                }
+
             }
             else {
                 resposta.status(400).json({
@@ -145,7 +210,9 @@ export default class ResponsavelCtrl {
                     "status": true,
                     "listaResponsaveis": listaResponsaveis
                 });
+                client.query('COMMIT');
             }).catch((erro) => {
+                client.query('ROLLBACK');
                 resposta.status(500).json({
                     "status": false,
                     "mensagem": 'Erro ao consultar as responsaveis: ' + erro.message
