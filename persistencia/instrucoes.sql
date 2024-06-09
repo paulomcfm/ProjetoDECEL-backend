@@ -246,11 +246,6 @@ VALUES ('preventiva', '2024-04-22', '', 1),
        ('corretiva', '2024-04-22', 'Trocar o escapamento.', 2),
        ('preventiva', '2024-04-22', '', 3);
 
--- Inserts para a tabela PeriodoManutencao
-INSERT INTO PeriodoManutencao(vei_codigo, pm_data_criacao)
-VALUES (1, '2024-04-22'),
-       (3, '2024-04-22');
-
 -- Inserts para a tabela Rotas_tem_PontosdeEmbarque
 INSERT INTO Rotas_tem_PontosdeEmbarque (rot_codigo,pde_codigo,ordem)
 VALUES (1,1,3),

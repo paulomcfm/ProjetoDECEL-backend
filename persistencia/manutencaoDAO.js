@@ -20,7 +20,6 @@ export default class ManutencaoDAO {
 
             const sql = "INSERT INTO Manutencoes (manu_tipo, manu_data, manu_observacoes, vei_codigo) VALUES ($1, $2, $3, $4) RETURNING manu_codigo";
             const parametros = [manutencao.tipo, manutencao.data, manutencao.observacoes, manutencao.veiculoCodigo];
-            console.log(sql, parametros);
             const { rows } = await client.query(sql, parametros);
             if (rows.length > 0) {
                 manutencao.codigo = rows[0].manu_codigo;
@@ -29,7 +28,7 @@ export default class ManutencaoDAO {
             if (manutencao.tipo === 'preventiva') {
                 const sqlPeriodo = "INSERT INTO PeriodoManutencao (vei_codigo, pm_data_criacao) VALUES ($1, $2) RETURNING pm_id";
                 const parametrosPeriodo = [manutencao.veiculoCodigo, manutencao.data];
-                const { rows: rows1 } = await client.query(sqlPeriodo, parametrosPeriodo);
+                await client.query(sqlPeriodo, parametrosPeriodo);
             }
         }
     }
@@ -55,7 +54,7 @@ export default class ManutencaoDAO {
             if (manutencaoAntiga.manu_tipo === 'corretiva' && manutencao.tipo === 'preventiva') {
                 const sqlPeriodo = "INSERT INTO PeriodoManutencao (vei_codigo, pm_data_criacao) VALUES ($1, $2) RETURNING pm_id";
                 const parametrosPeriodo = [manutencao.veiculoCodigo, manutencao.data];
-                const { rows: rows1 } = await client.query(sqlPeriodo, parametrosPeriodo);
+                await client.query(sqlPeriodo, parametrosPeriodo);
             }
         }
     }
