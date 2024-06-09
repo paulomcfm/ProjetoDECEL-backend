@@ -6,14 +6,14 @@ export default class ManutencaoDAO {
         if (manutencao instanceof Manutencao) {
             if (manutencao.tipo === 'preventiva') {
                 const periodoManutencaoDAO = new PeriodoManutencaoDAO();
-                const periodo = await periodoManutencaoDAO.consultarPorPlaca(manutencao.placa, client);
+                const periodo = await periodoManutencaoDAO.consultarPorCodigoVeiculo(manutencao.veiculoCodigo, client);
                 if (periodo) {
                     const seisMesesAtras = new Date();
-                    seisMesesAtras.setMonth(seisMesesAtras.getMonth() - 6);
-                    if (new Date(periodo.pm_data_criacao) > seisMesesAtras) {
+                    seisMesesAtras.setMonth(seisMesesAtras.getMonth() + 6); // Corrigir aqui para subtrair 6 meses
+                    if (new Date(periodo.pm_data_criacao) < seisMesesAtras) {
                         throw new Error('Ainda não está no tempo de manutenção preventiva.');
-                    } else {
-                        await periodoManutencaoDAO.excluirPorPlaca(manutencao.placa, client);
+                    } else if (new Date(periodo.pm_data_criacao) >= seisMesesAtras) {
+                        await periodoManutencaoDAO.excluirPorCodigoVeiculo(manutencao.veiculoCodigo, client);
                     }
                 }
             }
@@ -27,8 +27,9 @@ export default class ManutencaoDAO {
             }
 
             if (manutencao.tipo === 'preventiva') {
-                const periodoManutencaoDAO = new PeriodoManutencaoDAO();
-                await periodoManutencaoDAO.gravar(manutencao.placa, client);
+                const sqlPeriodo = "INSERT INTO PeriodoManutencao (vei_codigo, pm_data_criacao) VALUES ($1, $2) RETURNING pm_id";
+                const parametrosPeriodo = [manutencao.veiculoCodigo, manutencao.data];
+                const { rows: rows1 } = await client.query(sqlPeriodo, parametrosPeriodo);
             }
         }
     }
@@ -47,9 +48,14 @@ export default class ManutencaoDAO {
             const parametros = [manutencao.tipo, manutencao.data, manutencao.observacoes, manutencao.veiculoCodigo, manutencao.codigo];
             await client.query(sqlAtualiza, parametros);
 
-            if (manutencaoAntiga.manu_tipo === 'Preventiva' && manutencao.tipo === 'Corretiva') {
+            if (manutencaoAntiga.manu_tipo === 'preventiva' && manutencao.tipo === 'corretiva') {
                 const sqlExclui = "DELETE FROM PeriodoManutencao WHERE vei_codigo = $1";
                 await client.query(sqlExclui, [manutencao.veiculoCodigo]);
+            }
+            if (manutencaoAntiga.manu_tipo === 'corretiva' && manutencao.tipo === 'preventiva') {
+                const sqlPeriodo = "INSERT INTO PeriodoManutencao (vei_codigo, pm_data_criacao) VALUES ($1, $2) RETURNING pm_id";
+                const parametrosPeriodo = [manutencao.veiculoCodigo, manutencao.data];
+                const { rows: rows1 } = await client.query(sqlPeriodo, parametrosPeriodo);
             }
         }
     }

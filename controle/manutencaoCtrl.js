@@ -37,10 +37,17 @@ export default class ManutencaoCtrl {
                         client.query('COMMIT');
                     }).catch(async (erro) => {
                         await client.query('ROLLBACK');
-                        resposta.status(500).json({
-                            "status": false,
-                            "mensagem": 'Erro ao registrar a manutencao: ' + erro.message
-                        });
+                        if (erro.message === 'Ainda não está no tempo de manutenção preventiva.') {
+                            resposta.status(400).json({
+                                "status": false,
+                                "mensagem": erro.message
+                            });
+                        } else {
+                            resposta.status(500).json({
+                                "status": false,
+                                "mensagem": 'Erro ao registrar a manutenção: ' + erro.message
+                            });
+                        }
                     });
                 } catch (erro) {
                     await client.query('ROLLBACK');

@@ -91,7 +91,7 @@ CREATE TABLE Manutencoes (
   manu_codigo SERIAL PRIMARY KEY,
   manu_tipo VARCHAR(11) NOT NULL,
   manu_data DATE NOT NULL,
-  manu_observacoes varchar(255),
+  manu_observacoes VARCHAR(255),
   vei_codigo INT NOT NULL,
   CONSTRAINT fk_manutencoes_veiculos FOREIGN KEY (vei_codigo) REFERENCES Veiculos(vei_codigo)
 );
