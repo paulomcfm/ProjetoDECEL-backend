@@ -8,11 +8,12 @@ export default class ManutencaoDAO {
                 const periodoManutencaoDAO = new PeriodoManutencaoDAO();
                 const periodo = await periodoManutencaoDAO.consultarPorCodigoVeiculo(manutencao.veiculoCodigo, client);
                 if (periodo) {
-                    const seisMesesAtras = new Date();
-                    seisMesesAtras.setMonth(seisMesesAtras.getMonth() + 6); // Corrigir aqui para subtrair 6 meses
-                    if (new Date(periodo.pm_data_criacao) < seisMesesAtras) {
+                    const dataHoje = new Date();
+                    const seisMesesDepois = new Date(periodo.pm_data_criacao);
+                    seisMesesDepois.setMonth(seisMesesDepois.getMonth() + 6);
+                    if (seisMesesDepois - dataHoje > 0) {
                         throw new Error('Ainda não está no tempo de manutenção preventiva.');
-                    } else if (new Date(periodo.pm_data_criacao) >= seisMesesAtras) {
+                    } else if (seisMesesDepois - dataHoje <= 0) {
                         await periodoManutencaoDAO.excluirPorCodigoVeiculo(manutencao.veiculoCodigo, client);
                     }
                 }
