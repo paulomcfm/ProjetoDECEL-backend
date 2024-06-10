@@ -54,4 +54,14 @@ export default class VeiculoDAO {
         }
         return listaVeiculos;
     }
+
+    async consultarRota(veiCodigo, client) {
+        const sql = 'SELECT status FROM Rotas WHERE vei_codigo = $1';
+        const parametros = [veiCodigo];
+        const { rows } = await client.query(sql, parametros);
+        if (rows.length > 0) {
+            return rows[0].status;
+        }
+        return null;
+    }
 }

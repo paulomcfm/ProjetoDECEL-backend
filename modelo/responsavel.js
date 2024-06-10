@@ -8,7 +8,7 @@ export default class Responsavel {
     #email;
     #telefone;
     #celular;
-    #alunos;
+    #alunos = [];
 
     constructor(codigo = 0, nome = '', rg = '', cpf = '', email = '', telefone = '', celular = '') {
         this.#codigo = codigo;
