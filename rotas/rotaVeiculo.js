@@ -6,6 +6,7 @@ const rotaVeiculo = new Router();
 
 rotaVeiculo.get('/', veiCtrl.consultar)
     .get('/:termo', veiCtrl.consultar)
+    .get('/rota/:termo',veiCtrl.consultarRota)
     .post('/', veiCtrl.gravar)
     .patch('/', veiCtrl.atualizar)
     .put('/', veiCtrl.atualizar)
