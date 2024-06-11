@@ -204,4 +204,49 @@ export default class VeiculoCtrl {
             });
         }
     }
+
+    async consultarRota(requisicao, resposta) {
+        resposta.type('application/json');
+        if (requisicao.method === 'GET') {
+            const veiCodigo = requisicao.params.termo;
+            console.log(requisicao.params.termo);
+            console.log(veiCodigo);
+            if (!veiCodigo || isNaN(veiCodigo)) {
+                resposta.status(400).json({
+                    "status": false,
+                    "mensagem": 'Por favor, informe um código de veículo válido!'
+                });
+            }
+            const client = await poolConexao.getInstance().connect();
+            const veiculo = new Veiculo();
+            try {
+                const statusRota = await veiculo.consultarRota(veiCodigo, client);
+                if (statusRota === null) {
+                    resposta.status(404).json({
+                        "status": false,
+                        "mensagem": 'Veículo não encontrado em nenhuma rota!'
+                    });
+                } else {
+                    resposta.status(200).json({
+                        "status": true,
+                        "rotaAtiva": statusRota
+                    });
+                }
+                await client.query('COMMIT');
+            } catch (erro) {
+                await client.query('ROLLBACK');
+                resposta.status(500).json({
+                    "status": false,
+                    "mensagem": 'Erro ao consultar a rota do veículo: ' + erro.message
+                });
+            } finally {
+                client.release();
+            }
+        } else {
+            resposta.status(400).json({
+                "status": false,
+                "mensagem": 'Por favor, utilize o método GET para consultar a rota do veículo!'
+            });
+        }
+    }
 }

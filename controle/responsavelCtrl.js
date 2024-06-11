@@ -35,8 +35,8 @@ export default class ResponsavelCtrl {
                     await client.query('BEGIN');
                     await responsavel.gravar(client);
                     for(const aluno of responsavel.alunos){
-                        const alu = new Aluno(aluno.codigo);
-                        const parentesco = new Parentesco(alu.codigo, responsavel.codigo, aluno.parentesco)
+                        const alu = new Aluno(aluno.codigo, aluno.nome, aluno.rg, aluno.observacoes, aluno.dataNasc, aluno.celular, aluno.responsaveis, aluno.status, aluno.motivoInativo);
+                        const parentesco = new Parentesco(alu, responsavel, aluno.parentesco)
                         await parentesco.gravar(client);
                     }
                     await client.query('COMMIT');
@@ -105,14 +105,14 @@ export default class ResponsavelCtrl {
                         }
                         if(tem){
                             console.log(aluno.codigoAluno)
-                            const alu = new Aluno(aluno.codigoAluno);
-                            const par = new Parentesco(alu.codigo, responsavel.codigo,aluno.parentesco);
+                            const alu = new Aluno(aluno.codigoAluno, aluno.nome, aluno.rg, aluno.observacoes, aluno.dataNasc, aluno.celular, [], aluno.status, aluno.motivoInativo);
+                            const par = new Parentesco(alu, responsavel, aluno.parentesco);
                             await par.excluir(client);
                         }
                     }
                     for(const aluno of alunos){
-                        const alu = new Aluno(aluno.codigoAluno);
-                        const par = new Parentesco(alu.codigo, responsavel.codigo,aluno.parentesco);
+                        const alu = new Aluno(aluno.codigoAluno, aluno.nome, aluno.rg, aluno.observacoes, aluno.dataNasc, aluno.celular, [], aluno.status, aluno.motivoInativo);
+                        const par = new Parentesco(alu, responsavel, aluno.parentesco);
                         await par.gravar(client);
                     }
                     await responsavel.atualizar(client);

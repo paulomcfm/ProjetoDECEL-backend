@@ -95,4 +95,9 @@ export default class Veiculo {
         const veiDAO = new VeiculoDAO();
         return await veiDAO.consultar(parametro, client);
     }
+
+    async consultarRota(parametro, client) {
+        const veiDAO = new VeiculoDAO();
+        return await veiDAO.consultarRota(parametro, client);
+    }
 }
