@@ -22,9 +22,10 @@ export default class ManutencaoCtrl {
             const tipo = dados.tipo;
             const data = dados.data;
             const observacoes = dados.observacoes;
+            const valor = dados.valor;
             const veiculoCodigo = dados.veiculoCodigo;
             if (tipo && data && veiculoCodigo) {
-                const manutencao = new Manutencao(tipo, data, observacoes, veiculoCodigo);
+                const manutencao = new Manutencao(tipo, data, observacoes, valor, veiculoCodigo);
                 const client = await poolConexao.getInstance().connect();
                 try {
                     await client.query('BEGIN');
@@ -77,9 +78,10 @@ export default class ManutencaoCtrl {
             const tipo = dados.tipo;
             const data = dados.data;
             const observacoes = dados.observacoes;
+            const valor = dados.valor;
             const veiculoCodigo = dados.veiculoCodigo;
             if (codigo && tipo && data && veiculoCodigo) {
-                const manutencao = new Manutencao(tipo, data, observacoes, veiculoCodigo, codigo);
+                const manutencao = new Manutencao(tipo, data, observacoes, valor, veiculoCodigo, codigo);
                 const client = await poolConexao.getInstance().connect();
                 try {
                     await client.query('BEGIN');
@@ -126,7 +128,7 @@ export default class ManutencaoCtrl {
                 const client = await poolConexao.getInstance().connect();
                 try {
                     await client.query('BEGIN');
-                    const manutencao = new Manutencao('','','','',codigo);
+                    const manutencao = new Manutencao('','','','','',codigo);
                     await manutencao.excluir(client).then(() => {
                         resposta.status(200).json({
                             "status": true,

@@ -5,13 +5,15 @@ export default class Manutencao {
     #tipo;
     #data;
     #observacoes;
+    #valor;
     #veiculoCodigo; // Código do veículo relacionado à manutenção
 
-    constructor(tipo='', data='', observacoes='', veiculoCodigo= 1, codigo= 0) {
+    constructor(tipo='', data='', observacoes='', valor=0, veiculoCodigo= 1, codigo= 0) {
         this.#codigo = codigo;
         this.#tipo = tipo;
         this.#data = data;
         this.#observacoes = observacoes;
+        this.#valor = valor;
         this.#veiculoCodigo = veiculoCodigo;
     }
 
@@ -47,6 +49,14 @@ export default class Manutencao {
         this.#observacoes = novasObservacoes;
     }
 
+    get valor() {
+        return this.#valor;
+    }
+
+    set valor(novoValor) {
+        this.#valor = novoValor;
+    }
+
     get veiculoCodigo() {
         return this.#veiculoCodigo;
     }
@@ -61,6 +71,7 @@ export default class Manutencao {
             tipo: this.#tipo,
             data: this.#data,
             observacoes: this.#observacoes,
+            valor: this.#valor,
             veiculoCodigo: this.#veiculoCodigo
         };
     }
