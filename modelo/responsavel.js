@@ -8,7 +8,7 @@ export default class Responsavel {
     #email;
     #telefone;
     #celular;
-    #alunos;
+    #alunos = [];
 
     constructor(codigo = 0, nome = '', rg = '', cpf = '', email = '', telefone = '', celular = '') {
         this.#codigo = codigo;
@@ -110,19 +110,19 @@ export default class Responsavel {
         }
     }
 
-    async gravar() {
+    async gravar(client) {
         const respDAO = new ResponsavelDAO();
-        await respDAO.gravar(this);
+        await respDAO.gravar(this, client);
     }
 
-    async excluir() {
+    async excluir(client) {
         const respDAO = new ResponsavelDAO();
-        await respDAO.excluir(this);
+        await respDAO.excluir(this, client);
     }
 
-    async atualizar() {
+    async atualizar(client) {
         const respDAO = new ResponsavelDAO();
-        await respDAO.atualizar(this);
+        await respDAO.atualizar(this, client);
     }
 
     async consultar(parametro, client) {

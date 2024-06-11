@@ -4,6 +4,7 @@ CREATE TABLE Usuarios (
     user_cpf VARCHAR(14) NOT NULL,
     user_email VARCHAR(255) NOT NULL UNIQUE,
     user_celular VARCHAR(20) NOT NULL,
+    user_nivel VARCHAR(13) NOT NULL,
     CONSTRAINT pk_usuarios PRIMARY KEY (user_cpf)
 );
 
@@ -13,15 +14,6 @@ CREATE TABLE RedefinicoesSenha (
     codigo VARCHAR(6) NOT NULL,
     data_criacao TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_email) REFERENCES Usuarios(user_email) ON DELETE CASCADE
-);
-
-CREATE TABLE Veiculos (
-  vei_codigo SERIAL PRIMARY KEY,
-  vei_renavam VARCHAR(11) NOT NULL UNIQUE,
-  vei_placa VARCHAR(7) NOT NULL,
-  vei_modelo VARCHAR(45) NOT NULL,
-  vei_capacidade INT NOT NULL,
-  vei_tipo CHAR NOT NULL
 );
 
 CREATE TABLE Responsaveis (
@@ -86,6 +78,31 @@ CREATE TABLE Monitores (
   mon_celular VARCHAR(16) NOT NULL
 );
 
+CREATE TABLE Veiculos (
+  vei_codigo SERIAL PRIMARY KEY,
+  vei_renavam VARCHAR(11) NOT NULL UNIQUE,
+  vei_placa VARCHAR(7) NOT NULL UNIQUE,
+  vei_modelo VARCHAR(45) NOT NULL,
+  vei_capacidade INT NOT NULL,
+  vei_tipo CHAR NOT NULL
+);
+
+CREATE TABLE Manutencoes (
+  manu_codigo SERIAL PRIMARY KEY,
+  manu_tipo VARCHAR(11) NOT NULL,
+  manu_data DATE NOT NULL,
+  manu_observacoes VARCHAR(255),
+  vei_codigo INT NOT NULL,
+  CONSTRAINT fk_manutencoes_veiculos FOREIGN KEY (vei_codigo) REFERENCES Veiculos(vei_codigo)
+);
+
+CREATE TABLE PeriodoManutencao (
+    pm_id SERIAL PRIMARY KEY,
+    vei_codigo INT NOT NULL,
+    pm_data_criacao TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (vei_codigo) REFERENCES Veiculos(vei_codigo) ON DELETE CASCADE
+);
+
 CREATE TABLE Rotas (
   rot_codigo SERIAL PRIMARY KEY,
   rot_nome VARCHAR(255) NOT NULL,
@@ -122,15 +139,6 @@ CREATE TABLE Inscricoes (
   CONSTRAINT fk_inscricoes_rotas FOREIGN KEY (rot_codigo) REFERENCES Rotas(rot_codigo)
 );
 
-CREATE TABLE Manutencoes (
-  manu_codigo SERIAL PRIMARY KEY,
-  manu_tipo CHAR NOT NULL,
-  manu_data DATE NOT NULL,
-  manu_observacoes varchar(255),
-  vei_codigo INT,
-  CONSTRAINT fk_manutencoes_veiculos FOREIGN KEY (vei_codigo) REFERENCES Veiculos(vei_codigo)
-);
-
 CREATE TABLE Rotas_tem_PontosdeEmbarque (
   rot_codigo INT NOT NULL,
   pde_codigo INT NOT NULL,
@@ -149,10 +157,10 @@ CREATE TABLE Rotas_tem_Motoristas (
 );
 
 -- Inserts para a tabela Usuarios
-INSERT INTO Usuarios (user_nome, user_senha, user_cpf, user_email, user_celular)
-VALUES ('admin', 'senha123', '123.456.789-00', 'usuario1@email.com', '(12) 93456-7890'),
-       ('usuario2', 'senha456', '987.654.321-00', 'usuario2@email.com', '(98) 97654-3210'),
-       ('usuario3', 'senha789', '111.222.333-44', 'usuario3@email.com', '(11) 91222-3333');
+INSERT INTO Usuarios (user_nome, user_senha, user_cpf, user_email, user_celular, user_nivel)
+VALUES ('admin', 'senha123', '123.456.789-00', 'usuario1@email.com', '(12) 93456-7890', 'administrador'),
+       ('usuario2', 'senha456', '987.654.321-00', 'usuario2@email.com', '(98) 97654-3210', 'normal'),
+       ('usuario3', 'senha789', '111.222.333-44', 'usuario3@email.com', '(11) 91222-3333', 'normal');
 
 -- Inserts para a tabela Veiculos
 INSERT INTO Veiculos (vei_renavam, vei_placa, vei_modelo, vei_capacidade, vei_tipo)
@@ -233,10 +241,10 @@ VALUES
   (2024, '4', 'C', 'F', 'M', '2024-04-23', 'Rua São José', '34567-890', '345', 'Riacho Lua Doce', 3, 3, 4, 3);
 
 -- Inserts para a tabela Manutencoes
-INSERT INTO Manutencoes (manu_tipo, manu_data, vei_codigo)
-VALUES ('P', '2024-04-22', 1),
-       ('C', '2024-04-22', 2),
-       ('P', '2024-04-22', 3);
+INSERT INTO Manutencoes (manu_tipo, manu_data, manu_observacoes, vei_codigo)
+VALUES ('preventiva', '2024-04-22', '', 1),
+       ('corretiva', '2024-04-22', 'Trocar o escapamento.', 2),
+       ('preventiva', '2024-04-22', '', 3);
 
 -- Inserts para a tabela Rotas_tem_PontosdeEmbarque
 INSERT INTO Rotas_tem_PontosdeEmbarque (rot_codigo,pde_codigo,ordem)

@@ -30,8 +30,9 @@ export default class UsuarioCtrl {
             const cpf = dados.cpf;
             const email = dados.email;
             const celular = dados.celular;
-            if (nome && senha && cpf && email && celular) {
-                const usuario = new Usuario(nome, senha, cpf, email, celular);
+            const nivel = dados.nivel;
+            if (nome && senha && cpf && email && celular && nivel) {
+                const usuario = new Usuario(nome, senha, cpf, email, celular, nivel);
                 const client = await poolConexao.getInstance().connect();
                 try {
                     await client.query('BEGIN');
@@ -206,9 +207,10 @@ export default class UsuarioCtrl {
             const cpf = dados.cpf;
             const email = dados.email;
             const celular = dados.celular;
-            const usuario = new Usuario(nome, senha, cpf, email, celular);
+            const nivel = dados.nivel;
+            const usuario = new Usuario(nome, senha, cpf, email, celular, nivel);
             console.log(usuario.nome);
-            if (nome && senha && cpf && email && celular) {
+            if (nome && senha && cpf && email && celular && nivel) {
                 const client = await poolConexao.getInstance().connect();
                 try {
                     await client.query('BEGIN');

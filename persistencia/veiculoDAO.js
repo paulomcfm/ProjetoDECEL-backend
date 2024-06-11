@@ -3,8 +3,8 @@ import Veiculo from "../modelo/veiculo.js";
 export default class VeiculoDAO {
     async gravar(veiculo, client) {
         if (veiculo instanceof Veiculo) {
-            const sql = "INSERT INTO veiculos(vei_nome, vei_rg, vei_observacoes, vei_dataNasc, vei_celular) VALUES($1,$2,$3,$4,$5) RETURNING vei_codigo;";
-            const parametros = [veiculo.nome, veiculo.rg, veiculo.observacoes, veiculo.dataNasc, veiculo.celular];
+            const sql = "INSERT INTO veiculos(vei_renavam, vei_placa, vei_modelo, vei_capacidade, vei_tipo) VALUES($1,$2,$3,$4,$5) RETURNING vei_codigo;";
+            const parametros = [veiculo.renavam, veiculo.placa, veiculo.modelo, veiculo.capacidade, veiculo.tipo];
             
             const retorno = await client.query(sql, parametros);
             veiculo.codigo = retorno.rows[0].vei_codigo;
@@ -13,8 +13,8 @@ export default class VeiculoDAO {
 
     async atualizar(veiculo, client) {
         if (veiculo instanceof Veiculo) {
-            const sql = "UPDATE veiculos SET vei_nome = $1, vei_rg = $2, vei_observacoes = $3, vei_dataNasc = $4, vei_celular = $5 WHERE vei_codigo = $6";
-            const parametros = [veiculo.nome, veiculo.rg, veiculo.observacoes, veiculo.dataNasc, veiculo.celular, veiculo.codigo];
+            const sql = "UPDATE veiculos SET vei_renavam = $1, vei_placa = $2, vei_modelo = $3, vei_capacidade = $4, vei_tipo = $5 WHERE vei_codigo = $6";
+            const parametros = [veiculo.renavam, veiculo.placa, veiculo.modelo, veiculo.capacidade, veiculo.tipo, veiculo.codigo];
             
             await client.query(sql, parametros);
             
@@ -53,5 +53,15 @@ export default class VeiculoDAO {
             listaVeiculos.push(veiculo);
         }
         return listaVeiculos;
+    }
+
+    async consultarRota(veiCodigo, client) {
+        const sql = 'SELECT status FROM Rotas WHERE vei_codigo = $1';
+        const parametros = [veiCodigo];
+        const { rows } = await client.query(sql, parametros);
+        if (rows.length > 0) {
+            return rows[0].status;
+        }
+        return null;
     }
 }

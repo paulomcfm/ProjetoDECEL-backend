@@ -56,14 +56,22 @@ export default class ParentescoDAO {
         let sql = '';
         let parametros = [];
         if (!isNaN(parseInt(parametroConsulta))) {
-            sql = 'SELECT * FROM parentescos WHERE resp_codigo = $1';
+            sql = `
+                SELECT a.*, r.*, p.par_parentesco 
+                FROM parentescos p 
+                JOIN alunos a ON p.alu_codigo = a.alu_codigo 
+                JOIN responsaveis r ON p.resp_codigo = r.resp_codigo 
+                WHERE p.resp_codigo = $1
+            `;
             parametros = [parametroConsulta];
         }
         
-        const { rows: registros, fields: campos } = await client.query(sql, parametros);
+        const { rows: registros } = await client.query(sql, parametros);
         let listaParentescos = [];
         for (const registro of registros) {
-            const parentesco = new Parentesco(registro.alu_codigo, registro.resp_codigo, registro.par_parentesco);
+            const aluno = new Aluno(registro.alu_codigo, registro.alu_nome, registro.alu_rg, registro.alu_observacoes, registro.alu_datanasc, registro.alu_celular, null, registro.alu_status, registro.alu_motivoinativo);
+            const responsavel = new Responsavel(registro.resp_codigo, registro.resp_nome, registro.resp_rg, registro.resp_cpf, registro.resp_email, registro.resp_telefone, registro.resp_celular, null);
+            const parentesco = new Parentesco(aluno, responsavel, registro.par_parentesco);
             listaParentescos.push(parentesco);
         }
         return listaParentescos;

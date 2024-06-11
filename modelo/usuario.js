@@ -6,13 +6,15 @@ export default class Usuario {
     #cpf;
     #email;
     #celular;
+    #nivel;
 
-    constructor(nome='',senha='',cpf='',email='',celular=''){
+    constructor(nome='',senha='',cpf='',email='',celular='',nivel=''){
         this.#nome = nome;
         this.#senha = senha;
         this.#cpf = cpf;
         this.#email = email;
         this.#celular = celular;
+        this.#nivel = nivel;
     }
 
     get nome() {
@@ -55,13 +57,22 @@ export default class Usuario {
         this.#celular = novoCelular;
     }
 
+    get nivel() {
+        return this.#nivel;
+    }
+
+    set nivel(novoNivel) {
+        this.#nivel = novoNivel;
+    }
+
     toJSON(){
         return {
             nome: this.#nome,
             senha: this.#senha,
             cpf: this.#cpf,
             email: this.#email,
-            celular: this.#celular
+            celular: this.#celular,
+            nivel: this.#nivel
         }
     }
 
