@@ -7,7 +7,8 @@ export default class MotoristaCtrl{
     async gravar(requisicao,resposta){
         const body = requisicao.body;
         const motorista = new Motorista(0,body.nome,body.cnh,body.celular)
-        await motorista.gravar().then(()=>{
+        const client = await poolConexao.getInstance().connect()
+        await motorista.gravar(client).then(()=>{
                 resposta.status(200).json({
                     'status':true,
                     'mensagem':'Motorista gravado com sucesso'
@@ -23,7 +24,8 @@ export default class MotoristaCtrl{
     async deletar(requisicao,resposta){
         const body = requisicao.body
         const motorista = new Motorista(body.id)
-        motorista.deletar().then(()=>{
+        const client = await poolConexao.getInstance().connect()
+        motorista.deletar(client).then(()=>{
             resposta.status(200).json({
                 'status':true,
                 'mensagem':'Motorista deletado com sucesso'
@@ -38,8 +40,11 @@ export default class MotoristaCtrl{
 
     async atualizar(requisicao,resposta){
          const body = requisicao.body
-         const motorista = new Motorista(0,body.nome,body.cnh,body.telefone)
-         motorista.atualizar().then(()=>{
+         console.log("ola")
+         const motorista = new Motorista(0,body.nome,body.cnh,body.celular)
+         console.log(JSON.stringify(motorista))
+         const client = await poolConexao.getInstance().connect()
+         motorista.atualizar(client).then(()=>{
             resposta.status(200).json({
                 'status':true,
                 'mensagem':'Motorista atualizado com sucesso'

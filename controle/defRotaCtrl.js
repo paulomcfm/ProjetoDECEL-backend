@@ -262,7 +262,7 @@ export default class defRotaCtrl {
         try {
             const client = await poolConexao.getInstance().connect()
             const qtdInscr = await rota.consultarQtdInscricoes(client)
-            if (qtdInscr.length === 0) {
+            if (qtdInscr === 0) {
                 await new Rotas_Pontos().deletar(client, rota.codigo)
                 await new Rotas_Motoristas().deletar(client, rota.codigo)
                 await rota.deletar(client)
@@ -277,6 +277,7 @@ export default class defRotaCtrl {
                 })
             }
         } catch (erro) {
+            console.log(erro)
             resposta.status(500).json({
                 status: false,
                 mensagem: "Erro ao deletar rota: " + erro
