@@ -92,6 +92,7 @@ CREATE TABLE Manutencoes (
   manu_tipo VARCHAR(11) NOT NULL,
   manu_data DATE NOT NULL,
   manu_observacoes VARCHAR(255),
+  manu_valor NUMERIC(6,2),
   vei_codigo INT NOT NULL,
   CONSTRAINT fk_manutencoes_veiculos FOREIGN KEY (vei_codigo) REFERENCES Veiculos(vei_codigo)
 );
@@ -241,10 +242,15 @@ VALUES
   (2024, '4', 'C', 'F', 'M', '2024-04-23', 'Rua São José', '34567-890', '345', 'Riacho Lua Doce', 3, 3, 4, 3);
 
 -- Inserts para a tabela Manutencoes
-INSERT INTO Manutencoes (manu_tipo, manu_data, manu_observacoes, vei_codigo)
-VALUES ('preventiva', '2024-04-22', '', 1),
-       ('corretiva', '2024-04-22', 'Trocar o escapamento.', 2),
-       ('preventiva', '2024-04-22', '', 3);
+INSERT INTO Manutencoes (manu_tipo, manu_data, manu_observacoes, manu_valor, vei_codigo)
+VALUES ('preventiva', '2024-04-22', '', 5000, 1),
+       ('corretiva', '2024-04-22', 'Trocar o escapamento.', 7650, 2),
+       ('preventiva', '2024-04-22', '', 5000, 3);
+
+--InsertS para a tabela PeriodoManutencao
+INSERT INTO PeriodoManutencao (vei_codigo, pm_data_criacao)
+VALUES (1, '2024-04-22'),
+       (3, '2024-04-22');
 
 -- Inserts para a tabela Rotas_tem_PontosdeEmbarque
 INSERT INTO Rotas_tem_PontosdeEmbarque (rot_codigo,pde_codigo,ordem)
