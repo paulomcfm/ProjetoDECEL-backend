@@ -7,7 +7,6 @@ export default class ResponsavelDAO {
             const parametros = [responsavel.nome, responsavel.rg, responsavel.cpf, responsavel.email, responsavel.telefone, responsavel.celular];
             
             const retorno = await client.query(sql, parametros);
-            console.log(retorno.rows[0].resp_codigo);
             responsavel.codigo = retorno.rows[0].resp_codigo;
         }
     }

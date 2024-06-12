@@ -37,9 +37,7 @@ export default class ResponsavelCtrl {
                         await responsavel.gravar(client);
                         for (const aluno of responsavel.alunos) {
                             const alu = new Aluno(aluno.codigo, aluno.nome, aluno.rg, aluno.observacoes, aluno.dataNasc, aluno.celular, aluno.status, aluno.motivoInativo);
-                            console.log(aluno.codigo);
                             const parentesco = new Parentesco(alu, responsavel, aluno.parentesco);
-                            console.log(responsavel.codigo);
                             await parentesco.gravar(client);
                         }
                         await client.query('COMMIT');
