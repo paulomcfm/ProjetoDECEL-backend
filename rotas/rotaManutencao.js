@@ -5,6 +5,7 @@ const manutencaoCtrl = ManutencaoCtrl.getInstance();
 const rotaManutencao = new Router();
 
 rotaManutencao.get('/', manutencaoCtrl.consultar)
+.post('/relatorios',manutencaoCtrl.relatorio)
     .get('/:placa', manutencaoCtrl.consultarPorPlaca)
     .post('/', manutencaoCtrl.gravar)
     .patch('/', manutencaoCtrl.atualizar)

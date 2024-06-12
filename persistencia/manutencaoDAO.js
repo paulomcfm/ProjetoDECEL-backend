@@ -89,8 +89,49 @@ export default class ManutencaoDAO {
         const parametros = [placa];
         const { rows: registros } = await client.query(sql, parametros);
         if (registros.length > 0) {
-            const registro = registros[0];
-            return new Manutencao(registro.manu_tipo, registro.manu_data, registro.manu_observacoes, registro.manu_valor, registro.vei_codigo, registro.manu_codigo);
+            let lista = []
+            for(const registro of registros){
+                let dataISO = registro.manu_data;
+                // Cria um objeto Date a partir da string ISO
+                let data = new Date(dataISO);
+                // Extrai o dia, mês e ano
+                let dia = data.getUTCDate();
+                let mes = data.getUTCMonth() + 1; 
+                let ano = data.getUTCFullYear();
+                let dataPtBr = dia.toString().padStart(2, '0') + '/' + mes.toString().padStart(2, '0') + '/' + ano;
+
+                lista.push(new Manutencao(registro.manu_tipo,dataPtBr,registro.manu_observacoes,registro.manu_valor,registro.manu_vei_codigo,registro.manu_codigo))
+            }
+            return lista;
+        } else {
+            return null;
+        }
+    }
+
+    async consultarPorData(placa,ini,fim,client) {
+        const sql = `
+            SELECT m.*, v.vei_placa
+            FROM Manutencoes m
+            INNER JOIN Veiculos v ON m.vei_codigo = v.vei_codigo
+            WHERE v.vei_placa = $1 and TO_CHAR(manu_data, 'YYYY-MM-DD') >= $2 AND TO_CHAR(manu_data, 'YYYY-MM-DD') <= $3
+        `;
+        const parametros = [placa,ini,fim];
+        const { rows: registros } = await client.query(sql, parametros);
+        if (registros.length > 0) {
+            let lista = []
+            for(const registro of registros){
+                let dataISO = registro.manu_data;
+                // Cria um objeto Date a partir da string ISO
+                let data = new Date(dataISO);
+                // Extrai o dia, mês e ano
+                let dia = data.getUTCDate();
+                let mes = data.getUTCMonth() + 1; 
+                let ano = data.getUTCFullYear();
+                let dataPtBr = dia.toString().padStart(2, '0') + '/' + mes.toString().padStart(2, '0') + '/' + ano;
+
+                lista.push(new Manutencao(registro.manu_tipo,dataPtBr,registro.manu_observacoes,registro.manu_valor,registro.manu_vei_codigo,registro.manu_codigo))
+            }
+            return lista;
         } else {
             return null;
         }
