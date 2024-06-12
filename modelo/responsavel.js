@@ -10,7 +10,7 @@ export default class Responsavel {
     #celular;
     #alunos = [];
 
-    constructor(codigo = 0, nome = '', rg = '', cpf = '', email = '', telefone = '', celular = '') {
+    constructor(codigo = 0, nome = '', rg = '', cpf = '', email = '', telefone = '', celular = '', alunos =[]) {
         this.#codigo = codigo;
         this.#nome = nome;
         this.#rg = rg;
@@ -18,7 +18,7 @@ export default class Responsavel {
         this.#email = email;
         this.#telefone = telefone;
         this.#celular = celular;
-        this.#alunos = [];
+        this.#alunos = alunos;
     }
 
     get codigo() {
@@ -83,18 +83,6 @@ export default class Responsavel {
 
     set alunos(novoAluno) {
         this.#alunos = novoAluno;
-    }
-
-    validarRG(rg){
-        if (rg.length !== 9) {
-            return false;
-        }
-        for (let i = 0; i < rg.length; i++) {
-            if (isNaN(parseInt(rg[i]))) {
-                return false;
-            }
-        }
-        return true;
     }
 
     toJSON() {

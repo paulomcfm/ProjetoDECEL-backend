@@ -17,6 +17,7 @@ export default class ResponsavelCtrl {
             new ResponsavelCtrl();
         return ResponsavelCtrl._instance;
     }
+
     async gravar(requisicao, resposta) {
         resposta.type('application/json');
         if (requisicao.method === 'POST' && requisicao.is('application/json')) {
@@ -28,51 +29,51 @@ export default class ResponsavelCtrl {
             const telefone = dados.telefone;
             const celular = dados.celular;
             const alunos = dados.alunos;
-            const responsavel = new Responsavel(0, nome, rg, cpf, email, telefone, celular, alunos); 
             if (nome && rg && cpf && email && telefone && celular) {
-                const client = await poolConexao.getInstance().connect();
-                try{
-                    await client.query('BEGIN');
-                    await responsavel.gravar(client);
-                    for(const aluno of responsavel.alunos){
-                        const alu = new Aluno(aluno.codigo, aluno.nome, aluno.rg, aluno.observacoes, aluno.dataNasc, aluno.celular, aluno.responsaveis, aluno.status, aluno.motivoInativo);
-                        const parentesco = new Parentesco(alu, responsavel, aluno.parentesco)
-                        await parentesco.gravar(client);
-                    }
-                    await client.query('COMMIT');
-                    resposta.status(200).json({
-                        "status": true,
-                        "codigoGerado": responsavel.codigo,
-                        "mensagem": 'Responsável incluido com sucesso!'
-                    });
-                }catch(e){
-                    await client.query('ROLLBACK');
-                    if (e.code === '23505') {
-                        resposta.status(400).json({
-                            "status": false,
-                            "mensagem": 'RG já cadastrado.'
+                const responsavel = new Responsavel(0, nome, rg, cpf, email, telefone, celular, alunos);
+                    const client = await poolConexao.getInstance().connect();
+                    try {
+                        await client.query('BEGIN');
+                        await responsavel.gravar(client);
+                        for (const aluno of responsavel.alunos) {
+                            const alu = new Aluno(aluno.codigo, aluno.nome, aluno.rg, aluno.observacoes, aluno.dataNasc, aluno.celular, aluno.status, aluno.motivoInativo);
+                            console.log(aluno.codigo);
+                            const parentesco = new Parentesco(alu, responsavel, aluno.parentesco);
+                            console.log(responsavel.codigo);
+                            await parentesco.gravar(client);
+                        }
+                        await client.query('COMMIT');
+                        resposta.status(200).json({
+                            "status": true,
+                            "codigoGerado": responsavel.codigo,
+                            "mensagem": 'Responsável incluído com sucesso!'
                         });
-                    } else {
-                        resposta.status(500).json({
-                            "status": false,
-                            "mensagem": 'Erro ao atualizar o responsavel: ' + e.message
-                        });
+                    } catch (e) {
+                        await client.query('ROLLBACK');
+                        if (e.code === '23505') {
+                            resposta.status(400).json({
+                                "status": false,
+                                "mensagem": 'RG ou CPF já cadastrado.'
+                            });
+                        } else {
+                            resposta.status(500).json({
+                                "status": false,
+                                "mensagem": 'Erro ao gravar o responsável: ' + e.message
+                            });
+                        }
+                    } finally {
+                        client.release();
                     }
-                } finally {
-                    await client.release();
-                }
-            }
-            else {
+            } else {
                 resposta.status(400).json({
                     "status": false,
-                    "mensagem": 'Por favor, informe o nome da responsavel!'
+                    "mensagem": 'Por favor, informe todos os campos obrigatórios!'
                 });
             }
-        }
-        else {
+        } else {
             resposta.status(400).json({
                 "status": false,
-                "mensagem": 'Por favor, utilize o método POST para cadastrar uma responsavel!'
+                "mensagem": 'Por favor, utilize o método POST para cadastrar um responsável!'
             });
         }
     }
@@ -90,67 +91,52 @@ export default class ResponsavelCtrl {
             const celular = dados.celular;
             const alunos = dados.alunos;
             const responsavel = new Responsavel(codigo, nome, rg, cpf, email, telefone, celular, alunos); 
-            if (codigo>=0 && nome && rg && cpf && email && telefone && celular) {
+            if (codigo >= 0 && nome && rg && cpf && email && telefone && celular) {
                 const client = await poolConexao.getInstance().connect();
-                try{
+                try {
                     await client.query('BEGIN');
                     const parentescos = new Parentesco();
                     const parentescoDoResponsavel = await parentescos.consultarResponsavel(responsavel.codigo, client);
-                    
-                    for(const aluno of parentescoDoResponsavel){
-                        let tem = false
-                        for(const aluno1 of alunos){
-                            if(parentescoDoResponsavel.some(aluno => aluno.codigoAluno === aluno1.codigoAluno))
-                                tem = true;
-                        }
-                        if(tem){
-                            console.log(aluno.codigoAluno)
-                            const alu = new Aluno(aluno.codigoAluno, aluno.nome, aluno.rg, aluno.observacoes, aluno.dataNasc, aluno.celular, [], aluno.status, aluno.motivoInativo);
-                            const par = new Parentesco(alu, responsavel, aluno.parentesco);
-                            await par.excluir(client);
-                        }
+                    for (const item of parentescoDoResponsavel) {
+                        await item.excluir(client);
                     }
-                    for(const aluno of alunos){
-                        const alu = new Aluno(aluno.codigoAluno, aluno.nome, aluno.rg, aluno.observacoes, aluno.dataNasc, aluno.celular, [], aluno.status, aluno.motivoInativo);
-                        const par = new Parentesco(alu, responsavel, aluno.parentesco);
-                        await par.gravar(client);
+                    for (const aluno of responsavel.alunos) {
+                        const alu = new Aluno(aluno.codigo, aluno.nome, aluno.rg, aluno.observacoes, aluno.dataNasc, aluno.celular, aluno.status, aluno.motivoInativo);
+                        const parentesco = new Parentesco(alu, responsavel, aluno.parentesco);
+                        await parentesco.gravar(client);
                     }
                     await responsavel.atualizar(client);
+                    await client.query('COMMIT');
                     resposta.status(200).json({
                         "status": true,
-                        "codigoGerado": responsavel.codigo,
-                        "mensagem": 'Responsavel alterado com sucesso!'
+                        "mensagem": 'Responsável atualizado com sucesso!'
                     });
-                    await client.query('COMMIT');
-                } catch(e){
-                    console.log(e)
+                } catch (e) {
                     await client.query('ROLLBACK');
                     if (e.code === '23505') {
                         resposta.status(400).json({
                             "status": false,
-                            "mensagem": 'RG já cadastrado.'
+                            "mensagem": 'RG ou CPF já cadastrado.'
                         });
                     } else {
                         resposta.status(500).json({
                             "status": false,
-                            "mensagem": 'Erro ao atualizar o responsavel: ' + e.message
+                            "mensagem": 'Erro ao atualizar o responsável: ' + e.message
                         });
                     }
                 } finally {
                     client.release();
                 }
-            }
-            else {
+            } else {
                 resposta.status(400).json({
                     "status": false,
-                    "mensagem": 'Por favor, informe o codigo e o nome da responsavel!'
+                    "mensagem": 'Por favor, informe todos os campos obrigatórios!'
                 });
             }
-        }
-        else {
+        } else {
             resposta.status(400).json({
                 "status": false,
-                "mensagem": 'Por favor, utilize os métodos PUT ou PATCH para atualizar uma responsavel!'
+                "mensagem": 'Por favor, utilize o método PUT ou PATCH para atualizar um responsável!'
             });
         }
     }
@@ -206,6 +192,11 @@ export default class ResponsavelCtrl {
             const client = await poolConexao.getInstance().connect();
             const responsaveis = new Responsavel();
             responsaveis.consultar(termo, client).then((listaResponsaveis) => {
+                // Filtrar alunos com código null
+                listaResponsaveis = listaResponsaveis.map(responsavel => {
+                    responsavel.alunos = responsavel.alunos.filter(aluno => aluno.codigo !== null);
+                    return responsavel;
+                });
                 resposta.json({
                     "status": true,
                     "listaResponsaveis": listaResponsaveis
@@ -215,15 +206,14 @@ export default class ResponsavelCtrl {
                 client.query('ROLLBACK');
                 resposta.status(500).json({
                     "status": false,
-                    "mensagem": 'Erro ao consultar as responsaveis: ' + erro.message
+                    "mensagem": 'Erro ao consultar os responsáveis: ' + erro.message
                 });
             });
             client.release();
-        }
-        else {
+        } else {
             resposta.status(400).json({
                 "status": false,
-                "mensagem": 'Por favor, utilize o método GET para consultar as responsaveis!'
+                "mensagem": 'Por favor, utilize o método GET para consultar os responsáveis!'
             });
         }
     }

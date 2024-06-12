@@ -3,21 +3,22 @@ import Responsavel from "../modelo/responsavel.js";
 export default class ResponsavelDAO {
     async gravar(responsavel,client) {
         if (responsavel instanceof Responsavel) {
-            const sql = "INSERT INTO responsaveis(resp_nome, resp_rg, resp_cpf, resp_email, resp_telefone, resp_celular) VALUES($1,$2,$3,$4,$5,$6)";
+            const sql = "INSERT INTO responsaveis(resp_nome, resp_rg, resp_cpf, resp_email, resp_telefone, resp_celular) VALUES($1,$2,$3,$4,$5,$6) RETURNING resp_codigo";
             const parametros = [responsavel.nome, responsavel.rg, responsavel.cpf, responsavel.email, responsavel.telefone, responsavel.celular];
-            await client.query(sql, parametros);
+            
+            const retorno = await client.query(sql, parametros);
+            console.log(retorno.rows[0].resp_codigo);
+            responsavel.codigo = retorno.rows[0].resp_codigo;
         }
     }
 
     async atualizar(responsavel,client) {
         try{
             if (responsavel instanceof Responsavel) {
-                const sql = "UPDATE responsaveis SET resp_nome = $1, resp_email = $2, resp_telefone = $3, resp_celular = $4 WHERE resp_codigo = $5";
-                const parametros = [responsavel.nome, responsavel.email, responsavel.telefone, responsavel.celular, responsavel.codigo];
+                const sql = "UPDATE responsaveis SET resp_nome = $1, resp_rg = $2, resp_cpf = $3, resp_email = $4, resp_telefone = $5, resp_celular = $6 WHERE resp_codigo = $7";
+                const parametros = [responsavel.nome, responsavel.rg, responsavel.cpf, responsavel.email, responsavel.telefone, responsavel.celular, responsavel.codigo];
                 await client.query(sql, parametros);
-                console.log(sql,parametros)
             }
-            console.log("passouuuuuuuuuuuuuuu")
         }catch(e){
             console.log(e)
         }
@@ -43,7 +44,6 @@ export default class ResponsavelDAO {
             ORDER BY responsaveis.resp_nome, alunos.alu_nome;`;
             parametros = [parametroConsulta];
         } else {
-
             if (!parametroConsulta) {
                 parametroConsulta = '';
             }

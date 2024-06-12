@@ -38,13 +38,11 @@ export default class UsuarioDAO {
     }
 
     async consultarCPF(cpf, client) {
-        console.log(cpf);
         const sql = "SELECT * FROM Usuarios WHERE user_cpf = $1";
         const parametros = [cpf];
         const { rows: registros } = await client.query(sql, parametros);
         if (registros.length > 0) {
             const registro = registros[0];
-            console.log("nome: ", registro.user_nome);
             return new Usuario(registro.user_nome, registro.user_senha, registro.user_cpf, registro.user_email, registro.user_celular, registro.user_nivel);
         } else {
             return null;
