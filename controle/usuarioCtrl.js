@@ -79,7 +79,6 @@ export default class UsuarioCtrl {
             });
         }
         const { nome, cpf, senha } = requisicao.body;
-        console.log(requisicao.body);
         if (!nome || !cpf || !senha) {
             return resposta.status(400).json({
                 "status": false,
@@ -90,7 +89,6 @@ export default class UsuarioCtrl {
         try {
             await client.query('BEGIN');
             const usuario = new Usuario(nome,senha,cpf);
-            console.log(nome, senha, cpf, "camposaaa");
             const usuarioConsultado = await usuario.consultarCPF(usuario.cpf, client);
             if (usuarioConsultado && usuarioConsultado.nome === nome && usuarioConsultado.senha === senha) {
                 resposta.status(200).json({
@@ -139,7 +137,6 @@ export default class UsuarioCtrl {
             client = await poolConexao.getInstance().connect();
             const usuario = new Usuario();
             const usuarioConsultado = await usuario.consultarEmail(email, client);
-    
             if (usuarioConsultado) {
                 const codigo = crypto.randomBytes(3).toString('hex'); // Gera um código aleatório de 6 caracteres
                 await usuario.salvarCodigoRedefinicao(email, codigo, client);
@@ -181,7 +178,6 @@ export default class UsuarioCtrl {
             client = await poolConexao.getInstance().connect();
             const usuario = new Usuario();
             const codigoValido = await usuario.verificarCodigoRedefinicao(email, codigo, client);
-    
             if (codigoValido) {
                 await usuario.redefinirSenha(email, novaSenha, client);
                 await usuario.removerCodigoRedefinicao(email, client);
@@ -209,7 +205,6 @@ export default class UsuarioCtrl {
             const celular = dados.celular;
             const nivel = dados.nivel;
             const usuario = new Usuario(nome, senha, cpf, email, celular, nivel);
-            console.log(usuario.nome);
             if (nome && senha && cpf && email && celular && nivel) {
                 const client = await poolConexao.getInstance().connect();
                 try {
@@ -221,8 +216,6 @@ export default class UsuarioCtrl {
                             "mensagem": 'Usuario alterado com sucesso!'
                         });
                         client.query('COMMIT');
-                        console.log(client);
-                        console.log(usuario.nome);
                     }).catch(async (erro) => {
                         await client.query('ROLLBACK');
                         if (erro.code === '23505') {
@@ -230,15 +223,11 @@ export default class UsuarioCtrl {
                                 "status": false,
                                 "mensagem": 'CPF já cadastrado.'
                             });
-                            console.log(client);
-                            console.log(usuario.nome);
                         } else {
                             resposta.status(500).json({
                                 "status": false,
                                 "mensagem": 'Erro ao alterar o usuario: ' + erro.message
                             });
-                            console.log(client);
-                            console.log(usuario.nome);
                         }
                     });
                 } catch (e) {
