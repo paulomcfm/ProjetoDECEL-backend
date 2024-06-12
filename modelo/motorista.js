@@ -56,19 +56,23 @@ export default class Motorista{
 
     
 
-    async gravar(){
+    async gravar(client){
+        try{
         const motoristaDao = new motoristaDAO()
-        await  motoristaDao.gravar(this)
+        await  motoristaDao.gravar(this,client)
+        }catch(erro){
+            throw erro
+        }
     }
 
-    async atualizar(){
+    async atualizar(client){
         const motoristaDao = new motoristaDAO()
-        await motoristaDao.atualizar(this)
+        await motoristaDao.atualizar(this,client)
     }
 
-    async deletar(){
+    async deletar(client){
         const motoristaDao = new motoristaDAO()
-        await motoristaDao.deletar(this.#id)
+        await motoristaDao.deletar(this.#id,client)
     }
 
     // o filtro pode ou nao conter valores, na classe motoristaDAO tem um if para analisar

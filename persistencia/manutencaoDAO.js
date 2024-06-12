@@ -19,8 +19,8 @@ export default class ManutencaoDAO {
                 }
             }
 
-            const sql = "INSERT INTO Manutencoes (manu_tipo, manu_data, manu_observacoes, vei_codigo) VALUES ($1, $2, $3, $4) RETURNING manu_codigo";
-            const parametros = [manutencao.tipo, manutencao.data, manutencao.observacoes, manutencao.veiculoCodigo];
+            const sql = "INSERT INTO Manutencoes (manu_tipo, manu_data, manu_observacoes, manu_valor, vei_codigo) VALUES ($1, $2, $3, $4, $5) RETURNING manu_codigo";
+            const parametros = [manutencao.tipo, manutencao.data, manutencao.observacoes, manutencao.valor, manutencao.veiculoCodigo];
             const { rows } = await client.query(sql, parametros);
             if (rows.length > 0) {
                 manutencao.codigo = rows[0].manu_codigo;
@@ -44,8 +44,8 @@ export default class ManutencaoDAO {
                 throw new Error('Manutenção não encontrada!');
             }
 
-            const sqlAtualiza = "UPDATE Manutencoes SET manu_tipo = $1, manu_data = $2, manu_observacoes = $3, vei_codigo = $4 WHERE manu_codigo = $5";
-            const parametros = [manutencao.tipo, manutencao.data, manutencao.observacoes, manutencao.veiculoCodigo, manutencao.codigo];
+            const sqlAtualiza = "UPDATE Manutencoes SET manu_tipo = $1, manu_data = $2, manu_observacoes = $3, manu_valor = $4, vei_codigo = $5 WHERE manu_codigo = $6";
+            const parametros = [manutencao.tipo, manutencao.data, manutencao.observacoes, manutencao.valor, manutencao.veiculoCodigo, manutencao.codigo];
             await client.query(sqlAtualiza, parametros);
 
             if (manutencaoAntiga.manu_tipo === 'preventiva' && manutencao.tipo === 'corretiva') {
@@ -73,7 +73,7 @@ export default class ManutencaoDAO {
         const { rows: registros } = await client.query(sql);
         const listaManutencoes = [];
         for (const registro of registros) {
-            const manutencao = new Manutencao(registro.manu_tipo, registro.manu_data, registro.manu_observacoes, registro.vei_codigo, registro.manu_codigo);
+            const manutencao = new Manutencao(registro.manu_tipo, registro.manu_data, registro.manu_observacoes, registro.manu_valor, registro.vei_codigo, registro.manu_codigo);
             listaManutencoes.push(manutencao);
         }
         return listaManutencoes;
@@ -90,7 +90,7 @@ export default class ManutencaoDAO {
         const { rows: registros } = await client.query(sql, parametros);
         if (registros.length > 0) {
             const registro = registros[0];
-            return new Manutencao(registro.manu_tipo, registro.manu_data, registro.manu_observacoes, registro.vei_codigo, registro.manu_codigo);
+            return new Manutencao(registro.manu_tipo, registro.manu_data, registro.manu_observacoes, registro.manu_valor, registro.vei_codigo, registro.manu_codigo);
         } else {
             return null;
         }

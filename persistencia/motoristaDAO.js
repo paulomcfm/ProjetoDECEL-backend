@@ -3,16 +3,20 @@ import poolConexao from "./conexao.js";
 export default class motoristaDAO{
     #conexao
 
-    async gravar(motorista){
+    async gravar(motorista,client){
+        try{
         const sql = 'insert into motoristas(moto_nome,moto_cnh,moto_celular) values ($1,$2,$3)'
         const values = [motorista.nome,motorista.cnh,motorista.celular]
-        await this.#conexao.query(sql,values)
+        await client.query(sql,values)
+        }catch(erro){
+            throw erro
+        }
     }
 
-    async deletar(filtro){
+    async deletar(filtro,client){
         const sql = 'delete from motoristas where moto_id = $1'
         const values = [filtro]
-        await this.#conexao.query(sql,values)
+        await client.query(sql,values)
     }
 
     async consultar(client,filtro){
@@ -46,10 +50,10 @@ export default class motoristaDAO{
         }
     }
 
-    async atualizar(motorista){
+    async atualizar(motorista,client){
         const sql = 'update motoristas set moto_nome=$1,moto_celular=$2 where moto_cnh = $3'
         const values = [motorista.nome,motorista.celular,motorista.cnh]
-        await this.#conexao.query(sql,values)
+        await client.query(sql,values)
     }
 
 

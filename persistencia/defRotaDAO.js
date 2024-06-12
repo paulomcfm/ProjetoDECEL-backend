@@ -25,9 +25,9 @@ export default class defRotaDAO{
             let sql;
             let values
             if(termo === ''){
-                sql = 'SELECT * FROM rotas WHERE status = true'
+                sql = 'SELECT * FROM rotas'
             }else{
-                sql = 'SELECT * FROM rotas WHERE rot_nome ilike $1 and status = true'
+                sql = 'SELECT * FROM rotas WHERE rot_nome ilike $1'
                 values = ['%'+termo+'%']
             }
             
@@ -42,7 +42,6 @@ export default class defRotaDAO{
                 const { rows: monitor, fields: camposM } = await client.query(sql,values)
                 const rota = new defRota(registro.rot_codigo,registro.rot_nome,registro.rot_km,registro.rot_periodo,registro.rot_tempoinicio,registro.rot_tempofinal,veiculo,monitor,[],[],null,registro.status)
                 lista.push(rota)
-
             }
             return lista
         }catch(erro){
