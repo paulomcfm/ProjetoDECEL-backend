@@ -1,6 +1,7 @@
 import Manutencao from "../modelo/manutencao.js";
 import ManutencaoDAO from "../persistencia/manutencaoDAO.js";
 import poolConexao from "../persistencia/conexao.js";
+import Veiculo from "../modelo/veiculo.js";
 
 export default class ManutencaoCtrl {
     static _instance = null;
@@ -220,6 +221,47 @@ export default class ManutencaoCtrl {
                 "status": false,
                 "mensagem": 'Por favor, utilize o método GET e informe a placa do veículo para consultar a manutenção!'
             });
+        }
+    }
+
+    async relatorio(requisicao,resposta){
+        const body = requisicao.body
+        const dataI = body.inicio
+        const dataF = body.fim
+        console.log(dataI,dataF)
+        try{
+            const client = await poolConexao.getInstance().connect()
+            const veiculoModel = new Veiculo()
+            const manutencaoModel = new Manutencao()
+            
+            const listaVeiculos =await  veiculoModel.consultar(null,client)
+            let manutencoes;
+            for(let i=0;i<listaVeiculos.length;i++){
+                if(dataF==null || dataI==null || dataF==null || dataI == null)
+                    manutencoes  = await manutencaoModel.consultarPorPlaca(listaVeiculos[i].placa,client)
+                else
+                    manutencoes = await manutencaoModel.consultarPorData(listaVeiculos[i].placa,dataI,dataF,client)
+                if(manutencoes != null)
+                    listaVeiculos[i]={
+                        veiculo:listaVeiculos[i],
+                        manutencao: manutencoes
+                    }
+                else{
+                    listaVeiculos.splice(i,1)
+                    i--
+                }
+            }
+            resposta.status(200).json({
+                status:true,
+                mensagem:"Consultado com sucesso",
+                listaManutencoes:listaVeiculos
+            })
+        }
+        catch(erro){
+            resposta.status(500).json({
+                "status":false,
+                "mensagem":"Erro ao consultar as manutencoes"
+            })
         }
     }
 }

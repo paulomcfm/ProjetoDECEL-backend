@@ -100,4 +100,10 @@ export default class Manutencao {
         const manutencaoDAO = new ManutencaoDAO();
         return await manutencaoDAO.consultarPorPlaca(placa, client);
     }
+
+    async consultarPorData(placa,ini,fim, client) {
+        console.log(ini,fim)
+        const manutencaoDAO = new ManutencaoDAO();
+        return await manutencaoDAO.consultarPorData(placa,ini,fim, client);
+    }
 }

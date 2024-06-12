@@ -47,6 +47,7 @@ export default class VeiculoDAO {
         }
         
         const { rows: registros, fields: campos } = await client.query(sql, parametros);
+    
         let listaVeiculos = [];
         for (const registro of registros) {
             const veiculo = new Veiculo(registro.vei_codigo, registro.vei_renavam, registro.vei_placa, registro.vei_modelo, registro.vei_capacidade, registro.vei_tipo);

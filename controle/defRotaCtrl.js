@@ -236,7 +236,7 @@ export default class defRotaCtrl {
                         })
                     }
                 }
-                client.query('COMMIT')
+                await client.query('COMMIT')
             }catch(erro){
                 await client.query('ROLLBACK');
                 resposta.status(500).json({
@@ -262,22 +262,33 @@ export default class defRotaCtrl {
         try {
             const client = await poolConexao.getInstance().connect()
             const qtdInscr = await rota.consultarQtdInscricoes(client)
+            console.log("oi")
             if (qtdInscr === 0) {
-                await new Rotas_Pontos().deletar(client, rota.codigo)
-                await new Rotas_Motoristas().deletar(client, rota.codigo)
-                await rota.deletar(client)
-                resposta.status(200).json({
-                    status: true,
-                    "mensagem": "Rota deletada com sucesso"
-                })
+                try{   
+                    await new Rotas_Pontos().deletar(client, rota.codigo)
+                    await new Rotas_Motoristas().deletar(client, rota.codigo)
+                    await rota.deletar(client)
+                    resposta.status(200).json({
+                        status: true,
+                        "mensagem": "Rota deletada com sucesso"
+                    })
+                    await client.query('COMMIT')
+                }catch(erro){
+                    await client.query('ROLLBACK');
+                    resposta.status(500).json({
+                        status: false,
+                        mensagem: "Erro ao deletar rota: " + erro
+                    })
+                }
+                
+                client.release()
             } else {
                 resposta.status(500).json({
                     status: false,
                     mensagem: "Rota não pode ser deletada (contém inscrições vinculadas a ela)"
                 })
             }
-        } catch (erro) {
-            console.log(erro)
+        }catch (erro) {
             resposta.status(500).json({
                 status: false,
                 mensagem: "Erro ao deletar rota: " + erro

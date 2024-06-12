@@ -101,6 +101,7 @@ export default class defRotaDAO{
             let values = [rotaModelo.codigo]
             await client.query(sql,values)
         }catch(erro){
+            console.log("oi")
             await client.query('ROLLBACK')
             throw erro
         }
