@@ -102,7 +102,7 @@ export default class AlunoCtrl {
                     const parentescos = new Parentesco();
                     const insc = new Inscricao();
                     let hasInscricao = false;
-                    if (aluno.status === 'A') { 
+                    if (aluno.status === 'I') { 
                         hasInscricao = await insc.hasInscricaoAluno(client, codigo, new Date().getFullYear()); 
                     }
                     if (!hasInscricao) {
