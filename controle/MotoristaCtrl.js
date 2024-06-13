@@ -31,16 +31,22 @@ export default class MotoristaCtrl{
                 'mensagem':'Motorista deletado com sucesso'
             })
         }).catch((error)=>{
-            resposta.status(500).json({
-                'status':false,
-                'mensagem':`Erro ao deletar motorista. (${error})` 
-            })
+            if(error.code == 23503){
+                resposta.status(500).json({
+                    'status':false,
+                    'mensagem':`Erro ao deletar motorista. Já esta cadastrado em uma rota` 
+                })
+            }else{
+                resposta.status(500).json({
+                    'status':false,
+                    'mensagem':`Erro ao deletar motorista. (${error})` 
+                })
+            }
         })
     }
 
     async atualizar(requisicao,resposta){
          const body = requisicao.body
-         console.log("ola")
          const motorista = new Motorista(0,body.nome,body.cnh,body.celular)
          console.log(JSON.stringify(motorista))
          const client = await poolConexao.getInstance().connect()

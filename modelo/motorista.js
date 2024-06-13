@@ -71,8 +71,12 @@ export default class Motorista{
     }
 
     async deletar(client){
+        try{
         const motoristaDao = new motoristaDAO()
         await motoristaDao.deletar(this.#id,client)
+        }catch(erro){
+            throw erro
+        }
     }
 
     // o filtro pode ou nao conter valores, na classe motoristaDAO tem um if para analisar

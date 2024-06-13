@@ -14,9 +14,13 @@ export default class motoristaDAO{
     }
 
     async deletar(filtro,client){
-        const sql = 'delete from motoristas where moto_id = $1'
-        const values = [filtro]
-        await client.query(sql,values)
+        try{
+            const sql = 'delete from motoristas where moto_id = $1'
+            const values = [filtro]
+            await client.query(sql,values)
+        }catch(erro){
+            throw erro
+        }
     }
 
     async consultar(client,filtro){
