@@ -228,7 +228,6 @@ export default class ManutencaoCtrl {
         const body = requisicao.body
         const dataI = body.inicio
         const dataF = body.fim
-        console.log(dataI,dataF)
         try{
             const client = await poolConexao.getInstance().connect()
             const veiculoModel = new Veiculo()

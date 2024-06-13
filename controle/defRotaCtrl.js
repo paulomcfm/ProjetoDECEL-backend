@@ -280,7 +280,7 @@ export default class defRotaCtrl {
                         mensagem: "Erro ao deletar rota: " + erro
                     })
                 }
-                
+
                 client.release()
             } else {
                 resposta.status(500).json({
