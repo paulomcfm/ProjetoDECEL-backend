@@ -1,5 +1,5 @@
 # DECEL Project
-Project developed using React.js and Node.js technologies, implementing the MVC project pattern and using SOLID and GRASP concepts. It manages public school students and their school transportation.
+Project developed using React.js and Node.js, implementing the MVC project pattern and using SOLID and GRASP concepts. It manages public school students and their school transportation.
 
 ## Available Scripts
 
