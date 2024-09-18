@@ -157,6 +157,13 @@ CREATE TABLE Rotas_tem_Motoristas (
   CONSTRAINT fk_rotas_tem_motoristas_motoristas FOREIGN KEY (moto_id) REFERENCES Motoristas(moto_id)
 );
 
+CREATE TABLE ContasPagar (
+  conta_codigo SERIAL PRIMARY KEY,
+  conta_valor NUMERIC(6,2) NOT NULL,
+  conta_vencimento DATE NOT NULL,
+  conta_descricao VARCHAR(255)
+);
+
 -- Inserts para a tabela Usuarios
 INSERT INTO Usuarios (user_nome, user_senha, user_cpf, user_email, user_celular, user_nivel)
 VALUES ('admin', 'senha123', '868.946.030-65', 'usuario1@email.com', '(12) 93456-7890', 'administrador'),
