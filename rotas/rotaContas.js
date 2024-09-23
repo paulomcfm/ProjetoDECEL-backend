@@ -1,13 +1,13 @@
 import { Router } from "express";
-import ContasPagarCtrl from "../controle/contasPagarCtrl";
+import ContasPagarCtrl from "../controle/contasCtrl";
 
 const contasPagarCtrl = ContasPagarCtrl.getInstance();
-const rotaContasPagar = new Router();
+const rotaContas = new Router();
 
-rotaContasPagar.get('/', contasPagarCtrl.consultar)
+rotaContas.get('/', contasPagarCtrl.consultar)
     .post('/', contasPagarCtrl.gravar)
     .patch('/', contasPagarCtrl.atualizar)
     .put('/', contasPagarCtrl.atualizar)
     .delete('/', contasPagarCtrl.excluir);
 
-export default rotaContasPagar;
+export default rotaContas;

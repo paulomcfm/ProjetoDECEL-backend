@@ -157,11 +157,16 @@ CREATE TABLE Rotas_tem_Motoristas (
   CONSTRAINT fk_rotas_tem_motoristas_motoristas FOREIGN KEY (moto_id) REFERENCES Motoristas(moto_id)
 );
 
-CREATE TABLE ContasPagar (
-  conta_codigo SERIAL PRIMARY KEY,
-  conta_valor NUMERIC(6,2) NOT NULL,
-  conta_vencimento DATE NOT NULL,
-  conta_descricao VARCHAR(255)
+CREATE TABLE Contas (
+    con_id SERIAL PRIMARY KEY,
+    con_valor DECIMAL(10, 2) NOT NULL,
+    con_descricao VARCHAR(255) NOT NULL,
+    con_data_vencimento DATE,
+    con_data_recebimento DATE,
+    con_status VARCHAR(50) NOT NULL,
+    con_categoria VARCHAR(50),
+    con_data_criacao DATE CURRENT_DATE,
+    con_observacoes VARCHAR(255)
 );
 
 -- Inserts para a tabela Usuarios
