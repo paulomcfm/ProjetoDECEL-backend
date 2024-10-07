@@ -1,23 +1,27 @@
-import RecebimentoDao from "../persistencia/RecebimentoDao.js";
+import RecebimentoDao from "../persistencia/recebimentoDao.js";
+import AVista from "./avista.js";
 
 export default class Recebimento {
     #codigo;
     #tipo;
     #valorRecebimento;
+    #valorMensalidade;
     #status;
     #aluno;
     #mes;
     #ano;
     #calculo;
+    #qtdParcelas;
 
-    constructor(codigo=0, tipo='', valorRecebimento='', status='', aluno='', mes='', ano='', calculo='') {
+    constructor(codigo=0, tipo='', valorMensalidade='', status='', aluno='', mes='', ano='', qtdParcelas='') {
         this.#tipo = tipo;
-        this.#valorRecebimento = valorRecebimento;
+        this.#valorMensalidade = valorMensalidade;
         this.#status = status;
         this.#aluno = aluno;
         this.#mes = mes;
         this.#ano = ano;
-        this.#calculo = calculo;
+        this.#qtdParcelas = qtdParcelas;
+        this.#calculo = new AVista();
     }
 
     get codigo() {
@@ -34,6 +38,14 @@ export default class Recebimento {
 
     set tipo(novoTipo) {
         this.#tipo = novoTipo;
+    }
+
+    get valorMensalidade() {
+        return this.#valorMensalidade;
+    }
+
+    set valorMensalidade(novoValorMensalidade) {
+        this.#valorMensalidade = novoValorMensalidade;
     }
 
     get valorRecebimento() {
@@ -76,13 +88,17 @@ export default class Recebimento {
         this.#ano = novoAno;
     }
 
-    get calculo() {
-        return this.#calculo;
+    get qtdParcelas() {
+        return this.#qtdParcelas;
     }
 
-    set calculo(novoCalculo) {
-        this.#calculo = novoCalculo
+    set qtdParcelas(novoQtdParcelas) {
+        this.#qtdParcelas = novoQtdParcelas;
     }
+
+    calcularValor() {
+        this.#valorRecebimento = this.#calculo.calcular(this);
+    }   
 
     toJSON() {
         return {
@@ -93,7 +109,7 @@ export default class Recebimento {
             aluno: this.#aluno,
             mes: this.#mes,
             ano: this.#ano,
-            calculo: this.#calculo
+            qtdParcelas: this.#qtdParcelas
         }
     }
 

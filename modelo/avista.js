@@ -1,4 +1,6 @@
-import ICalcularValor from './icalcularvalor';
+import { ICalcularValor } from './icalcularvalor.js';
+import Recebimento from './recebimento.js';
+import Cartao from './cartao.js';
 
 export default class AVista {
 
@@ -8,10 +10,11 @@ export default class AVista {
 
     calcular(recebimento) {
         if (recebimento instanceof Recebimento) {
-            if(reccebimento.tipo === 'AVista'){
-                return recebimento.valorRecebimento-(recebimento.valorRecebimento*0.1);
-            }else{
-                cartao = new Cartao(recebimento);
+            if(recebimento.tipo === 'AVista'){
+                return recebimento.valorMensalidade - (recebimento.valorMensalidade * 0.1);
+            } else {
+                const cartao = new Cartao();
+                return cartao.calcular(recebimento);
             }
         }
     }

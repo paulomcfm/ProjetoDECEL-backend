@@ -1,4 +1,6 @@
-import ICalcularValor from './icalcularvalor';
+import { ICalcularValor } from './icalcularvalor.js';
+import Recebimento from './recebimento.js';
+import Parcelado from './parcelado.js';
 
 export default class Cartao {
 
@@ -8,10 +10,11 @@ export default class Cartao {
 
     calcular(recebimento) {
         if (recebimento instanceof Recebimento) {
-            if(reccebimento.tipo === 'Cartao'){
-                return recebimento.valorRecebimento;
+            if(recebimento.tipo === 'Cartao'){
+                return recebimento.valorMensalidade;
             }else{
-                parcelado = new Parcelado(recebimento);
+                const parcelado = new Parcelado();
+                return parcelado.calcular(recebimento);
             }
         }
     }

@@ -1,5 +1,3 @@
-const ICalcularValor ={
-    calcular: function (recebimento) { }
-}
-
-export default ICalcularValor;
+export const ICalcularValor = {
+    calcular: 'function'
+};

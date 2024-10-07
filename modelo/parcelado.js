@@ -1,4 +1,5 @@
-import ICalcularValor from './icalcularvalor';
+import { ICalcularValor } from './icalcularvalor.js';
+import Recebimento from './recebimento.js';
 
 export default class Parcelado {
 
@@ -8,7 +9,7 @@ export default class Parcelado {
 
     calcular(recebimento) {
         if (recebimento instanceof Recebimento) {
-            return recebimento.valorRecebimento / recebimento.qtdParcelas * 1.05;
+            return recebimento.valorMensalidade / recebimento.qtdParcelas * 1.05;
         }
     }
 
