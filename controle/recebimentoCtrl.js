@@ -1,5 +1,6 @@
 import Recebimento from "../modelo/recebimento.js";
 import poolConexao from "../persistencia/conexao.js";
+import Aluno from "../modelo/aluno.js";
 
 export default class RecebimentoCtrl {
     static _instance = null;
@@ -20,7 +21,8 @@ export default class RecebimentoCtrl {
             const tipo = dados.tipo;
             const valorMensalidade = dados.valorMensalidade;
             const status = 'N';
-            const aluno = dados.aluno;
+            const dadosAluno = dados.aluno;
+            const aluno = new Aluno(dadosAluno.codigo, dadosAluno.nome, dadosAluno.rg, dadosAluno.observacoes, dadosAluno.dataNasc, dadosAluno.celular, dadosAluno.status, dadosAluno.motivoInativo);
             const mes = dados.mes;
             const ano = dados.ano;
             const qtdParcelas = dados.qtdParcelas;
