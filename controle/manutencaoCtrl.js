@@ -27,10 +27,11 @@ export default class ManutencaoCtrl {
             const veiculoCodigo = dados.veiculoCodigo;
             if (tipo && data && veiculoCodigo) {
                 const manutencao = new Manutencao(tipo, data, observacoes, valor, veiculoCodigo);
+                const veiculo = new Veiculo(veiculoCodigo)
                 const client = await poolConexao.getInstance().connect();
                 try {
                     await client.query('BEGIN');
-                    await manutencao.gravar(client).then(() => {
+                    await manutencao.gravar(client).then(async () => {
                         resposta.status(200).json({
                             "status": true,
                             "manutencao": manutencao,
@@ -51,6 +52,9 @@ export default class ManutencaoCtrl {
                             });
                         }
                     });
+
+                    if(tipo == "preventiva")
+                        await veiculo.desativarVeiculo(client)
                 } catch (erro) {
                     await client.query('ROLLBACK');
                     throw erro;

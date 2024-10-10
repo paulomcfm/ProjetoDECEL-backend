@@ -84,7 +84,8 @@ CREATE TABLE Veiculos (
   vei_placa VARCHAR(7) NOT NULL UNIQUE,
   vei_modelo VARCHAR(45) NOT NULL,
   vei_capacidade INT NOT NULL,
-  vei_tipo CHAR NOT NULL
+  vei_tipo CHAR NOT NULL,
+  status BOOLEAN
 );
 
 CREATE TABLE Manutencoes (
@@ -176,18 +177,21 @@ VALUES ('admin', 'senha123', '868.946.030-65', 'usuario1@email.com', '(12) 93456
        ('usuario3', 'senha789', '714.378.720-50', 'usuario3@email.com', '(11) 91222-3333', 'normal');
 
 -- Inserts para a tabela Veiculos
-INSERT INTO Veiculos (vei_renavam, vei_placa, vei_modelo, vei_capacidade, vei_tipo)
-VALUES ('12345678901', 'ABC123', 'Ônibus', 5, 'C'),
-       ('98765432109', 'XYZ789', 'Micro', 7, 'V'),
-       ('11122233344', 'DEF456', 'Micro', 9, 'C'),
-       ('99726698546', 'GHI789', 'Ônibus', 9, 'C');
+INSERT INTO Veiculos (vei_renavam, vei_placa, vei_modelo, vei_capacidade, vei_tipo,status)
+VALUES ('12345678901', 'ABC123', 'Ônibus', 5, 'C',true),
+       ('98765432109', 'XYZ789', 'Micro', 7, 'V',true),
+       ('11122233344', 'DEF456', 'Micro', 9, 'C',true),
+       ('99726698546', 'GHI789', 'Ônibus', 9, 'C',true);
 
 -- Inserts para a tabela Responsaveis
 INSERT INTO Responsaveis (resp_nome, resp_rg, resp_cpf, resp_email, resp_telefone, resp_celular)
 VALUES ('Laura Gomes Santos', '1234567-8', '123.456.789-00', 'responsavel1@email.com', '(21) 2345-6789', '(22) 93456-7890'),
        ('Vitor Martins Costa', '9876543-2', '987.654.321-00', 'responsavel2@email.com', '(33) 4567-8901', '(44) 95678-9012'),
        ('Breno Lima Cunha', '1112223-4', '111.222.333-44', 'responsavel3@email.com', '(55) 6789-0123', '(66) 97890-1234'),
-       ('Brenda Ribeiro Sousa', '1112223-5', '111.222.333-55', 'email@email', '(55) 6789-0123', '(66) 97890-1234');
+       ('Brenda Ribeiro Sousa', '1112223-5', '111.222.333-55', 'email@email', '(55) 6789-0123', '(66) 97890-1234'),
+       ('Paulo Henrique da Silva', '2221110-9', '777.666.555-44', 'responsavel9@email.com', '(11) 91234-5678', '(11) 92345-6789'),
+       ('Sofia Andrade Lima', '4443332-1', '999.888.777-66', 'responsavel10@email.com', '(22) 93456-7890', '(22) 94567-8901');
+
 
 -- Inserts para a tabela Alunos
 INSERT INTO Alunos (alu_nome, alu_rg, alu_observacoes, alu_datanasc, alu_celular)
@@ -207,7 +211,9 @@ VALUES ('Anna Silva Sousa', '1234567-8', 'Observacoes sobre Aluno 1', '2005-01-0
 INSERT INTO Parentescos (alu_codigo, resp_codigo, par_parentesco)
 VALUES (1, 1, 'Pai'),
        (2, 2, 'Mãe'),
-       (3, 3, 'Tio');
+       (3, 3, 'Tio'),
+       (3, 4, 'Avô'),
+       (3, 5, 'Mãe');
 
 -- Inserts para a tabela PontosdeEmbarque
 INSERT INTO PontosdeEmbarque (pde_rua, pde_bairro, pde_numero, pde_cep)
@@ -252,17 +258,6 @@ VALUES
   (2024, '2', 'B', 'F', 'M', null, 'Rua Manuel Fagundes de Lima', '23456-789', '234', 'Felicidade Avista', 5, 2, 5, null),
   (2024, '3', 'C', 'F', 'V', null, 'Rua São José', '34567-890', '345', 'Riacho Lua Doce', 6, 1, 6, null),
   (2024, '4', 'C', 'F', 'M', '2024-04-23', 'Rua São José', '34567-890', '345', 'Riacho Lua Doce', 3, 3, 4, 3);
-
--- Inserts para a tabela Manutencoes
-INSERT INTO Manutencoes (manu_tipo, manu_data, manu_observacoes, manu_valor, vei_codigo)
-VALUES ('preventiva', '2024-04-22', '', 5000, 1),
-       ('corretiva', '2024-04-22', 'Trocar o escapamento.', 7650, 2),
-       ('preventiva', '2024-04-22', '', 5000, 3);
-
--- InsertS para a tabela PeriodoManutencao
-INSERT INTO PeriodoManutencao (vei_codigo, pm_data_criacao)
-VALUES (1, '2024-04-22'),
-       (3, '2024-04-22');
 
 -- Inserts para a tabela Rotas_tem_PontosdeEmbarque
 INSERT INTO Rotas_tem_PontosdeEmbarque (rot_codigo,pde_codigo,ordem)

@@ -1,12 +1,12 @@
 import ManutencaoDAO from "../persistencia/manutencaoDAO.js";
 
 export default class Manutencao {
-    #codigo; // Código da manutenção
+    #codigo; 
     #tipo;
     #data;
     #observacoes;
     #valor;
-    #veiculoCodigo; // Código do veículo relacionado à manutenção
+    #veiculoCodigo; 
 
     constructor(tipo='', data='', observacoes='', valor=0, veiculoCodigo= 1, codigo= 0) {
         this.#codigo = codigo;
