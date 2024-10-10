@@ -1,10 +1,11 @@
+import Responsavel from "../modelo/responsavel.js";
 import Veiculo from "../modelo/veiculo.js";
 
 export default class VeiculoDAO {
     async gravar(veiculo, client) {
         if (veiculo instanceof Veiculo) {
-            const sql = "INSERT INTO veiculos(vei_renavam, vei_placa, vei_modelo, vei_capacidade, vei_tipo) VALUES($1,$2,$3,$4,$5) RETURNING vei_codigo;";
-            const parametros = [veiculo.renavam, veiculo.placa, veiculo.modelo, veiculo.capacidade, veiculo.tipo];
+            const sql = "INSERT INTO veiculos(vei_renavam, vei_placa, vei_modelo, vei_capacidade, vei_tipo,status) VALUES($1,$2,$3,$4,$5,$6) RETURNING vei_codigo;";
+            const parametros = [veiculo.renavam, veiculo.placa, veiculo.modelo, veiculo.capacidade, veiculo.tipo,true];
             
             const retorno = await client.query(sql, parametros);
             veiculo.codigo = retorno.rows[0].vei_codigo;
@@ -30,6 +31,56 @@ export default class VeiculoDAO {
             
         }
     }
+
+    async desativar(veiculo,client){
+        try{
+            if (veiculo instanceof Veiculo) {
+                const sql = "UPDATE veiculos SET status = $1 WHERE vei_codigo = $2";
+                const parametros = [false,veiculo.codigo];
+                
+                await client.query(sql, parametros);
+                
+            }
+        }catch(erro){
+            throw erro
+        }
+    }
+
+    async consultarObservadores(parametroConsulta, client) {
+
+        let sql = 'SELECT * FROM (SELECT responsaveis.* FROM responsaveis INNER JOIN (SELECT parentescos.* FROM parentescos\
+                    INNER JOIN (SELECT alunos.* FROM alunos INNER JOIN (SELECT inscricoes.* FROM inscricoes INNER JOIN (SELECT *\
+                    FROM rotas WHERE rotas.vei_codigo = $1) as rota ON rota.rot_codigo = inscricoes.rot_codigo) as rotaIns ON\
+                    rotaIns.alu_codigo = alunos.alu_codigo) as alunoRot ON alunoRot.alu_codigo = parentescos.alu_codigo) as\
+                    parent ON parent.resp_codigo = responsaveis.resp_codigo) as observers';
+    
+        
+        let parametros = [parametroConsulta];
+        
+        
+        const { rows: registros, fields: campos } = await client.query(sql, parametros);
+        
+        
+        let listaObservadores = [];
+        
+        
+        for (const registro of registros) {
+            const resp = new Responsavel(
+                registro.resp_codigo,
+                registro.resp_nome,
+                registro.resp_rg,
+                registro.resp_cpf,
+                registro.resp_email,
+                registro.resp_telefone,
+                registro.resp_celular,
+                [] 
+            );
+
+            listaObservadores.push(resp);
+        }
+        return listaObservadores;
+    }
+    
 
     async consultar(parametroConsulta, client) {
         let sql = '';

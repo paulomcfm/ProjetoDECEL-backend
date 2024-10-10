@@ -1,20 +1,43 @@
 import VeiculoDAO from "../persistencia/veiculoDAO.js";
+import InterfaceSubject from "./interfaceSubject.js";
 
-export default class Veiculo {
+export default class Veiculo extends InterfaceSubject{
     #codigo;
     #renavam;
     #placa;
     #modelo;
     #capacidade;
     #tipo;
+    #status
+    #listaObservadores
 
-    constructor(codigo = 0, renavam = '', placa = '', modelo = '', capacidade = '', tipo = '') {
+    async registerObserver(){
+
+    }
+
+    async removeObserver(){
+
+    }
+
+    async notifyObserver(client){
+        try{
+            this.#listaObservadores = await new VeiculoDAO().consultarObservadores(this.#codigo,client);
+            for(let observador of this.#listaObservadores)
+                observador.update()
+        }catch(erro){
+            throw erro
+        }
+    }
+
+    constructor(codigo = 0, renavam = '', placa = '', modelo = '', capacidade = '', tipo = '',status = true) {
+        super()
         this.#codigo = codigo;
         this.#renavam = renavam;
         this.#placa = placa;
         this.#modelo = modelo;
         this.#capacidade = capacidade;
         this.#tipo = tipo;
+        this.#status = status
     }
 
     get codigo() {
@@ -89,6 +112,16 @@ export default class Veiculo {
     async atualizar(client) {
         const veiDAO = new VeiculoDAO();
         await veiDAO.atualizar(this, client);
+    }
+
+    async desativarVeiculo(client){
+        try{
+            const veiDAO = new VeiculoDAO();
+            await veiDAO.desativar(this, client);
+            await this.notifyObserver(client)
+        }catch(erro){
+            throw erro
+        }
     }
 
     async consultar(parametro, client) {
