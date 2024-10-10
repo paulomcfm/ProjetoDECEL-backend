@@ -169,6 +169,27 @@ CREATE TABLE Contas (
     con_observacoes VARCHAR(255)
 );
 
+CREATE TABLE Recebimentos (
+  rec_codigo SERIAL PRIMARY KEY,
+  rec_mes INT NOT NULL,
+  rec_ano INT NOT NULL,
+  rec_valorMensalidade NUMERIC(6,2) NOT NULL,
+  rec_valorRecebimento NUMERIC(6,2) NOT NULL,
+  rec_status CHAR NOT NULL,
+  rec_tipo VARCHAR(45) NOT NULL,
+  alu_codigo INT NOT NULL,
+  CONSTRAINT fk_recebimentos_inscricoes FOREIGN KEY (alu_codigo) REFERENCES Alunos(alu_codigo)
+);
+
+CREATE TABLE Pagamentos (
+  pag_codigo SERIAL PRIMARY KEY,
+  pag_mes INT NOT NULL,
+  pag_ano INT NOT NULL,
+  pag_valorPagamento NUMERIC(6,2) NOT NULL,
+  pag_status CHAR NOT NULL,
+  pag_tipo VARCHAR(45) NOT NULL
+);
+
 -- Inserts para a tabela Usuarios
 INSERT INTO Usuarios (user_nome, user_senha, user_cpf, user_email, user_celular, user_nivel)
 VALUES ('admin', 'senha123', '868.946.030-65', 'usuario1@email.com', '(12) 93456-7890', 'administrador'),
@@ -259,7 +280,7 @@ VALUES ('preventiva', '2024-04-22', '', 5000, 1),
        ('corretiva', '2024-04-22', 'Trocar o escapamento.', 7650, 2),
        ('preventiva', '2024-04-22', '', 5000, 3);
 
---InsertS para a tabela PeriodoManutencao
+-- InsertS para a tabela PeriodoManutencao
 INSERT INTO PeriodoManutencao (vei_codigo, pm_data_criacao)
 VALUES (1, '2024-04-22'),
        (3, '2024-04-22');

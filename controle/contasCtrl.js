@@ -1,5 +1,6 @@
-import poolConexao from "../persistencia/conexao.js";
-import Contas from "../modelo/contas.js";
+import Pagamento from "../modelo/pagamento.js";
+import Recebimento from "../modelo/recebimento.js";
+import Contas from "../modelo/contas.js"
 
 export default class ContasCtrl {
     static _instance = null;
@@ -14,33 +15,48 @@ export default class ContasCtrl {
         return ContasCtrl._instance;
     }
 
-    async gravar(requisicao, resposta) {
+    async gravarConta(requisicao, resposta) {
         const dados = requisicao.body;
         try {
-            const contas = new Contas(
-                dados.id, 
-                dados.valor, 
-                dados.descricao, 
-                dados.data_vencimento, 
-                dados.data_recebimento, 
-                dados.status, 
-                dados.categoria, 
-                dados.observacoes
-            );
+            let instance;
+            if (dados.tipo === 'pagamento') {
+                instance = new Pagamento(
+                    dados.id,
+                    dados.valor,
+                    dados.descricao,
+                    dados.data_vencimento,
+                    dados.status,
+                    dados.categoria,
+                    dados.observacoes
+                );
+            } else if (dados.tipo === 'recebimento') {
+                instance = new Recebimento(
+                    dados.id,
+                    dados.valor,
+                    dados.descricao,
+                    dados.data_recebimento,
+                    dados.status,
+                    dados.categoria,
+                    dados.observacoes
+                );
+            } else {
+                throw new Error("Tipo inválido.");
+            }
+
             const client = await poolConexao.getInstance().connect();
             await client.query('BEGIN');
             try {
-                await contas.gravar(client);
+                await instance.gravarConta(client);  // Calls the method from either Pagamento or Recebimento
                 resposta.status(200).json({
                     status: true,
-                    mensagem: "Conta gravada com sucesso!"
+                    mensagem: `${dados.tipo.charAt(0).toUpperCase() + dados.tipo.slice(1)} gravado(a) com sucesso!`
                 });
                 await client.query('COMMIT');
             } catch (erro) {
                 await client.query('ROLLBACK');
                 resposta.status(500).json({
                     status: false,
-                    mensagem: "Erro ao gravar conta: " + erro
+                    mensagem: `Erro ao gravar ${dados.tipo}: ` + erro
                 });
             } finally {
                 await client.release();
@@ -48,7 +64,7 @@ export default class ContasCtrl {
         } catch (erro) {
             resposta.status(500).json({
                 status: false,
-                mensagem: "Erro ao gravar conta: " + erro
+                mensagem: "Erro ao processar a requisição: " + erro
             });
         }
     }
