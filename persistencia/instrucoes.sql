@@ -158,15 +158,15 @@ CREATE TABLE Rotas_tem_Motoristas (
 );
 
 CREATE TABLE Contas (
-    con_id SERIAL PRIMARY KEY,
-    con_valor DECIMAL(10, 2) NOT NULL,
-    con_descricao VARCHAR(255) NOT NULL,
-    con_data_vencimento DATE,
-    con_data_recebimento DATE,
-    con_status VARCHAR(50) NOT NULL,
-    con_categoria VARCHAR(50),
-    con_data_criacao DATE CURRENT_DATE,
-    con_observacoes VARCHAR(255)
+  con_id SERIAL PRIMARY KEY,
+  con_valor DECIMAL(10, 2) NOT NULL,
+  con_descricao VARCHAR(255) NOT NULL,
+  con_mes INT NOT NULL,
+  con_ano INT NOT NULL,
+  con_status VARCHAR(50) NOT NULL,
+  con_categoria VARCHAR(50),
+  con_data_criacao DATE CURRENT_DATE,
+  con_observacoes VARCHAR(255)
 );
 
 CREATE TABLE Recebimentos (

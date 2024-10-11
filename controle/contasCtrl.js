@@ -19,25 +19,25 @@ export default class ContasCtrl {
         const dados = requisicao.body;
         try {
             let instance;
-            if (dados.tipo === 'pagamento') {
+            if (dados.categoria === 'pagamento') {
                 instance = new Pagamento(
                     dados.id,
+                    dados.mes,
+                    dados.ano,
                     dados.valor,
-                    dados.descricao,
-                    dados.data_vencimento,
                     dados.status,
-                    dados.categoria,
-                    dados.observacoes
+                    dados.tipo
                 );
-            } else if (dados.tipo === 'recebimento') {
+            } else if (dados.catetgoria === 'recebimento') {
                 instance = new Recebimento(
                     dados.id,
-                    dados.valor,
-                    dados.descricao,
-                    dados.data_recebimento,
+                    dados.mes,
+                    dados.ano,
+                    dados.valorMensalidade,
+                    dados.valorRecebimento,
                     dados.status,
-                    dados.categoria,
-                    dados.observacoes
+                    dados.tipo,
+                    dados.alu_codigo
                 );
             } else {
                 throw new Error("Tipo inválido.");
@@ -46,7 +46,7 @@ export default class ContasCtrl {
             const client = await poolConexao.getInstance().connect();
             await client.query('BEGIN');
             try {
-                await instance.gravarConta(client);  // Calls the method from either Pagamento or Recebimento
+                await instance.gravar(client);
                 resposta.status(200).json({
                     status: true,
                     mensagem: `${dados.tipo.charAt(0).toUpperCase() + dados.tipo.slice(1)} gravado(a) com sucesso!`
