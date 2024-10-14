@@ -1,10 +1,12 @@
 import Pagamento from "../modelo/pagamento.js";
 import poolConexao from "../persistencia/conexao.js";
+import ContasCtrl from "./contasCtrl.js";
 
-export default class PagamentoCtrl {
+export default class PagamentoCtrl extends ContasCtrl{
     static _instance = null;
 
     constructor() {
+        super();
         PagamentoCtrl._instance = this;
     }
 
@@ -23,11 +25,9 @@ export default class PagamentoCtrl {
             const valorPagamento = dados.valorPagamento;
             const status = dados.status || 'P'; // Status padrão como 'Pendente'
             const tipo = dados.tipo;
-
             if (mes && ano && valorPagamento && tipo) {
                 const pagamento = new Pagamento(0, mes, ano, valorPagamento, status, tipo);
                 const client = await poolConexao.getInstance().connect();
-
                 try {
                     await client.query('BEGIN');
                     await pagamento.gravar(client).then(() => {
@@ -50,6 +50,7 @@ export default class PagamentoCtrl {
                 } finally {
                     client.release();
                 }
+                this.gravarContaPagamento();
             } else {
                 resposta.status(400).json({
                     "status": false,
@@ -62,6 +63,18 @@ export default class PagamentoCtrl {
                 "mensagem": "Por favor, utilize o método POST e envie os dados no formato JSON!"
             });
         }
+    }
+
+    gravarContaPagamento() {
+        // Abre conexão com o banco, se necessário
+        console.log("Conexão com o banco aberta para Pagamento.");
+        this.gravarConta(); // Chama o método da classe base
+    }
+
+    atualizaCaixa() {
+        // Implementação específica para pagamentos
+        console.log(`Atualizando o caixa: subtraindo ${this.valor}`);
+        // Exemplo: atualiza o valor do caixa subtraindo o valor do pagamento
     }
 
     async atualizar(requisicao, resposta) {

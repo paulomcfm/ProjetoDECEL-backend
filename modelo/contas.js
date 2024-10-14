@@ -1,4 +1,4 @@
-import ContasDAO from "../persistencia/contasDAO";
+import ContasDAO from "../persistencia/contasDAO.js";
 
 export default class Contas {
     #id;
