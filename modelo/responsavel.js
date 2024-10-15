@@ -11,8 +11,14 @@ export default class Responsavel extends InterfaceObserver{
     #celular;
     #alunos = [];
 
-    update(){
-        console.log(`Responsavel ${this.#nome} notificado!`);
+    update(rotas){
+        var stringR = ""
+        for(let rota of rotas){
+            stringR+=`${rota.nome},`
+        }
+        stringR = stringR.slice(0,stringR.length-1)
+
+        console.log(`Responsavel ${this.#nome} notificado que as rotas (${stringR}) estão inativas!`);
     }
 
     constructor(codigo = 0, nome = '', rg = '', cpf = '', email = '', telefone = '', celular = '', alunos =[]) {

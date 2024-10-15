@@ -3,6 +3,7 @@ import Parentesco from "../modelo/parentesco.js";
 import Responsavel from "../modelo/responsavel.js";
 import Inscricao from "../modelo/inscricao.js";
 import poolConexao from "../persistencia/conexao.js";
+import Veiculo from "../modelo/veiculo.js";
 
 export default class AlunoCtrl {
     static _instance = null;
@@ -113,7 +114,8 @@ export default class AlunoCtrl {
                         for (const parentesco of responsaveisFaltantes) { // remover parentescos que existiam mas não existem mais
                             const resp = new Responsavel(parentesco.responsavel.codigo, parentesco.responsavel.nome, parentesco.responsavel.rg, parentesco.responsavel.cpf, parentesco.responsavel.email, parentesco.responsavel.telefone, parentesco.responsavel.celular);
                             const par = new Parentesco(aluno, resp, parentesco.parentesco);
-                            await par.excluir(client);
+                            //observer
+                            await new Veiculo().removeObserver(par,client);
                         }
                         const responsaveisNovos = aluno.responsaveis.filter(responsavel => {
                             return !parentescosDoAluno.some(parentesco => parentesco.responsavel.codigo === responsavel.codigo);
@@ -121,7 +123,8 @@ export default class AlunoCtrl {
                         for (const responsavel of responsaveisNovos) { // incluir novos parentescos
                             const resp = new Responsavel(responsavel.codigo, responsavel.nome, responsavel.rg, responsavel.cpf, responsavel.email, responsavel.telefone, responsavel.celular);
                             const par = new Parentesco(aluno, resp, responsavel.parentesco);
-                            await par.gravar(client);
+                            //observer
+                            await new Veiculo().registerObserver(par,client)
                         }
                         const parentescosAtuais = parentescosDoAluno.filter(responsavel => {
                             return aluno.responsaveis.some(alunoResponsavel => alunoResponsavel.codigo === responsavel.responsavel.codigo);
