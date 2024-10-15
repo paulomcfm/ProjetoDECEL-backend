@@ -1,6 +1,3 @@
-import Contas from "../modelo/contas.js";
-import poolConexao from "../persistencia/conexao.js";
-
 export default class ContasCtrl {
     static _instance = null;
 
@@ -14,15 +11,15 @@ export default class ContasCtrl {
         return ContasCtrl._instance;
     }
 
-    gravarConta() {
+    gravarConta(recebimento) {
+        console.log("Chamando gravarConta em ContasCtrl");
         this.verificaStatusCaixa();
-        this.atualizaCaixa();
+        this.atualizaCaixa(recebimento);
     }
 
     verificaStatusCaixa() {
-        // Implementação padrão: retorna status do caixa
         console.log("Verificando o status do caixa...");
-        return true; // Exemplo de retorno
+        return true;
     }
 
     atualizaCaixa() {

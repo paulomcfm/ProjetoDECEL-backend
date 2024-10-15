@@ -52,6 +52,7 @@ export default class RecebimentoCtrl extends ContasCtrl{
                             await recebimento.gravar(client);
                         }
                     }
+                    RecebimentoCtrl.getInstance().gravarConta(recebimento);
                     await client.query('COMMIT');
                     resposta.status(200).json({
                         "status": true,
@@ -67,7 +68,6 @@ export default class RecebimentoCtrl extends ContasCtrl{
                 } finally {
                     await client.release();
                 }
-                this.gravarContaRecebimento();
             } else {
                 resposta.status(400).json({
                     "status": false,
@@ -83,15 +83,7 @@ export default class RecebimentoCtrl extends ContasCtrl{
         }
     }
 
-    gravarContaRecebimento() {
-        // Abre conexão com o banco, se necessário
-        console.log("Conexão com o banco aberta para Recebimento.");
-        this.gravarConta(); // Chama o método da classe base
-    }
-
-    atualizaCaixa() {
-        // Implementação específica para recebimentos
-        console.log(`Atualizando o caixa: adicionando ${this.valor}`);
-        // Exemplo: atualiza o valor do caixa somando o valor do recebimento
+    atualizaCaixa(recebimento) {
+        console.log(`Atualizando o caixa: adicionando ${recebimento.valorRecebimento} R$`);
     }
 }

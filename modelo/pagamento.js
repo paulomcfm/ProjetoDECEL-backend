@@ -1,4 +1,4 @@
-import PagamentoDAO from "../persistencia/pagamentosDAO.js";
+import PagamentoDAO from "../persistencia/pagamentoDAO.js";
 
 export default class Pagamento {
     #codigo;
@@ -8,13 +8,10 @@ export default class Pagamento {
     #status;
     #tipo;
 
-    constructor(codigo = 0, mes = '', ano = '', valorPagamento = '', status = '', tipo = '') {
-        this.#codigo = codigo;
+    constructor(codigo = 0, mes = '', ano = '', valorPagamento = '') {
         this.#mes = mes;
         this.#ano = ano;
         this.#valorPagamento = valorPagamento;
-        this.#status = status;
-        this.#tipo = tipo;
     }
 
     get codigo() {
@@ -49,30 +46,12 @@ export default class Pagamento {
         this.#valorPagamento = novoValorPagamento;
     }
 
-    get status() {
-        return this.#status;
-    }
-
-    set status(novoStatus) {
-        this.#status = novoStatus;
-    }
-
-    get tipo() {
-        return this.#tipo;
-    }
-
-    set tipo(novoTipo) {
-        this.#tipo = novoTipo;
-    }
-
     toJSON() {
         return {
             codigo: this.#codigo,
             mes: this.#mes,
             ano: this.#ano,
-            valorPagamento: this.#valorPagamento,
-            status: this.#status,
-            tipo: this.#tipo
+            valorPagamento: this.#valorPagamento
         };
     }
 

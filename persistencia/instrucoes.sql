@@ -186,9 +186,7 @@ CREATE TABLE Pagamentos (
   pag_codigo SERIAL PRIMARY KEY,
   pag_mes INT NOT NULL,
   pag_ano INT NOT NULL,
-  pag_valorPagamento NUMERIC(6,2) NOT NULL,
-  pag_status CHAR NOT NULL,
-  pag_tipo VARCHAR(45) NOT NULL
+  pag_valorPagamento NUMERIC(6,2) NOT NULL
 );
 
 -- Inserts para a tabela Usuarios
