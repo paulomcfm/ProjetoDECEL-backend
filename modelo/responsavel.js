@@ -1,6 +1,7 @@
 import ResponsavelDAO from "../persistencia/responsavelDAO.js";
+import InterfaceObserver from "./interfaceObserver.js";
 
-export default class Responsavel {
+export default class Responsavel extends InterfaceObserver{
     #codigo;
     #nome;
     #rg;
@@ -10,7 +11,12 @@ export default class Responsavel {
     #celular;
     #alunos = [];
 
+    update(){
+        console.log(`Responsavel ${this.#nome} notificado!`);
+    }
+
     constructor(codigo = 0, nome = '', rg = '', cpf = '', email = '', telefone = '', celular = '', alunos =[]) {
+        super()
         this.#codigo = codigo;
         this.#nome = nome;
         this.#rg = rg;
