@@ -11,19 +11,21 @@ export default class Veiculo extends InterfaceSubject{
     #status
     #listaObservadores
 
-    async registerObserver(){
-
+    async registerObserver(observer,client){
+        await observer.gravar(client)
     }
 
     async removeObserver(){
-
+        await observer.excluir(client)
     }
 
     async notifyObserver(client){
         try{
             this.#listaObservadores = await new VeiculoDAO().consultarObservadores(this.#codigo,client);
-            for(let observador of this.#listaObservadores)
-                observador.update()
+            for(let observador of this.#listaObservadores){
+                let rotas = await new VeiculoDAO().consultarRotaResponsavel(client,observador.codigo,this.#codigo)
+                observador.update(rotas)
+            }
         }catch(erro){
             throw erro
         }

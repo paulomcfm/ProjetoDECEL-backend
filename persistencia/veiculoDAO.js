@@ -116,4 +116,21 @@ export default class VeiculoDAO {
         }
         return null;
     }
+
+
+    async consultarRotaResponsavel(client,observadorCodigo,veic_codigo){
+        const sql = 'SELECT rotas.* FROM rotas INNER JOIN (SELECT inscricoes.rot_codigo FROM inscricoes INNER JOIN (SELECT parentescos.alu_codigo FROM parentescos WHERE resp_codigo = $1) as alun ON inscricoes.alu_codigo = alun.alu_codigo) as rota ON rotas.rot_codigo = rota.rot_codigo'
+        let parametros = [observadorCodigo];
+        const { rows: registros, fields: campos } = await client.query(sql, parametros);
+        let rotas = []
+        for(const registro of registros){
+            if(registro.vei_codigo = veic_codigo)
+                rotas.push({"nome":`${registro.rot_nome}`})
+        }
+
+        return rotas
+    }
+
+
 }
+
