@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import dotenv from 'dotenv';
 import rotaEscola from './rotas/rotaEscola.js';
 import rotaResponsavel from './rotas/rotaResponsavel.js';
 import rotaAluno from './rotas/rotaAluno.js';
@@ -17,6 +18,7 @@ import rotaMonitor from './rotas/rotaMonitor.js';
 import rotaEnviarEmail from './rotas/rotaEnviarEmail.js';
 import rotaManutencao from './rotas/rotaManutencao.js';
 
+dotenv.config();
 const port = process.env.PORT || 8080;
 const app = express();
 app.use(express.json());
