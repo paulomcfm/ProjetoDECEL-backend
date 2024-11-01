@@ -17,6 +17,7 @@ import rotaMonitor from './rotas/rotaMonitor.js';
 import rotaEnviarEmail from './rotas/rotaEnviarEmail.js';
 import rotaManutencao from './rotas/rotaManutencao.js';
 
+const port = process.env.PORT || 3000;
 const app = express();
 const porta = '8080'
 app.use(express.json());
@@ -42,4 +43,8 @@ app.use('/enviar-email',rotaEnviarEmail);
 app.use('/manutencoes', rotaManutencao);
 
 
-app.listen(porta, () => { console.log("servidor iniciado " + porta) });
+app.listen(port, "0.0.0.0", function () {
+    console.log("servidor iniciado " + port)
+});
+//app.listen(porta, () => { console.log("servidor iniciado " + porta) });
+//app.listen(port, "0.0.0.0");
