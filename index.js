@@ -40,9 +40,10 @@ app.use('/inscricoes-rota',rota_Inscricoes_tem_Rotas);
 app.use('/monitor',rotaMonitor);
 app.use('/enviar-email',rotaEnviarEmail);
 app.use('/manutencoes', rotaManutencao);
+app.use('/', (req,res) => { res.send('Ola mundo!') });
 
 
-app.listen(port, "0.0.0.0", function () {
+app.listen(process.env.PORT || 8080, () => {
     console.log("servidor iniciado " + port)
 });
 //app.listen(porta, () => { console.log("servidor iniciado " + porta) });
