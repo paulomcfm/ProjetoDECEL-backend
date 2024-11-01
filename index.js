@@ -19,7 +19,6 @@ import rotaManutencao from './rotas/rotaManutencao.js';
 
 const port = process.env.PORT || 8080;
 const app = express();
-const porta = '8080'
 app.use(express.json());
 app.use(cors({ origin: "*" }));
 
@@ -30,11 +29,9 @@ app.use('/responsavel', rotaResponsavel);
 app.use('/pontos-embarque', rotaPontoEmbarque);
 app.use('/motorista', rotaMotorista);
 app.use('/inscricao-aluno', rotaInscricaoAluno);
-app.use('/motorista', rotaMotorista);
 app.use('/veiculo', rotaVeiculo);
 app.use('/definir-rota', rotaDefRota);
 app.use('/usuario', rotaUsuario);
-app.use('/definir-rota',rotaDefRota);
 app.use('/autenticar', rotaAutenticar);
 app.use('/alocar-alunos',rotaAlocarAlunos);
 app.use('/inscricoes-rota',rota_Inscricoes_tem_Rotas);
