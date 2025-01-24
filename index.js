@@ -46,5 +46,3 @@ app.use('/', (req,res) => { res.send('Ola mundo!') });
 app.listen(process.env.PORT || 8080, () => {
     console.log("servidor iniciado " + port)
 });
-//app.listen(porta, () => { console.log("servidor iniciado " + porta) });
-//app.listen(port, "0.0.0.0");
