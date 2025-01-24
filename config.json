@@ -1,0 +1,13 @@
+{
+    "production": {
+        "username": "postgres",
+        "password": "icojGlxrUqvMfYAzaFuHiqvfHWAkyXIx",
+        "database": "railway",
+        "host": "postgres.railway.internal",
+        "port": "19333",
+        "dialect": "postgres",
+        "define": {
+            "timestamps": true
+        }
+    }
+}
